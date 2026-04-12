@@ -40,9 +40,11 @@ git push origin vehicle/integration # Đẩy nhánh cha lên GitHub
 
 **Cho Thành viên A (Tạo nhánh con từ nhánh cha):**
 ```bash
+git clone git@github.com:PhungMinhPhuc/smart-traffic-simulation.git # Clone dự án về máy
+cd smart-traffic-simulation
 git fetch origin                           # Lấy thông tin các nhánh mới về
 git checkout vehicle/integration           # Sang nhánh cha của nhóm
-git checkout -b vehicle/A/base-logic       # Tạo nhánh con từ nhánh cha
+git checkout -b vehicle/A/base-logic       # Tạo nhánh con từ nhánh cha (A = your name)
 ```
 
 ---
