@@ -3,9 +3,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import node.Node;
+import road.Road;
 
 public class TrafficMap {
     private Map<Integer,ArrayList<Node>> adjacentList = new HashMap<>();
+    private ArrayList<Road> roadList = new ArrayList<Road>();
     
 
     public void addNode(Node n, ArrayList<Node> adjNodes){
