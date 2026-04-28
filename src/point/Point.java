@@ -5,22 +5,31 @@ import java.util.Objects;
 public class Point {
     private double x;
     private double y;
+    private static final double EPS = 1e-6;
 
     public Point(double x, double y) {
         this.x = x;
         this.y = y;
     }
 
+    public boolean isClose(Point other) {
+        return Math.abs(x - other.x) < EPS && Math.abs(y - other.y) < EPS;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        Point point = (Point) o;
-        return Double.compare(x, point.x) == 0 && Double.compare(y, point.y) == 0;
+        Point other = (Point) o;
+        return Double.compare(x, other.x) == 0 && Double.compare(y, other.y) == 0;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(x, y);
+    }
+
+    public Point moveBy(Vector2D vector) {
+        return new Point(x + vector.getX(), y + vector.getY());
     }
 
     public double getX() {
