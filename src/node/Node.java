@@ -1,8 +1,8 @@
 package node;
 
+import generator.IdGenerator;
 import point.Point;
 import road.Lane;
-import road.Road;
 import road.Way;
 
 import java.util.ArrayList;
@@ -10,97 +10,80 @@ import java.util.List;
 import java.util.Objects;
 
 public abstract class Node {
-    private String id;
-    private Point centerPoint;
-    private List<Path> pathList;
-    private List<Point> entryPointList;
-    private List<Point> exitPointList;
-    private List<Road> roadList;
+    protected String id;
+    protected Point centerPoint;
+    protected List<Path> pathList;
+    protected List<Way> entryWayList;
+    protected List<Way> exitWayList;
+    protected int maxConnections;
+    public static int idCounter = 0;
 
-    public Node(String id, Point centerPoint) {
-        this.id = id;
+    public Node(Point centerPoint) {
+        this.id = IdGenerator.NodeId(idCounter++);
         this.centerPoint = centerPoint;
         this.pathList = new ArrayList<>();
-        this.entryPointList = new ArrayList<>();
-        this.exitPointList = new ArrayList<>();
-        this.roadList = new ArrayList<>();
+        this.entryWayList = new ArrayList<>();
+        this.exitWayList = new ArrayList<>();
     }
 
-    // build road connect to other nodes
-    public void addConnection(Node other) {
-        this.roadList.add(new Road(this, other));
-    }
-
-    // build entrys and exits
-    public void buildEntryExitPoint() {
-        entryPointList.clear();
-        exitPointList.clear();
-        for (Road road : roadList) {
-            Way entryWay;
-            Way exitWay;
-            if (road.getStartNode().equals(this)) {
-                entryWay = road.getLeftWay();
-                exitWay = road.getRightWay();
-            } else {
-                entryWay = road.getRightWay();
-                exitWay = road.getLeftWay();
-            }
-            for (Lane lane : exitWay.getLaneList()) {
-                exitPointList.add(lane.getStartPoint());
-            }
-            for (Lane lane : entryWay.getLaneList()) {
-                entryPointList.add(lane.getEndPoint());
+    protected void addPathsBetween(Way entryWay, Way exitWay) {
+        for (Lane entryLane : entryWay.getLaneList()) {
+            for (Lane exitLane : exitWay.getLaneList()) {
+                Path path = new Path(
+                        IdGenerator.PathId(id, pathList.size()),
+                        entryLane.getEndPoint(),
+                        exitLane.getStartPoint()
+                );
+                addPath(path);
             }
         }
     }
 
-    // build all path when create node
-    public void buildPath() {
-        int idx = 0;
-        for (Point entry : entryPointList) {
-            for (Point exit : exitPointList) {
-                Path path =  new Path(String.valueOf(idx), entry, exit, 10);
-                addPath(path);
-                idx++;
+    protected void addPathForEntryWay(Way entryWay) {
+        for (Way exitWay : exitWayList) {
+            addPathsBetween(entryWay, exitWay);
+        }
+    }
+
+    protected void addPathForExitWay(Way exitWay) {
+        for (Way entryWay : entryWayList) {
+            addPathsBetween(entryWay, exitWay);
+        }
+    }
+
+    // Avoid turning back to current road
+    public void addWay(Way entryWay, Way exitWay) {
+        if (entryWayList.size() == maxConnections) {
+            return;
+        }
+        if (entryWayList.contains(entryWay)) {
+            addPathForEntryWay(entryWay);
+            entryWayList.add(entryWay);
+        }
+        if (exitWayList.contains(exitWay)) {
+            addPathForExitWay(exitWay);
+            exitWayList.add(exitWay);
+        }
+    }
+
+    // Build conflict point list after adding a path
+    public void buildConflictPointList(Path currentPath) {
+        for (Path otherPath : pathList) {
+            Point conflictPoint = currentPath.findConflictPoint(otherPath);
+            if (conflictPoint != null) {
+                currentPath.addConflictPoint(otherPath, conflictPoint);
+                otherPath.addConflictPoint(currentPath, conflictPoint);
             }
         }
     }
 
     public void addPath(Path path) {
         pathList.add(path);
+        buildConflictPointList(path);
     }
 
     public void removePath(Path path) {
         pathList.remove(path);
-    }
-
-    // Build conflict point after build path
-    public void buildConflictPoint() {
-
-        for (int i = 0; i < pathList.size(); i++) {
-            Path currentPath = pathList.get(i);
-            for (int j = i+1; j < pathList.size(); j++) {
-                Path otherPath = pathList.get(j);
-                Point conflictPoint = currentPath.findConflictPoint(otherPath);
-
-                // Thêm conflict point vào danh sách của 2 path nếu tồn tại
-                if (conflictPoint != null) {
-                    currentPath.addConflictPoint(otherPath, conflictPoint);
-                    otherPath.addConflictPoint(currentPath, conflictPoint);
-                }
-            }
-        }
-    }
-
-    // Build conflict point when add path
-    public void buildConflictPoint(Path path) {
-        for (Path otherPath : pathList) {
-            Point conflictPoint = path.findConflictPoint(otherPath);
-            if (conflictPoint != null) {
-                otherPath.addConflictPoint(path, conflictPoint);
-                path.addConflictPoint(otherPath, conflictPoint);
-            }
-        }
     }
 
     // override equals  hashCode to use containsKey of Map
@@ -123,6 +106,8 @@ public abstract class Node {
     public void setCenterPoint(Point centerPoint) {
         this.centerPoint = centerPoint;
     }
+
+
 
 
 }

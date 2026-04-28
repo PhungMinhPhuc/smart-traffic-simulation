@@ -3,7 +3,12 @@ package node;
 import point.Point;
 import vehicle.Vehicle;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.HashMap;
+
 
 public class Path {
     private String id;
@@ -11,15 +16,14 @@ public class Path {
     private Point endPoint;
     private List<Vehicle> vehicleList;
     private Map<Path, Point> conflictPointList;
-    private double width;
+    private final double width = 10;
 
-    public Path(String id, Point startPoint, Point endPoint, double width) {
+    public Path(String id, Point startPoint, Point endPoint) {
         this.id = id;
         this.startPoint = startPoint;
         this.endPoint = endPoint;
         this.vehicleList = new ArrayList<>();
         this.conflictPointList= new HashMap<>();
-        this.width = width;
     }
 
     @Override
@@ -62,7 +66,7 @@ public class Path {
             return null;
         }
 
-        // Định thức của mỗi node.Path
+        // Determinant of each Path
         double thisDeterminant = thisStartX * thisEndY - thisStartY * thisEndX;
         double otherDeterminant = otherStartX * otherEndY - otherStartY * otherEndX;
 
