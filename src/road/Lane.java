@@ -1,19 +1,23 @@
 package road;
 
 import point.Point;
+import point.Vector2D;
 import vehicle.Vehicle;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Lane {
-    private String id;
+    private String laneId;
+    private int index;
     private List<Vehicle> vehicleList;
     private Point startPoint;
     private Point endPoint;
 
-    public Lane(String id, Point startPoint, Point endPoint) {
-        this.id = id;
+
+    public Lane(String id, int index, Point startPoint, Point endPoint) {
+        this.laneId = id;
+        this.index = index;
         this.vehicleList = new ArrayList<>();
         this.startPoint = startPoint;
         this.endPoint = endPoint;
@@ -43,7 +47,7 @@ public class Lane {
         this.endPoint = endPoint;
     }
 
-    public String getId() {
-        return id;
+    public int getIndex() {
+        return index;
     }
 }

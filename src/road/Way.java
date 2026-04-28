@@ -1,26 +1,45 @@
 package road;
 
+import generator.IdGenerator;
+import point.Point;
+import point.Vector2D;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Way {
-    private String id;
+    String wayId;
     private TrafficLightState stateTrafficLight;
     private List<Lane> laneList;
+    private Vector2D direction;
+    private final double LANE_WIDTH = 10;
+    private final int LANES_PER_WAY = 3;
 
-    public Way() {
+    public Way(String id, Vector2D direction) {
+        this.wayId = id;
         this.laneList = new ArrayList<>();
-        this.stateTrafficLight = TrafficLightState.RED;
+        this.stateTrafficLight = TrafficLightState.GREEN;
+        this.direction = direction;
     }
 
-    public Way(String id, TrafficLightState stateTrafficLight) {
-        this.id = id;
-        this.stateTrafficLight = stateTrafficLight;
-        this.laneList = new ArrayList<>();
+    public void buildLanes(Point leftStart, Point leftEnd) {
+        Vector2D normalVector = direction.rotateRight90();
+
+        for (int index = 0; index < LANES_PER_WAY; index++) {
+            double offsetValue = (index + 0.5) * LANE_WIDTH;
+            Vector2D offset = normalVector.scale(offsetValue);
+
+            Point laneCenter = leftStart.moveBy(offset);
+            Point laneEnd = leftEnd.moveBy(offset);
+
+            Lane lane = new Lane(IdGenerator.LaneId(wayId, index), index, laneCenter, laneEnd);
+
+            laneList.add(lane);
+        }
     }
 
     public void addLane(Lane lane) {
-        laneList.add(lane);
+        laneList.addLast(lane);
     }
 
     public void removeLane(Lane lane) {
