@@ -1,0 +1,11 @@
+#editingSideBar{
+	-fx-padding: 12;
+	-fx-spacing: 10;
+	-fx-background-color: #ffffff;
+	-fx-border-color: #cccccc;
+}
+
+#MapCanvas{
+	-fx-padding: 12;
+	-fx-background-color: #ffffff;
+}
