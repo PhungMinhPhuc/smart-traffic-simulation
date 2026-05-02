@@ -14,19 +14,19 @@ public class Road {
     public Road(Point2D startPoint, Point2D endPoint, int laneCountPerWay, TrafficLight lightStateRightWay, TrafficLight lightStateLeftWay){
         this.startPoint = startPoint;
         this.endPoint = endPoint;
-        this.rightWay = new Way(lightStateRightWay, laneCountPerWay, true, startPoint, endPoint,id);
-        this.leftWay = new Way(lightStateLeftWay, laneCountPerWay, false, startPoint, endPoint,id);
         this.id = roadQty;
         roadQty++;
+        this.rightWay = new Way(lightStateRightWay, laneCountPerWay, true, startPoint, endPoint,id);
+        this.leftWay = new Way(lightStateLeftWay, laneCountPerWay, false, startPoint, endPoint,id);
     }
 
     public Road(Point2D startPoint, Point2D endPoint){
         this.startPoint = startPoint;
         this.endPoint = endPoint;
-        this.rightWay = new Way(TrafficLight.GREEN, 2, true, startPoint, endPoint, id);
-        this.leftWay = new Way(TrafficLight.GREEN, 2, false, startPoint, endPoint, id);
         this.id = roadQty;
         roadQty++;
+        this.rightWay = new Way(TrafficLight.GREEN, 2, true, startPoint, endPoint, id);
+        this.leftWay = new Way(TrafficLight.GREEN, 2, false, startPoint, endPoint, id);
     }
     
     //Check if this road conflicts with another road (i.e., they intersect)

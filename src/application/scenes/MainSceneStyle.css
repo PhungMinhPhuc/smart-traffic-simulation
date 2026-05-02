@@ -5,7 +5,7 @@
 	-fx-border-color: #cccccc;
 }
 
-#MapCanvas{
-	-fx-padding: 12;
-	-fx-background-color: #ffffff;
+#trafficMapContainer{
+    -fx-min-width: 1000px;
+    -fx-min-height: 1000px;
 }

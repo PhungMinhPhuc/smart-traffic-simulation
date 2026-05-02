@@ -5,7 +5,10 @@ import java.util.Optional;
 
 import items.map.TrafficMap;
 import items.node.*;
+import items.road.Lane;
+import items.road.Road;
 import items.utility.Point2D;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
@@ -35,23 +38,34 @@ public class MainSenceController {
 	@FXML Button removeRoadButton;
 	@FXML Label instructionsLabel; //For displaying instrictions to the user when they are adding or removing nodes and roads
 	@FXML ScrollPane trafficMapContainer;
+
 	
 	@FXML
 	private void initialize() {
+		
 		//Create some initial traffic nodes and roads for testing
-		TrafficNode node1 = new TJunction(new Point2D(400, 400));
-		TrafficNode node2 = new CrossJunction(new Point2D(800, 1000));
-		TrafficNode node3 = new FiveWayJunction(new Point2D(2000, 1600));
-		trafficMap.addNode(node1);
-		trafficMap.addNode(node2);
-		trafficMap.addNode(node3);
-		trafficMap.addConnection(node1, node2);
-		trafficMap.addConnection(node2, node3);
-		trafficMap.addConnection(node3, node1);
+//		TrafficNode node1 = new TJunction(new Point2D(400, 400));
+//		TrafficNode node2 = new CrossJunction(new Point2D(800, 1000));
+//		TrafficNode node3 = new FiveWayJunction(new Point2D(2000, 1600));
+//		trafficMap.addNode(node1);
+//		trafficMap.addNode(node2);
+//		trafficMap.addNode(node3);
+//		trafficMap.addConnection(node1, node2);
+//		trafficMap.addConnection(node2, node3);
+//		trafficMap.addConnection(node3, node1);
 		trafficMapContainer.setContent(trafficMapRenderer.render(trafficMap));
 		
 		//set initial instruction
 		DisplayInstruction("Click the buttons above to add or remove traffic nodes and roads.");
+		
+		//print testing info to console
+//		for(Road roads : trafficMap.getRoadList()) {
+//			System.out.println("Road from (" + roads.getStartPoint().getX() + ", " + roads.getStartPoint().getY() + ") to (" +
+//					roads.getEndPoint().getX() + ", " + roads.getEndPoint().getY() + ")");
+//			System.out.println("Road id:" + roads.getId());
+//			System.out.println("Left lane id:" + roads.getLeftWay().getRoadId());
+//			System.out.println("Right lane id:" + roads.getRightWay().getRoadId());
+//		}
 	}
 	
 	//Helper method to display instructions to the user in the instructions label
@@ -136,7 +150,7 @@ public class MainSenceController {
 		else {
 			trafficMap.addConnection(startNode, endNode);
 			trafficMapContainer.setContent(trafficMapRenderer.render(trafficMap));
-			System.out.println("Road added between node " + startNodeId + " and node " + endNodeId);
+//			System.out.println("Road added between node " + startNodeId + " and node " + endNodeId);
 		}
 	}
 	
