@@ -1,9 +1,9 @@
 package render;
-import items.road.*;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import model.road.*;
 
 public class RoadRenderer implements IRender<Road> {
 	private static WayRenderer wayRenderer = new WayRenderer();

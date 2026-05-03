@@ -3,25 +3,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import items.map.TrafficMap;
-import items.node.*;
-import items.road.Lane;
-import items.road.Road;
-import items.utility.Point2D;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Group;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
+import model.map.TrafficMap;
+import model.node.*;
+import model.utility.TrafficPoint;
 import render.TrafficMapRenderer;
 
 public class MainSenceController {
@@ -44,15 +35,15 @@ public class MainSenceController {
 	private void initialize() {
 		
 		//Create some initial traffic nodes and roads for testing
-//		TrafficNode node1 = new TJunction(new Point2D(400, 400));
-//		TrafficNode node2 = new CrossJunction(new Point2D(800, 1000));
-//		TrafficNode node3 = new FiveWayJunction(new Point2D(2000, 1600));
-//		trafficMap.addNode(node1);
-//		trafficMap.addNode(node2);
-//		trafficMap.addNode(node3);
-//		trafficMap.addConnection(node1, node2);
-//		trafficMap.addConnection(node2, node3);
-//		trafficMap.addConnection(node3, node1);
+		TrafficNode node1 = new Junction(new TrafficPoint(400, 400),5);
+		TrafficNode node2 = new Junction(new TrafficPoint(800, 1000),3);
+		TrafficNode node3 = new Junction(new TrafficPoint(2000, 1600),4);
+		trafficMap.addNode(node1);
+		trafficMap.addNode(node2);
+		trafficMap.addNode(node3);
+		trafficMap.addConnection(node1, node2);
+		trafficMap.addConnection(node2, node3);
+		trafficMap.addConnection(node3, node1);
 		trafficMapContainer.setContent(trafficMapRenderer.render(trafficMap));
 		
 		//set initial instruction
@@ -95,22 +86,22 @@ public class MainSenceController {
 	        //Transform Scene coordinates to Local coordinates of that content
 	        javafx.geometry.Point2D localPoint = content.sceneToLocal(e.getSceneX(), e.getSceneY());
 
-	        //Convert to custom Point2D
-	        Point2D lastClickedPoint = new Point2D(localPoint.getX(), localPoint.getY());
+	        //Convert to custom TrafficPoint
+	        TrafficPoint lastClickedPoint = new TrafficPoint(localPoint.getX(), localPoint.getY());
 
 	        TrafficNode node;
 	        switch (result.get()) {
 	            case "T Junction":
-	                node = new TJunction(lastClickedPoint);
-	                System.out.println("T Junction added at: " + lastClickedPoint.getX() + ", " + lastClickedPoint.getY());
+	                node = new Junction(lastClickedPoint,3);
+//	                System.out.println("T Junction added at: " + lastClickedPoint.getX() + ", " + lastClickedPoint.getY());
 	                break;
 	            case "Cross Junction":
-	                node = new CrossJunction(lastClickedPoint);
-	                System.out.println("Cross Junction added at: " + lastClickedPoint.getX() + ", " + lastClickedPoint.getY());
+	                node = new Junction(lastClickedPoint,4);
+//	                System.out.println("Cross Junction added at: " + lastClickedPoint.getX() + ", " + lastClickedPoint.getY());
 	                break;
 	            case "Five-Way Junction":
-	                node = new FiveWayJunction(lastClickedPoint);
-	                System.out.println("Five-Way Junction added at: " + lastClickedPoint);
+	                node = new Junction(lastClickedPoint,5);
+//	                System.out.println("Five-Way Junction added at: " + lastClickedPoint);
 	                break;
 	            default:
 	                return;
@@ -126,23 +117,23 @@ public class MainSenceController {
 	public void addNewRoad(ActionEvent event) {
 		
 		//Dialogs to select start and end nodes for the new road
-		int startNodeId;
-		int endNodeId;
-		ChoiceDialog<Integer> startNodeDialog = new ChoiceDialog<>(-1, trafficMap.getTrafficNodeList().stream().map(TrafficNode::getId).toList());
-		ChoiceDialog<Integer> endNodeDialog = new ChoiceDialog<>(-1, trafficMap.getTrafficNodeList().stream().map(TrafficNode::getId).toList());
+		String startNodeId;
+		String endNodeId;
+		ChoiceDialog<String> startNodeDialog = new ChoiceDialog<>("", trafficMap.getTrafficNodeList().stream().map(TrafficNode::getId).toList());
+		ChoiceDialog<String> endNodeDialog = new ChoiceDialog<>("", trafficMap.getTrafficNodeList().stream().map(TrafficNode::getId).toList());
 		startNodeDialog.setTitle("Select Start Node");
 		startNodeDialog.setHeaderText("Choose the start node for the new road");
-		startNodeId = startNodeDialog.showAndWait().orElse(-1);
+		startNodeId = startNodeDialog.showAndWait().orElse("");
 		endNodeDialog.setTitle("Select End Node");
 		endNodeDialog.setHeaderText("Choose the end node for the new road");
-		endNodeId = endNodeDialog.showAndWait().orElse(-1);
+		endNodeId = endNodeDialog.showAndWait().orElse("");
 		
-		if(startNodeId == -1 || endNodeId == -1) {
+		if(startNodeId.isEmpty() || endNodeId.isEmpty()) {
 			return; //user cancelled
 		}
 		
-		TrafficNode startNode = trafficMap.getTrafficNodeList().stream().filter(node -> node.getId() == startNodeId).findFirst().orElse(null);
-		TrafficNode endNode = trafficMap.getTrafficNodeList().stream().filter(node -> node.getId() == endNodeId).findFirst().orElse(null);
+		TrafficNode startNode = trafficMap.getTrafficNodeList().stream().filter(node -> node.getId().equals(startNodeId)).findFirst().orElse(null);
+		TrafficNode endNode = trafficMap.getTrafficNodeList().stream().filter(node -> node.getId().equals(endNodeId)).findFirst().orElse(null);
 		if(startNode == null || endNode == null) {
 			DisplayInstruction("Invalid node selection. Please try again.");
 			return;
@@ -155,12 +146,12 @@ public class MainSenceController {
 	}
 	
 	public void removeNode(ActionEvent event) {
-		int removeNodeId;
-		ChoiceDialog<Integer> removeNodeDialog = new ChoiceDialog<>(-1, trafficMap.getTrafficNodeList().stream().map(TrafficNode::getId).toList());
+		String removeNodeId;
+		ChoiceDialog<String> removeNodeDialog = new ChoiceDialog<>("", trafficMap.getTrafficNodeList().stream().map(TrafficNode::getId).toList());
 		removeNodeDialog.setTitle("Select Node to Remove");
 		removeNodeDialog.setHeaderText("Choose the traffic node to remove");
-		removeNodeId = removeNodeDialog.showAndWait().orElse(-1);
-		if(removeNodeId == -1) {
+		removeNodeId = removeNodeDialog.showAndWait().orElse("");
+		if(removeNodeId.isEmpty()) {
 			return; //user cancelled
 		}
 		trafficMap.removeNode(removeNodeId);

@@ -1,15 +1,18 @@
-package items.map;
+package model.map;
 import java.util.HashMap;
 import java.util.Map;
+
+import config.Constants;
+import model.node.TrafficNode;
+import model.road.Road;
+import model.utility.TrafficPoint;
+import model.utility.TrafficVector;
+
 import java.util.ArrayList;
-import items.node.TrafficNode;
-import items.road.Road;
-import items.utility.Point2D;
-import items.utility.Vector2D;
 
 
 public class TrafficMap {
-    private Map<Integer,ArrayList<TrafficNode>> adjacentList = new HashMap<>();
+    private Map<String,ArrayList<TrafficNode>> adjacentList = new HashMap<>();
     private ArrayList<Road> roadList = new ArrayList<Road>();
     private ArrayList<TrafficNode> trafficNodeList = new ArrayList<TrafficNode>();
     
@@ -28,11 +31,10 @@ public class TrafficMap {
         //check if both nodes exist in the map, if they do, add the connection between them, otherwise print an error message
         if(adjacentList.containsKey(startNode.getId()) && adjacentList.containsKey(endNode.getId())){
 
-
             //create new road between the two nodes and add it to the road list
-            Vector2D directionVector = new Vector2D(startNode.getCenterPoint(), endNode.getCenterPoint());
-            Point2D roadStartPoint = directionVector.translatePoint(startNode.getCenterPoint(),startNode.getRadius());
-            Point2D roadEndPoint = directionVector.translatePoint(endNode.getCenterPoint(),-endNode.getRadius());
+            TrafficVector directionVector = new TrafficVector(startNode.getCenterPoint(), endNode.getCenterPoint());
+            TrafficPoint roadStartPoint = directionVector.translatePoint(startNode.getCenterPoint(),Constants.JUNCTION_RADIUS);
+            TrafficPoint roadEndPoint = directionVector.translatePoint(endNode.getCenterPoint(),-Constants.JUNCTION_RADIUS);
             Road newRoad = new Road(roadStartPoint, roadEndPoint); //Use the constructor with default lane count and traffic light state
             
             //check collision between the new road and existing roads, if there is a collision, print an error message and do not add the connection
@@ -60,11 +62,11 @@ public class TrafficMap {
         }
     }
 
-    public void removeNode(int nodeId){
+    public void removeNode(String nodeId){
         if(adjacentList.containsKey(nodeId)){
             TrafficNode nodeRemove = null;
             for(TrafficNode trafficNode : trafficNodeList){ //find the node with the given id in the node list
-                if(trafficNode.getId() == nodeId){
+                if(trafficNode.getId().equals(nodeId)){
                     nodeRemove = trafficNode;
                     trafficNodeList.remove(trafficNode);
                     break;

@@ -1,20 +1,20 @@
-package items.utility;
+package model.utility;
 
-public class Point2D {
+public class TrafficPoint {
 
 	private double x;
 	private double y;
 	
-	public Point2D(double x, double y) {
+	public TrafficPoint(double x, double y) {
 		this.x = x;
 		this.y = y;
 	}
 	
-	public Point2D clone() {
-		return new Point2D(this.x, this.y);
+	public TrafficPoint clone() {
+		return new TrafficPoint(this.x, this.y);
 	}
 	
-	public double distance(Point2D other) {
+	public double distance(TrafficPoint other) {
 		double dx = this.x - other.x;
 		double dy = this.y - other.y;
 		return Math.sqrt(dx * dx + dy * dy);

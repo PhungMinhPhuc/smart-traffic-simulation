@@ -1,13 +1,13 @@
 package render;
-import items.road.Lane;
-import items.road.Way;
-import items.road.Light.TrafficLight;
+import config.Constants;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
-import items.utility.*;
-//import javafx.scene.shape.Line;
+import model.road.Lane;
+import model.road.Way;
+import model.traffic.LightState;
+import model.utility.*;
 
 
 public class WayRenderer implements IRender<Way> {
@@ -25,11 +25,11 @@ public class WayRenderer implements IRender<Way> {
 			 Lane currentLane = way.getLaneList().get(i);
 			 Lane nextLane = way.getLaneList().get(i + 1);
 			 
-			 Point2D dividerStartPoint = new Point2D(
+			 TrafficPoint dividerStartPoint = new TrafficPoint(
 					 (currentLane.getStartPoint().getX() + nextLane.getStartPoint().getX()) / 2.0,
 					 (currentLane.getStartPoint().getY() + nextLane.getStartPoint().getY()) / 2.0
 					 );
-			 Point2D dividerEndPoint = new Point2D(
+			 TrafficPoint dividerEndPoint = new TrafficPoint(
 					 (currentLane.getEndPoint().getX() + nextLane.getEndPoint().getX()) / 2.0,
 					 (currentLane.getEndPoint().getY() + nextLane.getEndPoint().getY()) / 2.0
 					 );
@@ -47,16 +47,16 @@ public class WayRenderer implements IRender<Way> {
 		 
 		 
 		// Render the traffic light as a perpendicular line centered at the lane end point.
-		Point2D firstLaneEndPoint = way.getLaneList().getFirst().getEndPoint();
-		Point2D lastLaneEndPoint = way.getLaneList().getLast().getEndPoint();
+		TrafficPoint firstLaneEndPoint = way.getLaneList().getFirst().getEndPoint();
+		TrafficPoint lastLaneEndPoint = way.getLaneList().getLast().getEndPoint();
 		
-		Vector2D lightVector = new Vector2D(firstLaneEndPoint, lastLaneEndPoint);
-		firstLaneEndPoint = lightVector.translatePoint(firstLaneEndPoint, -Lane.LANEWIDTH / 2.0);
-		lastLaneEndPoint = lightVector.translatePoint(lastLaneEndPoint, Lane.LANEWIDTH /2.0);
+		TrafficVector lightVector = new TrafficVector(firstLaneEndPoint, lastLaneEndPoint);
+		firstLaneEndPoint = lightVector.translatePoint(firstLaneEndPoint, -Constants.LANE_WIDTH / 2.0);
+		lastLaneEndPoint = lightVector.translatePoint(lastLaneEndPoint, Constants.LANE_WIDTH /2.0);
 		
 		Line lightLine = new Line(firstLaneEndPoint.getX(), firstLaneEndPoint.getY(), lastLaneEndPoint.getX(), lastLaneEndPoint.getY());
 		lightLine.setStrokeWidth(2.0);
-		lightLine.setStroke(way.getStateTrafficLight() == TrafficLight.RED ? Color.RED : Color.LIMEGREEN);
+		lightLine.setStroke(way.getStateTrafficLight() == LightState.RED ? Color.RED : Color.LIMEGREEN);
 		wayGroup.getChildren().add(lightLine);
 		
 		return wayGroup;

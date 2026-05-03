@@ -1,34 +1,32 @@
-package items.node;
+package model.node;
 
 import java.util.ArrayList;
+import model.utility.TrafficPoint;
+import model.vehicle.Vehicle;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import items.utility.Point2D;
-import items.vehicle.Vehicle;
-
 public class Path {
-    private Point2D startPoint;
-    private Point2D endPoint;      
-    private Map<Path, Point2D> conflictPointList = new HashMap<Path, Point2D>(); //the key is the path that has conflict with this path, the value is the conflict point of the two paths
+    private TrafficPoint startPoint;
+    private TrafficPoint endPoint;      
+    private Map<Path, TrafficPoint> conflictPointList = new HashMap<Path, TrafficPoint>(); //the key is the path that has conflict with this path, the value is the conflict point of the two paths
     private ArrayList<Vehicle> vehicleList = new ArrayList<Vehicle>();
-    private int id;
-    private static int pathQty = 0;
+    private String id;
 
-    public Path(Point2D startPoint, Point2D endPoint){
+    public Path(String id,TrafficPoint startPoint, TrafficPoint endPoint){
         this.startPoint = startPoint.clone();
         this.endPoint = endPoint.clone();
-        id = pathQty;
-        pathQty++;
+        this.id = id;
     }
 
 
-	public Point2D findConflictPoint(Path otherPath) {
+	public TrafficPoint findConflictPoint(Path otherPath) {
         // Calculate conflict point using Cramer
-        Point2D thisStart = this.getStartPoint();
-        Point2D thisEnd = this.getEndPoint();
-        Point2D otherStart = otherPath.getStartPoint();
-        Point2D otherEnd = otherPath.getEndPoint();
+        TrafficPoint thisStart = this.getStartPoint();
+        TrafficPoint thisEnd = this.getEndPoint();
+        TrafficPoint otherStart = otherPath.getStartPoint();
+        TrafficPoint otherEnd = otherPath.getEndPoint();
 
         double thisStartX = thisStart.getX();
         double thisStartY = thisStart.getY();
@@ -62,7 +60,7 @@ public class Path {
         boolean isOnOtherPath = isPointOnSegment(conflictPointX, conflictPointY, otherStartX, otherStartY, otherEndX, otherEndY);
 
         if (isOnThisPath && isOnOtherPath) {
-            return new Point2D(conflictPointX, conflictPointY);
+            return new TrafficPoint(conflictPointX, conflictPointY);
         }
 
         return null;
@@ -79,7 +77,7 @@ public class Path {
         return pointX >= minX && pointX <= maxX && pointY >= minY && pointY <= maxY;
     }
 
-    public void addConflictPoint(Path otherPath, Point2D conflictPoint) {
+    public void addConflictPoint(Path otherPath, TrafficPoint conflictPoint) {
         conflictPointList.put(otherPath, conflictPoint);
     }
 
@@ -97,23 +95,23 @@ public class Path {
         }
     }
 
-    public Point2D getStartPoint() {
+    public TrafficPoint getStartPoint() {
         return startPoint;
     }
 
-    public void setStartPoint(Point2D startPoint) {
+    public void setStartPoint(TrafficPoint startPoint) {
         this.startPoint = startPoint;
     }
 
-    public Point2D getEndPoint() {
+    public TrafficPoint getEndPoint() {
         return endPoint;
     }
 
-    public void setEndPoint(Point2D endPoint) {
+    public void setEndPoint(TrafficPoint endPoint) {
         this.endPoint = endPoint;
     }
 
-    public int getId(){
+    public String getId(){
         return id;
     }
 }

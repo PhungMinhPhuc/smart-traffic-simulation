@@ -1,9 +1,9 @@
 package render;
-import items.map.*;
-import items.node.*;
-import items.road.*;
 import javafx.scene.Group;
 import javafx.scene.Parent;
+import model.map.*;
+import model.node.*;
+import model.road.*;
 
 public class TrafficMapRenderer implements IRender<TrafficMap> {
 	private static RoadRenderer roadRenderer = new RoadRenderer();

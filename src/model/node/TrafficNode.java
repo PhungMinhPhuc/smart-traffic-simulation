@@ -1,34 +1,27 @@
-package items.node;
+package model.node;
 
 import java.util.ArrayList;
-import items.road.Road;
-import items.road.Way;
-import items.utility.Point2D;
-import items.road.Lane;
+import generator.IdGenerator;
+import model.road.Lane;
+import model.road.Road;
+import model.road.Way;
+import model.utility.TrafficPoint;
 
 public abstract class TrafficNode {
-    protected Point2D centerPoint;
+    protected TrafficPoint centerPoint;
     protected ArrayList<Path> pathList = new ArrayList<Path>();
     protected ArrayList<Road> roadList = new ArrayList<Road>();
-    protected ArrayList<Point2D> entryPointList = new ArrayList<Point2D>();
-    protected ArrayList<Point2D> exitPointList = new ArrayList<Point2D>();
-    protected int id;
-    protected static int nodeQty = 0; 
-    protected double radius;
+    protected String id;
 
-    public TrafficNode(Point2D point){
-        centerPoint = (Point2D)point.clone();
-        id = nodeQty;
-        nodeQty++;
+    public TrafficNode(TrafficPoint point){
+        centerPoint = (TrafficPoint)point.clone();
+        id = IdGenerator.nodeId();
     }
 
     //build the node from the road list, this method will be called after the road list is updated
     public void buildNode(){
         pathList.clear();
-        entryPointList.clear();
-        exitPointList.clear();
         buildAllPaths();
-        buildAllEntryExitPoint();
         buildAllConflictPoints();
     }
 
@@ -38,9 +31,9 @@ public abstract class TrafficNode {
         buildNode();
     }
 
-    public void removeRoad(int roadId){
+    public void removeRoad(String roadId){
         for(Road road : roadList){
-            if(road.getId() == roadId){
+            if(road.getId().equals(roadId)){
                 roadList.remove(road);
                 buildNode(); //if the road is removed, the node need to be built again
                 return;
@@ -72,7 +65,10 @@ public abstract class TrafficNode {
                     if(entryWay.getRoadId() != exitWay.getRoadId()){
                         for(Lane entryLane : entryWay.getLaneList()){
                             for(Lane exitLane : exitWay.getLaneList()){
-                                Path path = new Path(entryLane.getEndPoint(), exitLane.getStartPoint());
+                                Path path = new Path(
+                                		IdGenerator.pathId(id,pathList.size()),
+                                		entryLane.getEndPoint(), 
+                                		exitLane.getStartPoint());
                                 pathList.add(path);
                             }
                         }
@@ -88,7 +84,7 @@ public abstract class TrafficNode {
             for(int j = i + 1; j < length; j++){
                 Path path1 = pathList.get(i);
                 Path path2 = pathList.get(j);
-                Point2D conflictPoint = path1.findConflictPoint(path2);
+                TrafficPoint conflictPoint = path1.findConflictPoint(path2);
                 if(conflictPoint != null){
                     path1.addConflictPoint(path2, conflictPoint);
                     path2.addConflictPoint(path1, conflictPoint);
@@ -96,22 +92,14 @@ public abstract class TrafficNode {
             }
         }
     }
+  
 
-    public void buildAllEntryExitPoint(){
-        for(Path path : pathList){
-            entryPointList.add(path.getStartPoint());
-            exitPointList.add(path.getEndPoint());
-        }
-    }
-    
-    abstract public double getRadius();
-
-    public Point2D getCenterPoint() {
+    public TrafficPoint getCenterPoint() {
         return centerPoint;
     }
 
-    public void setCenterPoint(Point2D centerPoint) {
-        this.centerPoint = (Point2D)centerPoint.clone();
+    public void setCenterPoint(TrafficPoint centerPoint) {
+        this.centerPoint = (TrafficPoint)centerPoint.clone();
     }
 
     public ArrayList<Path> getPathList() {
@@ -122,7 +110,7 @@ public abstract class TrafficNode {
         return roadList;
     }
 
-    public int getId(){
+    public String getId(){
         return id;
     }
 }

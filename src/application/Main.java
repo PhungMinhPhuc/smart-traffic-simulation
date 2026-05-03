@@ -3,16 +3,8 @@ package application;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
-import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import render.*;
-import items.road.*;
-import items.utility.*;
-import items.map.*;
-import items.node.*;
-import items.vehicle.*;
 
 
 public class Main extends Application {

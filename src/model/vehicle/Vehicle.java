@@ -1,4 +1,4 @@
-package items.vehicle;
+package model.vehicle;
 
 public class Vehicle {
 	private int id;

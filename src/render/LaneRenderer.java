@@ -1,10 +1,11 @@
 package render;
 
-import items.road.Lane;
+import config.Constants;
 import javafx.scene.Parent;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import model.road.Lane;
 
 public class LaneRenderer implements IRender<Lane> {
 
@@ -14,7 +15,7 @@ public class LaneRenderer implements IRender<Lane> {
 				lane.getStartPoint().getX(), lane.getStartPoint().getY(),
 			lane.getEndPoint().getX(), lane.getEndPoint().getY()
 		);
-		laneLine.setStrokeWidth(Lane.LANEWIDTH);
+		laneLine.setStrokeWidth(Constants.LANE_WIDTH);
 		laneLine.setStroke(Color.GRAY);
 		Group laneGroup = new Group();	
 		laneGroup.getChildren().add(laneLine);
