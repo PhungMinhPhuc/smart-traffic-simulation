@@ -56,12 +56,18 @@ public abstract class Node {
         if (entryWayList.size() == maxConnections) {
             return;
         }
-        if (entryWayList.contains(entryWay)) {
+
+        if (!entryWayList.contains(entryWay)) {
             addPathForEntryWay(entryWay);
+        }
+        if (!exitWayList.contains(exitWay)) {
+            addPathForExitWay(exitWay);
+        }
+
+        if (!entryWayList.contains(entryWay)) {
             entryWayList.add(entryWay);
         }
-        if (exitWayList.contains(exitWay)) {
-            addPathForExitWay(exitWay);
+        if (!exitWayList.contains(exitWay)) {
             exitWayList.add(exitWay);
         }
     }
