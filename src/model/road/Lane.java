@@ -1,5 +1,6 @@
-package model.map;
+package model.road;
 
+import model.utility.TrafficPoint;
 import model.vehicle.Vehicle;
 import java.util.ArrayList;
 import java.util.List;

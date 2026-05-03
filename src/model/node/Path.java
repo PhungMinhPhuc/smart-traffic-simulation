@@ -1,6 +1,6 @@
 package model.node;
 
-import model.map.*;
+import model.utility.TrafficPoint;
 import model.vehicle.Vehicle;
 import java.util.HashMap;
 import java.util.Map;

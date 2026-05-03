@@ -1,9 +1,9 @@
 package model.vehicle;
 
 import generator.IdGenerator;
-import model.map.TrafficPoint;
-import model.map.Lane;
 import model.node.Path;
+import model.road.Lane;
+import model.utility.TrafficPoint;
 // import model.map.Vector2D;
 import model.vehicle.behavior.DriverBehavior;
 

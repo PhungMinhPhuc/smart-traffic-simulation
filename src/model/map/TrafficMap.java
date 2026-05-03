@@ -1,12 +1,13 @@
 package model.map;
 
-import model.node.Node;
+import model.node.TrafficNode;
+import model.road.Road;
 import model.node.Junction;
 import model.vehicle.Vehicle;
 import java.util.*; 
 
 public class TrafficMap {
-    private Map<Node, List<Road>> adjacencyList;
+    private Map<TrafficNode, List<Road>> adjacencyList;
     private List<Vehicle> vehicles;
     private List<Road> allRoads; 
 
@@ -17,13 +18,13 @@ public class TrafficMap {
     }
 
     // If the node isn't in the list, add it with an empty list of roads
-    public void addNode(Node node) {
+    public void addNode(TrafficNode node) {
         adjacencyList.putIfAbsent(node, new ArrayList<>());
     }
 
     public void addRoad(Road road) {
-        Node start = road.getStartNode();
-        Node end = road.getEndNode();
+        TrafficNode start = road.getStartNode();
+        TrafficNode end = road.getEndNode();
         addNode(start);
         addNode(end);
         adjacencyList.get(start).add(road);
@@ -47,7 +48,7 @@ public class TrafficMap {
     }
 
     // Find all roads connected to a specific node
-    public List<Road> getConnectedRoads(Node node) {
+    public List<Road> getConnectedRoads(TrafficNode node) {
         return adjacencyList.getOrDefault(node, new ArrayList<>());
     }
 
@@ -57,7 +58,7 @@ public class TrafficMap {
 
     public void update(double deltaTime) {
         // Update Junctions (Traffic Lights)
-        for (Node node : adjacencyList.keySet()) {
+        for (TrafficNode node : adjacencyList.keySet()) {
             if (node instanceof Junction) {
                 ((Junction) node).update(deltaTime);
             }
@@ -75,9 +76,9 @@ public class TrafficMap {
         }
     }
 
-    public Node findNodeAt(model.map.TrafficPoint p, double threshold) {
+    public TrafficNode findNodeAt(model.utility.TrafficPoint p, double threshold) {
     // Iterate through all nodes (keys in the adjacency list)
-        for (Node node : adjacencyList.keySet()) {
+        for (TrafficNode node : adjacencyList.keySet()) {
             if (node.getCenterPoint().distanceTo(p) < threshold) {
                 return node;
             }
@@ -86,11 +87,11 @@ public class TrafficMap {
     }
     
     // Getters and Setters
-    public Map<Node, List<Road>> getAdjacencyList() {
+    public Map<TrafficNode, List<Road>> getAdjacencyList() {
         return adjacencyList;
     }
 
-    public void setAdjacencyList(Map<Node, List<Road>> adjacencyList) {
+    public void setAdjacencyList(Map<TrafficNode, List<Road>> adjacencyList) {
         this.adjacencyList = adjacencyList;
     }
 

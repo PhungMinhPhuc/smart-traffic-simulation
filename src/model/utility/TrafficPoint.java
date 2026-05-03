@@ -1,4 +1,4 @@
-package model.map;
+package model.utility;
 
 import java.util.Objects;
 import config.Constants;
@@ -13,13 +13,13 @@ public class TrafficPoint {
     }
 
     // Point + Vector = New Point
-    public TrafficPoint add(Vector2D v) {
+    public TrafficPoint add(TrafficVector v) {
         return new TrafficPoint(this.x + v.dx, this.y + v.dy);
     }
 
     // Point - Point = Vector
-    public Vector2D subtract(TrafficPoint other) {
-        return new Vector2D(this.x - other.x, this.y - other.y);
+    public TrafficVector subtract(TrafficPoint other) {
+        return new TrafficVector(this.x - other.x, this.y - other.y);
     }
 
     // Calculate the distance to another point (collision + distance keeping)

@@ -1,10 +1,9 @@
 package model.node;
 
-import model.map.TrafficPoint;
-import model.map.Road;
-import model.map.Way;
-// import model.node.Path;
-import model.map.Lane;
+import model.road.Lane;
+import model.road.Road;
+import model.road.Way;
+import model.utility.TrafficPoint;
 import config.Constants;
 
 import java.util.ArrayList;
@@ -12,7 +11,7 @@ import java.util.List;
 import java.util.Objects;
 
 
-public abstract class Node {
+public abstract class TrafficNode {
     protected String id;
     protected TrafficPoint centerPoint;
     protected List<Road> roadList;
@@ -20,7 +19,7 @@ public abstract class Node {
     protected List<TrafficPoint> entryPoints; // Points where vehicles enter the junction from a Road
     protected List<TrafficPoint> exitPoints; // Points where vehicles leave the junction to enter a Road
 
-    public Node(String id, TrafficPoint centerPoint) {
+    public TrafficNode(String id, TrafficPoint centerPoint) {
         this.id = id;
         this.centerPoint = centerPoint;
         this.roadList = new ArrayList<>();
@@ -146,8 +145,8 @@ public abstract class Node {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Node)) return false;
-        Node node = (Node) o;
+        if (!(o instanceof TrafficNode)) return false;
+        TrafficNode node = (TrafficNode) o;
         return Objects.equals(id, node.id);
     }
 

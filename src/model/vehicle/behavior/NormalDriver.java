@@ -1,8 +1,8 @@
 package model.vehicle.behavior;
 
 import model.vehicle.Vehicle;
+import model.road.Lane;
 import model.traffic.LightState;
-import model.map.Lane;
 
 public class NormalDriver implements DriverBehavior {
     private final double SAFE_TIME_GAP = 1.5; // Seconds of gap to the car ahead

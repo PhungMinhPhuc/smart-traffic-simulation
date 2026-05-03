@@ -1,11 +1,11 @@
-package model.map;
+package model.utility;
 
 import config.Constants;
 
-public class Vector2D {
+public class TrafficVector {
     public double dx, dy;
 
-    public Vector2D(double dx, double dy) {
+    public TrafficVector(double dx, double dy) {
         this.dx = dx;
         this.dy = dy;
     }
@@ -14,17 +14,17 @@ public class Vector2D {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
-    public Vector2D normalize() {
+    public TrafficVector normalize() {
         double len = length();
-        if (len < Constants.EPS) return new Vector2D(0, 0);
-        return new Vector2D(dx / len, dy / len);
+        if (len < Constants.EPS) return new TrafficVector(0, 0);
+        return new TrafficVector(dx / len, dy / len);
     }
 
-    public Vector2D multiply(double scalar) {
-        return new Vector2D(dx * scalar, dy * scalar);
+    public TrafficVector multiply(double scalar) {
+        return new TrafficVector(dx * scalar, dy * scalar);
     }
 
-    public Vector2D getPerpendicular() {
-        return new Vector2D(-dy, dx);
+    public TrafficVector getPerpendicular() {
+        return new TrafficVector(-dy, dx);
     }
 }

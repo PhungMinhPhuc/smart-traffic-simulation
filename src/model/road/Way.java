@@ -1,7 +1,10 @@
-package model.map;
+package model.road;
 
 import model.traffic.LightState;
 import model.traffic.TrafficLight;
+import model.utility.TrafficPoint;
+import model.utility.TrafficVector;
+
 import java.util.ArrayList;
 import java.util.List;
 import config.Constants;
@@ -25,12 +28,12 @@ public class Way {
 
     // Generates parallel lanes using perpendicular vector offsets. Lanes are indexed from 0 (innermost/left) to n-1 (outermost/right).
     public void generateLanes(int numberOfLanes) {
-        Vector2D direction = endPoint.subtract(startPoint);
-        Vector2D normal = direction.getPerpendicular().normalize();
+        TrafficVector direction = endPoint.subtract(startPoint);
+        TrafficVector normal = direction.getPerpendicular().normalize();
         for (int i = 0; i < numberOfLanes; i++) {
             // Calculate the offset for the center of this specific lane. Formula: (i + 0.5) * width ensures the first lane is shifted by half-width
             double offsetDist = (i + 0.5) * Constants.LANE_WIDTH;
-            Vector2D offsetVector = normal.multiply(offsetDist);
+            TrafficVector offsetVector = normal.multiply(offsetDist);
 
             // Shift both start and end points to create a parallel line
             TrafficPoint laneStart = startPoint.add(offsetVector);

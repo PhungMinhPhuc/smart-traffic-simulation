@@ -1,13 +1,13 @@
 package model.node;
 
-import model.map.TrafficPoint;
-import model.map.Road;
-import model.map.Way;
 import model.traffic.TrafficLight;
+import model.utility.TrafficPoint;
+import model.road.Road;
+import model.road.Way;
 import model.traffic.LightState;
 import config.Constants;
 
-public class Junction extends Node {
+public class Junction extends TrafficNode {
     
     private int currentGreenRoadIndex = 0;
     private double timer = 0;
