@@ -1,11 +1,12 @@
 package point;
 
+import config.Constants;
+
 import java.util.Objects;
 
 public class TrafficPoint {
     private double x;
     private double y;
-    private static final double EPS = 1e-6;
 
     public TrafficPoint(double x, double y) {
         this.x = x;
@@ -13,7 +14,7 @@ public class TrafficPoint {
     }
 
     public boolean isClose(TrafficPoint other) {
-        return Math.abs(x - other.x) < EPS && Math.abs(y - other.y) < EPS;
+        return Math.abs(x - other.x) < Constants.EPS && Math.abs(y - other.y) < Constants.EPS;
     }
 
     @Override

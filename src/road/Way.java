@@ -3,6 +3,7 @@ package road;
 import generator.IdGenerator;
 import point.TrafficPoint;
 import point.TrafficVector;
+import config.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +13,6 @@ public class Way {
     private TrafficLightState stateTrafficLight;
     private List<Lane> laneList;
     private TrafficVector direction;
-    private final double LANE_WIDTH = 10;
-    private final int LANES_PER_WAY = 3;
 
     public Way(String id, TrafficVector direction) {
         this.wayId = id;
@@ -25,8 +24,8 @@ public class Way {
     public void buildLanes(TrafficPoint leftStart, TrafficPoint leftEnd) {
         TrafficVector normalVector = direction.rotateRight90();
 
-        for (int index = 0; index < LANES_PER_WAY; index++) {
-            double offsetValue = (index + 0.5) * LANE_WIDTH;
+        for (int index = 0; index < Constants.LANES_PER_WAY; index++) {
+            double offsetValue = (index + 0.5) * Constants.LANE_WIDTH;
             TrafficVector offset = normalVector.scale(offsetValue);
 
             TrafficPoint laneCenter = leftStart.moveBy(offset);

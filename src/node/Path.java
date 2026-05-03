@@ -2,6 +2,7 @@ package node;
 
 import point.TrafficPoint;
 import vehicle.Vehicle;
+import config.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,6 @@ public class Path {
     private TrafficPoint endPoint;
     private List<Vehicle> vehicleList;
     private Map<Path, TrafficPoint> conflictPointList;
-    private final double width = 10;
 
     public Path(String id, TrafficPoint startPoint, TrafficPoint endPoint) {
         this.id = id;
@@ -62,7 +62,7 @@ public class Path {
         // Main determinant
         double determinant = (thisStartX - thisEndX) * (otherStartY - otherEndY) - (thisStartY - thisEndY) * (otherStartX - otherEndX);
 
-        if (Math.abs(determinant) < 1e-9) {
+        if (Math.abs(determinant) < Constants.EPS) {
             return null;
         }
 
@@ -88,12 +88,10 @@ public class Path {
     }
 
     private boolean isPointOnSegment(double pointX, double pointY, double startX, double startY, double endX, double endY) {
-        double epsilon = 1e-9;
-
-        double minX = Math.min(startX, endX) - epsilon;
-        double maxX = Math.max(startX, endX) + epsilon;
-        double minY = Math.min(startY, endY) - epsilon;
-        double maxY = Math.max(startY, endY) + epsilon;
+        double minX = Math.min(startX, endX) - Constants.EPS;
+        double maxX = Math.max(startX, endX) + Constants.EPS;
+        double minY = Math.min(startY, endY) - Constants.EPS;
+        double maxY = Math.max(startY, endY) + Constants.EPS;
 
         return pointX >= minX && pointX <= maxX && pointY >= minY && pointY <= maxY;
     }
@@ -130,7 +128,4 @@ public class Path {
         this.endPoint = endPoint;
     }
 
-    public double getWidth() {
-        return width;
-    }
 }
