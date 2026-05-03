@@ -1,6 +1,6 @@
 package node;
 
-import point.TrafficPoint;
+import utility.TrafficPoint;
 import vehicle.Vehicle;
 import config.Constants;
 

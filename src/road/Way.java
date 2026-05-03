@@ -1,8 +1,8 @@
 package road;
 
 import generator.IdGenerator;
-import point.TrafficPoint;
-import point.TrafficVector;
+import utility.TrafficPoint;
+import utility.TrafficVector;
 import config.Constants;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class Way {
     }
 
     public void buildLanes(TrafficPoint leftStart, TrafficPoint leftEnd) {
-        TrafficVector normalVector = direction.rotateRight90();
+        TrafficVector normalVector = direction.rotateVector(-Math.PI/2);
 
         for (int index = 0; index < Constants.LANES_PER_WAY; index++) {
             double offsetValue = (index + 0.5) * Constants.LANE_WIDTH;

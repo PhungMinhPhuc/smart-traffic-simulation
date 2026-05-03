@@ -1,7 +1,7 @@
 package node;
 
 import generator.IdGenerator;
-import point.TrafficPoint;
+import utility.TrafficPoint;
 import road.Lane;
 import road.Way;
 

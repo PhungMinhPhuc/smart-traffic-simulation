@@ -1,4 +1,4 @@
-package point;
+package utility;
 
 public class TrafficVector {
     private  double x;
@@ -9,9 +9,8 @@ public class TrafficVector {
         this.y = y;
     }
 
-    // Create vector from 2 points
-    public static TrafficVector fromPoints(TrafficPoint start, TrafficPoint end) {
-        return new TrafficVector(end.getX() - start.getX(), end.getY() - start.getY());
+    public TrafficVector (TrafficPoint start, TrafficPoint end) {
+        this(end.getX() - start.getX(), end.getY() - start.getY());
     }
 
     public double length() {
@@ -30,14 +29,12 @@ public class TrafficVector {
         return new TrafficVector(x * scale, y * scale);
     }
 
-    // Rotate 90 degrees to the right
-    public TrafficVector rotateRight90() {
-        return new TrafficVector(y, -x);
-    }
-
-    // Rotate 180 degrees
-    public TrafficVector rotate180() {
-        return new TrafficVector(-x, -y);
+    public TrafficVector rotateVector(double radianAngle) {
+        double cosAngle = Math.cos(radianAngle);
+        double sinAngle = Math.sin(radianAngle);
+        double newX = this.x * cosAngle - this.y * sinAngle;
+        double newY = this.x * sinAngle + this.y * cosAngle;
+        return new TrafficVector(newX, newY);
     }
 
     public double getX() {

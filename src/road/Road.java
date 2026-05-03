@@ -1,8 +1,8 @@
 package road;
 
 import generator.IdGenerator;
-import point.TrafficPoint;
-import point.TrafficVector;
+import utility.TrafficPoint;
+import utility.TrafficVector;
 
 public class Road {
     private String roadId;
@@ -17,9 +17,9 @@ public class Road {
         this.roadId = IdGenerator.roadId(roadIdCounter++);
         this.endPoint = endPoint;
         this.startPoint = startPoint;
-        this.direction = TrafficVector.fromPoints(startPoint, endPoint).normalize();
+        this.direction = new TrafficVector(startPoint, endPoint).normalize();
         this.fowardWay = new Way(IdGenerator.fowawrdWayId(roadId), direction);
-        this.reverseWay = new Way(IdGenerator.reverseWayId(roadId), direction.rotate180());
+        this.reverseWay = new Way(IdGenerator.reverseWayId(roadId), direction.rotateVector(Math.PI));
         buildWays();
     }
 

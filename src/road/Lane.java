@@ -1,6 +1,6 @@
 package road;
 
-import point.TrafficPoint;
+import utility.TrafficPoint;
 import vehicle.Vehicle;
 
 import java.util.ArrayList;
