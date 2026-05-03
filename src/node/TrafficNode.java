@@ -1,7 +1,7 @@
 package node;
 
 import generator.IdGenerator;
-import point.Point;
+import point.TrafficPoint;
 import road.Lane;
 import road.Way;
 
@@ -9,16 +9,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class Node {
+public abstract class TrafficNode {
     protected String id;
-    protected Point centerPoint;
+    protected TrafficPoint centerPoint;
     protected List<Path> pathList;
     protected List<Way> entryWayList;
     protected List<Way> exitWayList;
     protected int maxConnections;
     public static int idCounter = 0;
 
-    public Node(Point centerPoint) {
+    public TrafficNode(TrafficPoint centerPoint) {
         this.id = IdGenerator.NodeId(idCounter++);
         this.centerPoint = centerPoint;
         this.pathList = new ArrayList<>();
@@ -75,7 +75,7 @@ public abstract class Node {
     // Build conflict point list after adding a path
     public void buildConflictPointList(Path currentPath) {
         for (Path otherPath : pathList) {
-            Point conflictPoint = currentPath.findConflictPoint(otherPath);
+            TrafficPoint conflictPoint = currentPath.findConflictPoint(otherPath);
             if (conflictPoint != null) {
                 currentPath.addConflictPoint(otherPath, conflictPoint);
                 otherPath.addConflictPoint(currentPath, conflictPoint);
@@ -96,7 +96,7 @@ public abstract class Node {
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        Node node = (Node) o;
+        TrafficNode node = (TrafficNode) o;
         return Objects.equals(id, node.id);
     }
 
@@ -105,11 +105,11 @@ public abstract class Node {
         return Objects.hashCode(id);
     }
 
-    public Point getCenterPoint() {
+    public TrafficPoint getCenterPoint() {
         return centerPoint;
     }
 
-    public void setCenterPoint(Point centerPoint) {
+    public void setCenterPoint(TrafficPoint centerPoint) {
         this.centerPoint = centerPoint;
     }
 

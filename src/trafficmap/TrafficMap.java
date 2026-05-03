@@ -1,7 +1,7 @@
 package trafficmap;
 
 import node.Edge;
-import node.Node;
+import node.TrafficNode;
 import road.Road;
 
 import java.util.ArrayList;
@@ -10,18 +10,18 @@ import java.util.List;
 import java.util.Map;
 
 public class TrafficMap {
-    private Map<Node, List<Edge>> adjacentList;
+    private Map<TrafficNode, List<Edge>> adjacentList;
 
     public TrafficMap() {
         this.adjacentList = new HashMap<>();
         System.out.println("Map created");
     }
 
-    public void addNode(Node node) {
+    public void addNode(TrafficNode node) {
         adjacentList.putIfAbsent(node, new ArrayList<>());
     }
 
-    public void addEdge(Node startNode, Node endNode) {
+    public void addEdge(TrafficNode startNode, TrafficNode endNode) {
 
         // Check node existence
         if (!adjacentList.containsKey(startNode) || !adjacentList.containsKey(endNode)) {
@@ -40,7 +40,7 @@ public class TrafficMap {
         adjacentList.get(endNode).add(edge);
     }
 
-    public Map<Node, List<Edge>> getAdjacentList() {
+    public Map<TrafficNode, List<Edge>> getAdjacentList() {
         return adjacentList;
     }
 }

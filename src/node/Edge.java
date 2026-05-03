@@ -3,17 +3,17 @@ package node;
 import road.Road;
 
 public class Edge {
-    private Node startNode;
-    private Node endNode;
+    private TrafficNode startNode;
+    private TrafficNode endNode;
     private Road road;
 
-    public Edge(Node startNode, Node endNode, Road road) {
+    public Edge(TrafficNode startNode, TrafficNode endNode, Road road) {
         this.startNode = startNode;
         this.endNode = endNode;
         this.road = road;
     }
 
-    public Node getOtherNode(Node node) {
+    public TrafficNode getOtherNode(TrafficNode node) {
         if (node.equals(startNode)) {
             return endNode;
         }

@@ -1,10 +1,10 @@
 package node;
 
-import point.Point;
+import point.TrafficPoint;
 
-public class TJunction extends Node {
+public class TJunction extends TrafficNode {
 
-    public TJunction(Point centerPoint) {
+    public TJunction(TrafficPoint centerPoint) {
         super(centerPoint);
         maxConnections = 3;
     }

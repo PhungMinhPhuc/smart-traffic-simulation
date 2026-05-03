@@ -2,24 +2,24 @@ package point;
 
 import java.util.Objects;
 
-public class Point {
+public class TrafficPoint {
     private double x;
     private double y;
     private static final double EPS = 1e-6;
 
-    public Point(double x, double y) {
+    public TrafficPoint(double x, double y) {
         this.x = x;
         this.y = y;
     }
 
-    public boolean isClose(Point other) {
+    public boolean isClose(TrafficPoint other) {
         return Math.abs(x - other.x) < EPS && Math.abs(y - other.y) < EPS;
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        Point other = (Point) o;
+        TrafficPoint other = (TrafficPoint) o;
         return Double.compare(x, other.x) == 0 && Double.compare(y, other.y) == 0;
     }
 
@@ -28,8 +28,8 @@ public class Point {
         return Objects.hash(x, y);
     }
 
-    public Point moveBy(Vector2D vector) {
-        return new Point(x + vector.getX(), y + vector.getY());
+    public TrafficPoint moveBy(TrafficVector vector) {
+        return new TrafficPoint(x + vector.getX(), y + vector.getY());
     }
 
     public double getX() {

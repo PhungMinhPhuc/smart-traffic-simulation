@@ -1,6 +1,6 @@
 package node;
 
-import point.Point;
+import point.TrafficPoint;
 import vehicle.Vehicle;
 
 import java.util.ArrayList;
@@ -12,13 +12,13 @@ import java.util.HashMap;
 
 public class Path {
     private String id;
-    private Point startPoint;
-    private Point endPoint;
+    private TrafficPoint startPoint;
+    private TrafficPoint endPoint;
     private List<Vehicle> vehicleList;
-    private Map<Path, Point> conflictPointList;
+    private Map<Path, TrafficPoint> conflictPointList;
     private final double width = 10;
 
-    public Path(String id, Point startPoint, Point endPoint) {
+    public Path(String id, TrafficPoint startPoint, TrafficPoint endPoint) {
         this.id = id;
         this.startPoint = startPoint;
         this.endPoint = endPoint;
@@ -38,16 +38,16 @@ public class Path {
         return Objects.hashCode(id);
     }
 
-    public void addConflictPoint(Path conflictPath, Point conflictPoint) {
+    public void addConflictPoint(Path conflictPath, TrafficPoint conflictPoint) {
         conflictPointList.put(conflictPath, conflictPoint);
     }
 
-    public Point findConflictPoint(Path otherPath) {
+    public TrafficPoint findConflictPoint(Path otherPath) {
         // Calculate conflict point using Cramer
-        Point thisStart = this.getStartPoint();
-        Point thisEnd = this.getEndPoint();
-        Point otherStart = otherPath.getStartPoint();
-        Point otherEnd = otherPath.getEndPoint();
+        TrafficPoint thisStart = this.getStartPoint();
+        TrafficPoint thisEnd = this.getEndPoint();
+        TrafficPoint otherStart = otherPath.getStartPoint();
+        TrafficPoint otherEnd = otherPath.getEndPoint();
 
         double thisStartX = thisStart.getX();
         double thisStartY = thisStart.getY();
@@ -81,7 +81,7 @@ public class Path {
         boolean isOnOtherPath = isPointOnSegment(conflictPointX, conflictPointY, otherStartX, otherStartY, otherEndX, otherEndY);
 
         if (isOnThisPath && isOnOtherPath) {
-            return new Point(conflictPointX, conflictPointY);
+            return new TrafficPoint(conflictPointX, conflictPointY);
         }
 
         return null;
@@ -110,23 +110,23 @@ public class Path {
         vehicleList.remove(vehicle);
     }
 
-    public Map<Path, Point> getConflictPointList() {
+    public Map<Path, TrafficPoint> getConflictPointList() {
         return conflictPointList;
     }
 
-    public Point getStartPoint() {
+    public TrafficPoint getStartPoint() {
         return startPoint;
     }
 
-    public Point getEndPoint() {
+    public TrafficPoint getEndPoint() {
         return endPoint;
     }
 
-    public void setStartPoint(Point startPoint) {
+    public void setStartPoint(TrafficPoint startPoint) {
         this.startPoint = startPoint;
     }
 
-    public void setEndPoint(Point endPoint) {
+    public void setEndPoint(TrafficPoint endPoint) {
         this.endPoint = endPoint;
     }
 

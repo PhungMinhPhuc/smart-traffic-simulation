@@ -1,9 +1,9 @@
 package node;
 
-import point.Point;
+import point.TrafficPoint;
 
-public class FiveWayJunction extends Node {
-    public FiveWayJunction(Point centerPoint) {
+public class FiveWayJunction extends TrafficNode {
+    public FiveWayJunction(TrafficPoint centerPoint) {
         super(centerPoint);
         maxConnections = 5;
     }

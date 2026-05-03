@@ -1,7 +1,6 @@
 package road;
 
-import point.Point;
-import point.Vector2D;
+import point.TrafficPoint;
 import vehicle.Vehicle;
 
 import java.util.ArrayList;
@@ -11,11 +10,11 @@ public class Lane {
     private String laneId;
     private int index;
     private List<Vehicle> vehicleList;
-    private Point startPoint;
-    private Point endPoint;
+    private TrafficPoint startPoint;
+    private TrafficPoint endPoint;
 
 
-    public Lane(String id, int index, Point startPoint, Point endPoint) {
+    public Lane(String id, int index, TrafficPoint startPoint, TrafficPoint endPoint) {
         this.laneId = id;
         this.index = index;
         this.vehicleList = new ArrayList<>();
@@ -31,19 +30,19 @@ public class Lane {
         vehicleList.remove(vehicle);
     }
 
-    public Point getStartPoint() {
+    public TrafficPoint getStartPoint() {
         return startPoint;
     }
 
-    public void setStartPoint(Point startPoint) {
+    public void setStartPoint(TrafficPoint startPoint) {
         this.startPoint = startPoint;
     }
 
-    public Point getEndPoint() {
+    public TrafficPoint getEndPoint() {
         return endPoint;
     }
 
-    public void setEndPoint(Point endPoint) {
+    public void setEndPoint(TrafficPoint endPoint) {
         this.endPoint = endPoint;
     }
 
