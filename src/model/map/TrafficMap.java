@@ -28,6 +28,19 @@ public class TrafficMap {
         addNode(end);
         adjacencyList.get(start).add(road);
         adjacencyList.get(end).add(road);
+        
+        // Register the road inside the nodes
+        start.addRoad(road);
+        end.addRoad(road);
+        
+        // Initialize the junctions so traffic lights are created and cycles begin
+        if (start instanceof Junction) {
+            ((Junction) start).initializeJunction();
+        }
+        if (end instanceof Junction) {
+            ((Junction) end).initializeJunction();
+        }
+        
         if (!allRoads.contains(road)) {
             allRoads.add(road);
         }
@@ -60,6 +73,16 @@ public class TrafficMap {
         for (Vehicle v : vehicleCopy) {
             v.update(deltaTime);
         }
+    }
+
+    public Node findNodeAt(model.map.TrafficPoint p, double threshold) {
+    // Iterate through all nodes (keys in the adjacency list)
+        for (Node node : adjacencyList.keySet()) {
+            if (node.getCenterPoint().distanceTo(p) < threshold) {
+                return node;
+            }
+        }
+        return null;
     }
     
     // Getters and Setters

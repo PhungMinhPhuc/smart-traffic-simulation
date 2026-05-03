@@ -1,6 +1,6 @@
 package model.node;
 
-import model.map.Point;
+import model.map.TrafficPoint;
 import model.map.Road;
 import model.map.Way;
 import model.traffic.TrafficLight;
@@ -12,7 +12,7 @@ public class Junction extends Node {
     private int currentGreenRoadIndex = 0;
     private double timer = 0;
 
-    public Junction(String id, Point centerPoint) {
+    public Junction(String id, TrafficPoint centerPoint) {
         super(id, centerPoint);
     }
 

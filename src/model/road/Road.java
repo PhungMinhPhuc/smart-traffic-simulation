@@ -17,8 +17,8 @@ public class Road {
         this.startNode = start;
         this.endNode = end;
 
-        Point pStart = start.getCenterPoint();
-        Point pEnd = end.getCenterPoint();
+        TrafficPoint pStart = start.getCenterPoint();
+        TrafficPoint pEnd = end.getCenterPoint();
         this.length = pStart.distanceTo(pEnd);
 
         // Calculate direction vector and its perpendicular (normal) vector
@@ -28,16 +28,16 @@ public class Road {
         double shiftDistance = lanesPerWay * Constants.LANE_WIDTH;
 
         // Create RightWay. Shift start and end points to the right
-        Point rightStart = pStart.add(normal.multiply(shiftDistance));
-        Point rightEnd = pEnd.add(normal.multiply(shiftDistance));
+        TrafficPoint rightStart = pStart.add(normal.multiply(shiftDistance));
+        TrafficPoint rightEnd = pEnd.add(normal.multiply(shiftDistance));
         this.rightWay = new Way(id + "_Right", rightStart, rightEnd, lanesPerWay);
 
         // Create LeftWay. Calculate direction from End to Start, then shift to its right.
         Vector2D revDirection = pStart.subtract(pEnd);
         Vector2D revNormal = revDirection.getPerpendicular().normalize();
         
-        Point leftStart = pEnd.add(revNormal.multiply(shiftDistance));
-        Point leftEnd = pStart.add(revNormal.multiply(shiftDistance));
+        TrafficPoint leftStart = pEnd.add(revNormal.multiply(shiftDistance));
+        TrafficPoint leftEnd = pStart.add(revNormal.multiply(shiftDistance));
         this.leftWay = new Way(id + "_Left", leftStart, leftEnd, lanesPerWay);
     }
 

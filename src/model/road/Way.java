@@ -10,11 +10,11 @@ import config.Constants;
 public class Way {
     private String id;
     private List<Lane> laneList;
-    private Point startPoint;
-    private Point endPoint;
+    private TrafficPoint startPoint;
+    private TrafficPoint endPoint;
     private TrafficLight trafficLight; // Current state of the traffic light for this direction
 
-    public Way(String id, Point start, Point end, int numberOfLanes) {
+    public Way(String id, TrafficPoint start, TrafficPoint end, int numberOfLanes) {
         this.id = id;
         this.startPoint = start;
         this.endPoint = end;
@@ -33,8 +33,8 @@ public class Way {
             Vector2D offsetVector = normal.multiply(offsetDist);
 
             // Shift both start and end points to create a parallel line
-            Point laneStart = startPoint.add(offsetVector);
-            Point laneEnd = endPoint.add(offsetVector);
+            TrafficPoint laneStart = startPoint.add(offsetVector);
+            TrafficPoint laneEnd = endPoint.add(offsetVector);
 
             // Create the lane with an index and a reference back to this Way
             Lane lane = new Lane(id + "_L" + i, i, this, laneStart, laneEnd);
@@ -66,11 +66,11 @@ public class Way {
         return trafficLight;
     }
 
-    public Point getStartPoint() {
+    public TrafficPoint getStartPoint() {
         return startPoint;
     }
 
-    public Point getEndPoint() {
+    public TrafficPoint getEndPoint() {
         return endPoint;
     }
 }

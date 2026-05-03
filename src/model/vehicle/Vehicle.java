@@ -1,7 +1,7 @@
 package model.vehicle;
 
 import generator.IdGenerator;
-import model.map.Point;
+import model.map.TrafficPoint;
 import model.map.Lane;
 import model.node.Path;
 // import model.map.Vector2D;
@@ -10,7 +10,7 @@ import model.vehicle.behavior.DriverBehavior;
 public abstract class Vehicle {
     protected String id;
     protected String type;
-    protected Point position;
+    protected TrafficPoint position;
     protected double speed;
     protected double acceleration;
     protected double maxSpeed;
@@ -56,7 +56,7 @@ public abstract class Vehicle {
 
     // Calculates the next position based on current segment (Lane or Path).
     private void move(double deltaTime) {
-        Point target = getTargetPoint();
+        TrafficPoint target = getTargetPoint();
         if (target != null) {
             this.position = this.position.moveTowards(target, speed * deltaTime);
         }
@@ -64,7 +64,7 @@ public abstract class Vehicle {
 
     // Calculates the angle the vehicle is currently facing (GUI)
     public double getRotation() {
-        Point target = getTargetPoint();
+        TrafficPoint target = getTargetPoint();
         if (target != null) 
             return position.angleTo(target);
         else 
@@ -72,7 +72,7 @@ public abstract class Vehicle {
     }
 
     // Helper to identify what the vehicle is aiming for.
-    public Point getTargetPoint() {
+    public TrafficPoint getTargetPoint() {
         if (currentLane != null) return currentLane.getEndPoint();
         if (currentPath != null) return currentPath.getEndPoint();
         return null;
@@ -102,11 +102,11 @@ public abstract class Vehicle {
         this.type = type;
     }
 
-    public Point getPosition() {
+    public TrafficPoint getPosition() {
         return position;
     }
 
-    public void setPosition(Point position) {
+    public void setPosition(TrafficPoint position) {
         this.position = position;
     }
 

@@ -10,13 +10,13 @@ import config.Constants;
 
 public class Path {
     private String id;
-    private Point startPoint;
-    private Point endPoint;
+    private TrafficPoint startPoint;
+    private TrafficPoint endPoint;
     private double width;
     private List<Vehicle> vehicleList; // List of vehicles currently performing a turn on this path
-    private Map<Path, Point> conflictPointMap;
+    private Map<Path, TrafficPoint> conflictPointMap;
 
-    public Path(String id, Point start, Point end, double width) {
+    public Path(String id, TrafficPoint start, TrafficPoint end, double width) {
         this.id = id;
         this.startPoint = start;
         this.endPoint = end;
@@ -26,7 +26,7 @@ public class Path {
     }
 
     // Finds the intersection point between this path and another using Cramer's Rule.
-    public Point findConflictPoint(Path other) {
+    public TrafficPoint findConflictPoint(Path other) {
         double x1 = this.startPoint.getX(), y1 = this.startPoint.getY();
         double x2 = this.endPoint.getX(),   y2 = this.endPoint.getY();
         
@@ -46,7 +46,7 @@ public class Path {
         // Verify if the intersection point lies within BOTH line segments
         if (isPointOnSegment(intersectX, intersectY, x1, y1, x2, y2) &&
             isPointOnSegment(intersectX, intersectY, x3, y3, x4, y4)) {
-            return new Point(intersectX, intersectY);
+            return new TrafficPoint(intersectX, intersectY);
         }
 
         return null;
@@ -60,7 +60,7 @@ public class Path {
 
     // Calculates the distance from the start of this path to the conflict point with another path (for Time to Collision)
     public double getDistanceToConflict(Path otherPath) {
-        Point conflictPoint = conflictPointMap.get(otherPath);
+        TrafficPoint conflictPoint = conflictPointMap.get(otherPath);
         if (conflictPoint == null) return Double.MAX_VALUE;
         return startPoint.distanceTo(conflictPoint);
     }
@@ -76,7 +76,7 @@ public class Path {
 
     // Management Methods
 
-    public void addConflictPoint(Path other, Point intersect) {
+    public void addConflictPoint(Path other, TrafficPoint intersect) {
         conflictPointMap.put(other, intersect);
     }
 
@@ -102,19 +102,19 @@ public class Path {
         this.id = id;
     }
 
-    public Point getStartPoint() {
+    public TrafficPoint getStartPoint() {
         return startPoint;
     }
 
-    public void setStartPoint(Point startPoint) {
+    public void setStartPoint(TrafficPoint startPoint) {
         this.startPoint = startPoint;
     }
 
-    public Point getEndPoint() {
+    public TrafficPoint getEndPoint() {
         return endPoint;
     }
 
-    public void setEndPoint(Point endPoint) {
+    public void setEndPoint(TrafficPoint endPoint) {
         this.endPoint = endPoint;
     }
 
@@ -134,11 +134,11 @@ public class Path {
         this.vehicleList = vehicleList;
     }
 
-    public Map<Path, Point> getConflictPointMap() {
+    public Map<Path, TrafficPoint> getConflictPointMap() {
         return conflictPointMap;
     }
 
-    public void setConflictPointMap(Map<Path, Point> conflictPointMap) {
+    public void setConflictPointMap(Map<Path, TrafficPoint> conflictPointMap) {
         this.conflictPointMap = conflictPointMap;
     }
 }

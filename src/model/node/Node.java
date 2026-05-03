@@ -1,6 +1,6 @@
 package model.node;
 
-import model.map.Point;
+import model.map.TrafficPoint;
 import model.map.Road;
 import model.map.Way;
 // import model.node.Path;
@@ -14,13 +14,13 @@ import java.util.Objects;
 
 public abstract class Node {
     protected String id;
-    protected Point centerPoint;
+    protected TrafficPoint centerPoint;
     protected List<Road> roadList;
     protected List<Path> pathList;
-    protected List<Point> entryPoints; // Points where vehicles enter the junction from a Road
-    protected List<Point> exitPoints; // Points where vehicles leave the junction to enter a Road
+    protected List<TrafficPoint> entryPoints; // Points where vehicles enter the junction from a Road
+    protected List<TrafficPoint> exitPoints; // Points where vehicles leave the junction to enter a Road
 
-    public Node(String id, Point centerPoint) {
+    public Node(String id, TrafficPoint centerPoint) {
         this.id = id;
         this.centerPoint = centerPoint;
         this.roadList = new ArrayList<>();
@@ -67,8 +67,8 @@ public abstract class Node {
     public void buildPaths() {
         pathList.clear();
         int pathCounter = 0;
-        for (Point entry : entryPoints) {
-            for (Point exit : exitPoints) {
+        for (TrafficPoint entry : entryPoints) {
+            for (TrafficPoint exit : exitPoints) {
                 // Connect every entry point to every exit point except if they belong to the same road (preventing U-turns)
                 if (entry.distanceTo(exit) > Constants.LANE_WIDTH * 0.2) { // Heuristic
                     Path path = new Path(id + "_P" + (pathCounter++), entry, exit, Constants.LANE_WIDTH);
@@ -84,7 +84,7 @@ public abstract class Node {
             Path pathA = pathList.get(i);
             for (int j = i + 1; j < pathList.size(); j++) {
                 Path pathB = pathList.get(j);
-                Point intersect = pathA.findConflictPoint(pathB);
+                TrafficPoint intersect = pathA.findConflictPoint(pathB);
                 
                 if (intersect != null) {
                     pathA.addConflictPoint(pathB, intersect);
@@ -103,11 +103,11 @@ public abstract class Node {
         this.id = id;
     }
 
-    public Point getCenterPoint() {
+    public TrafficPoint getCenterPoint() {
         return centerPoint;
     }
 
-    public void setCenterPoint(Point centerPoint) {
+    public void setCenterPoint(TrafficPoint centerPoint) {
         this.centerPoint = centerPoint;
     }
 
@@ -127,19 +127,19 @@ public abstract class Node {
         this.pathList = pathList;
     }
 
-    public List<Point> getEntryPoints() {
+    public List<TrafficPoint> getEntryPoints() {
         return entryPoints;
     }
 
-    public void setEntryPoints(List<Point> entryPoints) {
+    public void setEntryPoints(List<TrafficPoint> entryPoints) {
         this.entryPoints = entryPoints;
     }
 
-    public List<Point> getExitPoints() {
+    public List<TrafficPoint> getExitPoints() {
         return exitPoints;
     }
 
-    public void setExitPoints(List<Point> exitPoints) {
+    public void setExitPoints(List<TrafficPoint> exitPoints) {
         this.exitPoints = exitPoints;
     }
 

@@ -8,8 +8,8 @@ public class Lane {
     private String id;
     private int index;
     private Way parentWay;
-    private Point startPoint;
-    private Point endPoint;
+    private TrafficPoint startPoint;
+    private TrafficPoint endPoint;
     
     // List of vehicles currently in this lane.  Usually ordered from the one closest to the exit to the one furthest away.
     private List<Vehicle> vehicleList;
@@ -17,7 +17,7 @@ public class Lane {
     // Current status of the traffic light at the end of this lane
     private boolean isRedLight = false;
 
-    public Lane(String id, int index, Way parentWay, Point startPoint, Point endPoint) {
+    public Lane(String id, int index, Way parentWay, TrafficPoint startPoint, TrafficPoint endPoint) {
         this.id = id;
         this.index = index;
         this.parentWay = parentWay;
@@ -107,19 +107,19 @@ public class Lane {
         this.parentWay = parentWay;
     }
 
-    public Point getStartPoint() {
+    public TrafficPoint getStartPoint() {
         return startPoint;
     }
 
-    public void setStartPoint(Point startPoint) {
+    public void setStartPoint(TrafficPoint startPoint) {
         this.startPoint = startPoint;
     }
 
-    public Point getEndPoint() {
+    public TrafficPoint getEndPoint() {
         return endPoint;
     }
 
-    public void setEndPoint(Point endPoint) {
+    public void setEndPoint(TrafficPoint endPoint) {
         this.endPoint = endPoint;
     }
 
