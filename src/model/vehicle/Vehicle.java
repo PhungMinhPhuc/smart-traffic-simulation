@@ -18,8 +18,6 @@ public abstract class Vehicle {
     protected double width;
     protected String sound;
     protected DriverBehavior behavior;
-    
-    // Environmental context
     protected Lane currentLane;
     protected Path currentPath;
     protected boolean isEmergency;
@@ -36,25 +34,42 @@ public abstract class Vehicle {
         this.isEmergency = false;
     }
 
-    // Logic processing separated from Drawing (This method is called every frame to update the vehicle's state)
     public void update(double deltaTime) {
-        // Sense the environment
+    	// Lấy thông tin từ lane
         Vehicle ahead = getVehicleAhead();
+        double distToLight = position.distanceTo(currentLane.getEndPoint());
+        boolean isRead = currentLane.isRedLight();
         
-        // Decide acceleration based on Behavior (Strategy Pattern)
-        this.acceleration = behavior.decideAcceleration(this, ahead);
+        // Behavior quyết định hành động 
+        behavior.decide(this, ahead, distToLight, isRead);
+        
+        // Cập nhật giá trị vật lý, tọa độ xe
         applyPhysics(deltaTime);
-        move(deltaTime); // Update Position
+        move(deltaTime);
     }
 
+    
+    public void applyAcceleration(double a) {
+    	this.acceleration = a;
+    }
+    
+    public void changeLane(int offset) {
+    	//offset = 1 -> phải, offset = -1 -> trái
+    	Lane neighbor = currentLane.getNeighborLane(offset);
+    	if (neighbor != null) {
+    		currentLane.removeVehicle(this);
+    		this.currentLane = neighbor;
+    		this.currentLane.addVehicle(this);
+    	}
+    }
+    
     private void applyPhysics(double deltaTime) {
         speed += acceleration * deltaTime;
-        // Clamp speed between 0 and maxSpeed
-        if (speed < 0) speed = 0;
         if (speed > maxSpeed) speed = maxSpeed;
+        else if (speed < 0) speed = 0;
+     
     }
 
-    // Calculates the next position based on current segment (Lane or Path).
     private void move(double deltaTime) {
         Point target = getTargetPoint();
         if (target != null) {
@@ -62,131 +77,119 @@ public abstract class Vehicle {
         }
     }
 
-    // Calculates the angle the vehicle is currently facing (GUI)
-    public double getRotation() {
-        Point target = getTargetPoint();
-        if (target != null) 
-            return position.angleTo(target);
-        else 
-            return 0;
-    }
-
-    // Helper to identify what the vehicle is aiming for.
     public Point getTargetPoint() {
         if (currentLane != null) return currentLane.getEndPoint();
         if (currentPath != null) return currentPath.getEndPoint();
         return null;
     }
 
-    // Asks the current Lane or Path for the vehicle immediately in front.
     private Vehicle getVehicleAhead() {
         if (currentLane != null) return currentLane.getVehicleAhead(this);
         if (currentPath != null) return currentPath.getVehicleAhead(this);
         return null;
     }
 
-    // Getters and Setters
-    public String getId() {
-        return id;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public String getType() {
-        return type;
-    }
+	public String getType() {
+		return type;
+	}
 
-    public void setType(String type) {
-        this.type = type;
-    }
+	public void setType(String type) {
+		this.type = type;
+	}
 
-    public Point getPosition() {
-        return position;
-    }
+	public Point getPosition() {
+		return position;
+	}
 
-    public void setPosition(Point position) {
-        this.position = position;
-    }
+	public void setPosition(Point position) {
+		this.position = position;
+	}
 
-    public double getSpeed() {
-        return speed;
-    }
+	public double getSpeed() {
+		return speed;
+	}
 
-    public void setSpeed(double speed) {
-        this.speed = speed;
-    }
+	public void setSpeed(double speed) {
+		this.speed = speed;
+	}
 
-    public double getAcceleration() {
-        return acceleration;
-    }
+	public double getAcceleration() {
+		return acceleration;
+	}
 
-    public void setAcceleration(double acceleration) {
-        this.acceleration = acceleration;
-    }
+	public void setAcceleration(double acceleration) {
+		this.acceleration = acceleration;
+	}
 
-    public double getMaxSpeed() {
-        return maxSpeed;
-    }
+	public double getMaxSpeed() {
+		return maxSpeed;
+	}
 
-    public void setMaxSpeed(double maxSpeed) {
-        this.maxSpeed = maxSpeed;
-    }
+	public void setMaxSpeed(double maxSpeed) {
+		this.maxSpeed = maxSpeed;
+	}
 
-    public double getLength() {
-        return length;
-    }
+	public double getLength() {
+		return length;
+	}
 
-    public void setLength(double length) {
-        this.length = length;
-    }
+	public void setLength(double length) {
+		this.length = length;
+	}
 
-    public double getWidth() {
-        return width;
-    }
+	public double getWidth() {
+		return width;
+	}
 
-    public void setWidth(double width) {
-        this.width = width;
-    }
+	public void setWidth(double width) {
+		this.width = width;
+	}
 
-    public String getSound() {
-        return sound;
-    }
+	public String getSound() {
+		return sound;
+	}
 
-    public void setSound(String sound) {
-        this.sound = sound;
-    }
+	public void setSound(String sound) {
+		this.sound = sound;
+	}
 
-    public DriverBehavior getBehavior() {
-        return behavior;
-    }
+	public DriverBehavior getBehavior() {
+		return behavior;
+	}
 
-    public void setBehavior(DriverBehavior behavior) {
-        this.behavior = behavior;
-    }
+	public void setBehavior(DriverBehavior behavior) {
+		this.behavior = behavior;
+	}
 
-    public Lane getCurrentLane() {
-        return currentLane;
-    }
+	public Lane getCurrentLane() {
+		return currentLane;
+	}
 
-    public void setCurrentLane(Lane currentLane) {
-        this.currentLane = currentLane;
-    }
+	public void setCurrentLane(Lane currentLane) {
+		this.currentLane = currentLane;
+	}
 
-    public Path getCurrentPath() {
-        return currentPath;
-    }
+	public Path getCurrentPath() {
+		return currentPath;
+	}
 
-    public void setCurrentPath(Path currentPath) {
-        this.currentPath = currentPath;
-    }
+	public void setCurrentPath(Path currentPath) {
+		this.currentPath = currentPath;
+	}
 
-    public boolean isEmergency() {
-        return isEmergency;
-    }
+	public boolean isEmergency() {
+		return isEmergency;
+	}
 
-    public void setEmergency(boolean isEmergency) {
-        this.isEmergency = isEmergency;
-    }
+	public void setEmergency(boolean isEmergency) {
+		this.isEmergency = isEmergency;
+	}
 }
