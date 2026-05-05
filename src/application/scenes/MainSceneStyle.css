@@ -1,6 +1,6 @@
 #editingSideBar{
 	-fx-padding: 12;
-	-fx-spacing: 10;
+	-fx-spacing: 50;
 	-fx-background-color: #ffffff;
 	-fx-border-color: #cccccc;
 }
@@ -9,3 +9,4 @@
     -fx-min-width: 1000px;
     -fx-min-height: 1000px;
 }
+

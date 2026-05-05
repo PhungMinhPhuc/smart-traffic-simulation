@@ -1,5 +1,6 @@
 package model.map;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import config.Constants;
@@ -7,95 +8,106 @@ import model.node.TrafficNode;
 import model.road.Road;
 import model.utility.TrafficPoint;
 import model.utility.TrafficVector;
+import model.node.Edge;
 
 import java.util.ArrayList;
 
-
 public class TrafficMap {
-    private Map<String,ArrayList<TrafficNode>> adjacentList = new HashMap<>();
-    private ArrayList<Road> roadList = new ArrayList<Road>();
-    private ArrayList<TrafficNode> trafficNodeList = new ArrayList<TrafficNode>();
+    private Map<TrafficNode, ArrayList<Edge>> adjacentList;
+
+    public TrafficMap() {
+        this.adjacentList = new HashMap<>();
+        System.out.println("Map created");
+    }
+
+    public void addNode(TrafficNode node) {
+        adjacentList.putIfAbsent(node, new ArrayList<>());
+    }
+
+    public void addConnection(TrafficNode startNode, TrafficNode endNode) {
+        // Check node existence
+        if (!adjacentList.containsKey(startNode) || !adjacentList.containsKey(endNode)) {
+            System.out.println("One or both nodes do not exist in the map");
+            return;
+        }
+        // Create road and edge
+		TrafficVector directionVector = new TrafficVector(startNode.getCenterPoint(), endNode.getCenterPoint());
+		TrafficPoint roadStartPoint = directionVector.translatePoint(startNode.getCenterPoint(),Constants.JUNCTION_RADIUS);
+		TrafficPoint roadEndPoint = directionVector.translatePoint(endNode.getCenterPoint(),-Constants.JUNCTION_RADIUS);
+		Road newRoad = new Road(roadStartPoint, roadEndPoint); //Use the constructor with default lane count and traffic light state
+		
+		//check colision with existing roads
+		for(Road existingRoad : getRoadList()) {
+			if(existingRoad.checkConflict(newRoad)) {
+				System.out.println("New road conflicts with existing road:" + existingRoad.getId());
+				return;
+			}
+		}
+		
+        Edge newEdge = new Edge(startNode, endNode, newRoad);
+
+        // Add edge to both nodes's adjacentList
+        adjacentList.get(startNode).add(newEdge);
+        adjacentList.get(endNode).add(newEdge);
+        
+        // Add road to both nodes
+        startNode.addRoad(newRoad);
+        endNode.addRoad(newRoad);
+    }
     
+    public void removeNode(TrafficNode removeNode) {
+        if (!adjacentList.containsKey(removeNode)) {
+            throw new IllegalArgumentException("Node does not exist");
+        }
 
-    public void addNode(TrafficNode trafficNode){
-        trafficNodeList.add(trafficNode);
-        if(!adjacentList.containsKey(trafficNode.getId())){
-            adjacentList.put(trafficNode.getId(), new ArrayList<TrafficNode>());
+        for (ArrayList<Edge> edgeList : adjacentList.values()) {
+            for (Iterator<Edge> it = edgeList.iterator(); it.hasNext(); ) { //use iterator to avoid ConcurrentModificationException
+                Edge edge = it.next();
+                if (edge.getOtherNode(removeNode) != null) {
+                    Road road = edge.getRoad();
+                    edge.getStartNode().removeRoad(road.getId());
+                    edge.getEndNode().removeRoad(road.getId());
+                    it.remove(); // safe removal during iteration
+                }
+            }
         }
-        else{
-            System.out.println("TrafficNode with id " + trafficNode.getId() + " already exists in the map.");
-        }
+
+        adjacentList.remove(removeNode);
     }
+    
+    //Get unique set of TraffiNode 
+	public ArrayList<TrafficNode> getTrafficNodeList() {
+		ArrayList<TrafficNode> trafficNodeList = new ArrayList<>();
+		for(TrafficNode node : adjacentList.keySet()) {
+			trafficNodeList.add(node);
+		}
+		return trafficNodeList;
+	}
 
-    public void addConnection(TrafficNode startNode, TrafficNode endNode){
-        //check if both nodes exist in the map, if they do, add the connection between them, otherwise print an error message
-        if(adjacentList.containsKey(startNode.getId()) && adjacentList.containsKey(endNode.getId())){
-
-            //create new road between the two nodes and add it to the road list
-            TrafficVector directionVector = new TrafficVector(startNode.getCenterPoint(), endNode.getCenterPoint());
-            TrafficPoint roadStartPoint = directionVector.translatePoint(startNode.getCenterPoint(),Constants.JUNCTION_RADIUS);
-            TrafficPoint roadEndPoint = directionVector.translatePoint(endNode.getCenterPoint(),-Constants.JUNCTION_RADIUS);
-            Road newRoad = new Road(roadStartPoint, roadEndPoint); //Use the constructor with default lane count and traffic light state
-            
-            //check collision between the new road and existing roads, if there is a collision, print an error message and do not add the connection
-            for(Road road : roadList) {
-            	if(newRoad.checkConflict(road)){
-					System.out.println("The new road between node " + startNode.getId() + " and node " + endNode.getId() + " collides with an existing road. Connection not added.");
-					return;
+	//Get unique set of Road
+	public ArrayList<Road> getRoadList() {
+		ArrayList<Road> roadList = new ArrayList<>();
+		for(ArrayList<Edge> edgeList : adjacentList.values()) {
+			for(Edge edge : edgeList) {
+				if(!roadList.contains(edge.getRoad())) {
+					roadList.add(edge.getRoad());
 				}
-            }
+			}
+		}
+		return roadList;
+	}
+	
+	public TrafficNode getNodeByPoint(TrafficPoint point) {
+		for(TrafficNode node : adjacentList.keySet()) {
+			if(node.containsPoint(point)) {
+				return node;
+			}
+		}
+		return null; //no node found at the point
+	}
+	
 
-            
-            //add the connection between the two nodes, which is to add each node to the adjacent list of the other node
-            adjacentList.get(startNode.getId()).add(endNode);
-            adjacentList.get(endNode.getId()).add(startNode);
-            
-            //add road to the map's roadLiss
-            roadList.add(newRoad);
-            
-            //add road to the nodes's road lists
-            startNode.addRoad(newRoad);
-            endNode.addRoad(newRoad);
-        }
-        else{
-            System.out.println("One or both nodes do not exist in the map.");
-        }
+    public Map<TrafficNode, ArrayList<Edge>> getAdjacentList() {
+        return adjacentList;
     }
-
-    public void removeNode(String nodeId){
-        if(adjacentList.containsKey(nodeId)){
-            TrafficNode nodeRemove = null;
-            for(TrafficNode trafficNode : trafficNodeList){ //find the node with the given id in the node list
-                if(trafficNode.getId().equals(nodeId)){
-                    nodeRemove = trafficNode;
-                    trafficNodeList.remove(trafficNode);
-                    break;
-                }
-            }
-            if(nodeRemove != null){
-                ArrayList<Road> roadsToRemove = nodeRemove.getRoadList(); //Roads connected to the node that need to be removed from the road list
-                for(TrafficNode adjacentNode : adjacentList.get(nodeId)){
-                    adjacentList.get(adjacentNode.getId()).remove(nodeRemove); //remove the node from the adjacent list of its adjacent nodes
-                    for(Road road : roadsToRemove){
-                        adjacentNode.removeRoad(road.getId()); //remove the road from the adjacent nodes
-                        roadList.remove(road); //remove the road from the road list
-                    }
-                }
-            }
-            //remove the node from the adjacent list
-            adjacentList.remove(nodeRemove.getId());
-        }
-        else{
-            System.out.println("TrafficNode with id " + nodeId + " does not exist in the map.");
-        }
-    }
-
-    public ArrayList<TrafficNode> getTrafficNodeList() {
-        return trafficNodeList;
-    }
-
-    public ArrayList<Road> getRoadList() {
-        return roadList;
-    }
-
 }

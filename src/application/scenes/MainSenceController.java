@@ -5,22 +5,20 @@ import java.util.Optional;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Line;
 import model.map.TrafficMap;
 import model.node.*;
 import model.utility.TrafficPoint;
 import render.TrafficMapRenderer;
 
 public class MainSenceController {
-	
-	//Map and map renderer
-	private static TrafficMapRenderer trafficMapRenderer = new TrafficMapRenderer();
-	private static TrafficMap trafficMap = new TrafficMap();
-
 	//FXML elements
 	@FXML VBox editingSideBar;
 	@FXML Button addTrafficNodeButton;
@@ -28,25 +26,29 @@ public class MainSenceController {
 	@FXML Button addRoadButton;
 	@FXML Button removeRoadButton;
 	@FXML Label instructionsLabel; //For displaying instrictions to the user when they are adding or removing nodes and roads
-	@FXML ScrollPane trafficMapContainer;
-
+	@FXML ScrollPane trafficMapWrapper; //Create view port of the map
+	@FXML Pane trafficMapContainer; //Pane to draw the actual map on, will be placed inside the ScrollPane
+	
+	//Map and map renderer
+	private static TrafficMapRenderer trafficMapRenderer = new TrafficMapRenderer();
+	private static TrafficMap trafficMap = new TrafficMap();
+	
+	//Normal fields for functionalities
+	Boolean addingRoad = false; //flag to indicate if currently in the process of adding a road
+	Line previewLine = null; //line to show the road being dragged out when adding a new road by dragging from start node to end node
+	TrafficNode startNode = null; //placeHolder for TrafficNode for event handlers when adding or removing roads and nodes
+	TrafficNode endNode = null; 
 	
 	@FXML
-	private void initialize() {
+	private void initialize() { //auto run when the scene is loaded
+		//Create defaultMap
+		createDefaultMap();
 		
-		//Create some initial traffic nodes and roads for testing
-		TrafficNode node1 = new Junction(new TrafficPoint(400, 400),5);
-		TrafficNode node2 = new Junction(new TrafficPoint(800, 1000),3);
-		TrafficNode node3 = new Junction(new TrafficPoint(2000, 1600),4);
-		trafficMap.addNode(node1);
-		trafficMap.addNode(node2);
-		trafficMap.addNode(node3);
-		trafficMap.addConnection(node1, node2);
-		trafficMap.addConnection(node2, node3);
-		trafficMap.addConnection(node3, node1);
-		trafficMapContainer.setContent(trafficMapRenderer.render(trafficMap));
+		//initializes base map
+		renderTrafficMap();
 		
 		//set initial instruction
+		instructionsLabel.setWrapText(true);
 		DisplayInstruction("Click the buttons above to add or remove traffic nodes and roads.");
 		
 		//print testing info to console
@@ -59,12 +61,42 @@ public class MainSenceController {
 //		}
 	}
 	
-	//Helper method to display instructions to the user in the instructions label
+/**
+ * Helper functions for this controller
+ */
+	//Method to display instructions to the user in the instructions label
 	private void DisplayInstruction(String instruction) {
 		instructionsLabel.setText(instruction);
 	}
+	//createDefaultMap		
+	private void createDefaultMap() {
+		TrafficNode node1 = new Junction(new TrafficPoint(400, 400),5);
+		TrafficNode node2 = new Junction(new TrafficPoint(800, 1000),3);
+		TrafficNode node3 = new Junction(new TrafficPoint(2000, 1600),4);
+		trafficMap.addNode(node1);
+		trafficMap.addNode(node2);
+		trafficMap.addNode(node3);
+		trafficMap.addConnection(node1, node2);
+		trafficMap.addConnection(node2, node3);
+		trafficMap.addConnection(node3, node1);
+	}
+	//render map
+	private void renderTrafficMap() {
+		trafficMapContainer.getChildren().clear();
+		trafficMapContainer.getChildren().add(trafficMapRenderer.render(trafficMap));
+		trafficMapWrapper.setContent(trafficMapContainer);
+	}
+	//clamp function for auto scrolling when dragging near the edge of the viewport
+	private double clamp(double value) {
+	    if (value < 0.0) return 0.0;
+	    if (value > 1.0) return 1.0;
+	    return value;
+	}
 	
 	
+/**
+ * Functions for app's functionalities
+ */
 	public void addNewNode(ActionEvent event) {
 		//Display choose dialog to select the type of traffic node to add
 	    List<String> choices = Arrays.asList("T Junction", "Cross Junction", "Five-Way Junction");
@@ -80,11 +112,9 @@ public class MainSenceController {
 	    DisplayInstruction("Click on the map to set the location of the new traffic node");
 
 	    trafficMapContainer.setOnMouseClicked((e) -> {//one shot event handler to get clicked point
-	    	//Get the actual content (the Canvas or Group) inside the ScrollPane
-	        javafx.scene.Node content = trafficMapContainer.getContent();
 
 	        //Transform Scene coordinates to Local coordinates of that content
-	        javafx.geometry.Point2D localPoint = content.sceneToLocal(e.getSceneX(), e.getSceneY());
+	       Point2D localPoint = trafficMapWrapper.getContent().sceneToLocal(e.getSceneX(), e.getSceneY());
 
 	        //Convert to custom TrafficPoint
 	        TrafficPoint lastClickedPoint = new TrafficPoint(localPoint.getX(), localPoint.getY());
@@ -106,55 +136,109 @@ public class MainSenceController {
 	            default:
 	                return;
 	        }
-
 	        trafficMap.addNode(node);
-	        trafficMapContainer.setContent(trafficMapRenderer.render(trafficMap));
+	        renderTrafficMap();
 	        trafficMapContainer.setOnMouseClicked(null); //remove event handler after one use
 	    });
 	}
-
 	
 	public void addNewRoad(ActionEvent event) {
+		addingRoad = true;
+		DisplayInstruction("Click on the start node, then drag to the end node to create a new road");
 		
-		//Dialogs to select start and end nodes for the new road
-		String startNodeId;
-		String endNodeId;
-		ChoiceDialog<String> startNodeDialog = new ChoiceDialog<>("", trafficMap.getTrafficNodeList().stream().map(TrafficNode::getId).toList());
-		ChoiceDialog<String> endNodeDialog = new ChoiceDialog<>("", trafficMap.getTrafficNodeList().stream().map(TrafficNode::getId).toList());
-		startNodeDialog.setTitle("Select Start Node");
-		startNodeDialog.setHeaderText("Choose the start node for the new road");
-		startNodeId = startNodeDialog.showAndWait().orElse("");
-		endNodeDialog.setTitle("Select End Node");
-		endNodeDialog.setHeaderText("Choose the end node for the new road");
-		endNodeId = endNodeDialog.showAndWait().orElse("");
+		//One shot event handlers to add road by dragging from start node to end node
+		trafficMapContainer.setOnMousePressed((e)->{
+			if(!addingRoad) return; //not in adding road mode
+			
+			Point2D clickedPoint = trafficMapWrapper.getContent().sceneToLocal(e.getSceneX(), e.getSceneY());
+			TrafficPoint localPoint = new TrafficPoint(clickedPoint.getX(), clickedPoint.getY()); //convert to custom TrafficPoint
+			startNode = trafficMap.getNodeByPoint(localPoint);
 		
-		if(startNodeId.isEmpty() || endNodeId.isEmpty()) {
-			return; //user cancelled
-		}
+			if(startNode != null) {
+				previewLine = new Line(localPoint.getX(), localPoint.getY(), localPoint.getX(), localPoint.getY());
+				trafficMapContainer.getChildren().add(previewLine);
+			}
+		});
 		
-		TrafficNode startNode = trafficMap.getTrafficNodeList().stream().filter(node -> node.getId().equals(startNodeId)).findFirst().orElse(null);
-		TrafficNode endNode = trafficMap.getTrafficNodeList().stream().filter(node -> node.getId().equals(endNodeId)).findFirst().orElse(null);
-		if(startNode == null || endNode == null) {
-			DisplayInstruction("Invalid node selection. Please try again.");
-			return;
-		}
-		else {
-			trafficMap.addConnection(startNode, endNode);
-			trafficMapContainer.setContent(trafficMapRenderer.render(trafficMap));
-//			System.out.println("Road added between node " + startNodeId + " and node " + endNodeId);
-		}
+		trafficMapContainer.setOnMouseDragged((e)->{
+			if(!addingRoad) return; //not in adding road mode
+			if(previewLine == null) return; //not started dragging from a node
+			
+			//update preview line end point as mouse drags
+			Point2D draggedPoint = trafficMapWrapper.getContent().sceneToLocal(e.getSceneX(), e.getSceneY());
+			TrafficPoint localPoint = new TrafficPoint(draggedPoint.getX(), draggedPoint.getY()); //convert to custom TrafficPoint
+			
+			//Auto scroll when dragging near the edge of the viewport
+		    double edgeMargin = 20;      // px from viewport edge
+		    double scrollStep = 0.002;    // per drag event, tune this
+		    // mouse position in viewport coordinates
+		    Point2D viewportPoint = trafficMapWrapper.sceneToLocal(e.getSceneX(), e.getSceneY());
+		    double vx = viewportPoint.getX();
+		    double vy = viewportPoint.getY();
+
+		    double vw = trafficMapWrapper.getViewportBounds().getWidth();
+		    double vh = trafficMapWrapper.getViewportBounds().getHeight();
+
+		    if (vx < edgeMargin) {
+		        trafficMapWrapper.setHvalue(clamp(trafficMapWrapper.getHvalue() - scrollStep));
+		    } else if (vx > vw - edgeMargin) {
+		        trafficMapWrapper.setHvalue(clamp(trafficMapWrapper.getHvalue() + scrollStep));
+		    }
+
+		    if (vy < edgeMargin) {
+		        trafficMapWrapper.setVvalue(clamp(trafficMapWrapper.getVvalue() - scrollStep));
+		    } else if (vy > vh - edgeMargin) {
+		        trafficMapWrapper.setVvalue(clamp(trafficMapWrapper.getVvalue() + scrollStep));
+		    }
+			
+			//update preview line end point
+			previewLine.setEndX(localPoint.getX());
+			previewLine.setEndY(localPoint.getY());
+		});
+		
+		trafficMapContainer.setOnMouseReleased((e)->{
+			Point2D releasedPoint = trafficMapWrapper.getContent().sceneToLocal(e.getSceneX(), e.getSceneY());
+			TrafficPoint localPoint = new TrafficPoint(releasedPoint.getX(), releasedPoint.getY()); //convert to custom TrafficPoint
+			
+			endNode = trafficMap.getNodeByPoint(localPoint);
+			if(endNode != null && startNode != null && endNode != startNode) {
+				trafficMap.addConnection(startNode, endNode);
+				renderTrafficMap();
+			}
+			//clean up 
+	       if (previewLine != null) {
+	            trafficMapContainer.getChildren().remove(previewLine);
+	        }
+			trafficMapContainer.setOnMousePressed(null);
+			trafficMapContainer.setOnMouseDragged(null);
+			trafficMapContainer.setOnMouseReleased(null);
+			startNode = null;
+			endNode = null;
+			previewLine = null;
+			addingRoad = false;
+			DisplayInstruction("");
+		});
 	}
 	
 	public void removeNode(ActionEvent event) {
-		String removeNodeId;
-		ChoiceDialog<String> removeNodeDialog = new ChoiceDialog<>("", trafficMap.getTrafficNodeList().stream().map(TrafficNode::getId).toList());
-		removeNodeDialog.setTitle("Select Node to Remove");
-		removeNodeDialog.setHeaderText("Choose the traffic node to remove");
-		removeNodeId = removeNodeDialog.showAndWait().orElse("");
-		if(removeNodeId.isEmpty()) {
-			return; //user cancelled
+		DisplayInstruction("Click on the node you want to remove");
+		//Event handler like addNode
+		trafficMapContainer.setOnMouseClicked((e)->{
+			Point2D clickedPoint = trafficMapWrapper.getContent().sceneToLocal(e.getSceneX(), e.getSceneY());
+			TrafficPoint localPoint = new TrafficPoint(clickedPoint.getX(), clickedPoint.getY()); //convert to custom TrafficPoint
+			startNode = trafficMap.getNodeByPoint(localPoint);
+			if(startNode != null) {
+				trafficMap.removeNode(startNode);
+				renderTrafficMap();
+			}
+			trafficMapContainer.setOnMouseClicked(null); //remove event handler after one use
+			DisplayInstruction("");
+		});
+		
+		if(startNode != null) {
+			trafficMap.removeNode(startNode);
+			renderTrafficMap();
 		}
-		trafficMap.removeNode(removeNodeId);
-		trafficMapContainer.setContent(trafficMapRenderer.render(trafficMap));
 	}
+	
 }

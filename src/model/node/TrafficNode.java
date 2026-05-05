@@ -1,6 +1,8 @@
 package model.node;
 
 import java.util.ArrayList;
+
+import config.Constants;
 import generator.IdGenerator;
 import model.road.Lane;
 import model.road.Road;
@@ -78,6 +80,7 @@ public abstract class TrafficNode {
         }
     }
 
+
     public void buildAllConflictPoints(){
         int length = pathList.size();
         for(int i = 0; i < length; i++){
@@ -92,6 +95,12 @@ public abstract class TrafficNode {
             }
         }
     }
+    
+    public boolean containsPoint(TrafficPoint point) {
+		//check if the point is within a certain distance from the center point, if it is, then it is considered as containing the point
+		double distance = centerPoint.distance(point);
+		return distance <= Constants.JUNCTION_RADIUS; 
+	}
   
 
     public TrafficPoint getCenterPoint() {

@@ -1,6 +1,7 @@
 package model.road;
 
 import generator.IdGenerator;
+import config.Constants;
 import model.traffic.LightState;
 import model.utility.TrafficPoint;
 
@@ -22,8 +23,8 @@ public class Road {
         this.startPoint = startPoint;
         this.endPoint = endPoint;
         this.id = IdGenerator.roadId();
-        this.rightWay = new Way(LightState.GREEN, 2, true, startPoint, endPoint, id);
-        this.leftWay = new Way(LightState.GREEN, 2, false, startPoint, endPoint, id);
+        this.rightWay = new Way(LightState.GREEN, Constants.DEFAULT_LANE_COUNT, true, startPoint, endPoint, id);
+        this.leftWay = new Way(LightState.GREEN, Constants.DEFAULT_LANE_COUNT, false, startPoint, endPoint, id);
     }
     
     //Check if this road conflicts with another road (i.e., they intersect)

@@ -4,7 +4,9 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.scenes.MainSenceController">
    <left>
@@ -13,11 +15,17 @@
             <Button fx:id="addTrafficNodeButton" alignment="CENTER" mnemonicParsing="false" onAction="#addNewNode" text="Add Traffic Node" />
             <Button fx:id="removeTrafficNodeButton" mnemonicParsing="false" onAction="#removeNode" text="Remove Traffic Node" />
             <Button fx:id="addRoadButton" mnemonicParsing="false" onAction="#addNewRoad" text="Add Road" />
-            <Label fx:id="instructionsLabel" text="Label" />
+            <Label fx:id="instructionsLabel" text="">
+               <font>
+                  <Font name="System Bold" size="15.0" />
+               </font></Label>
          </children>
       </VBox>
    </left>
    <center>
-      <ScrollPane fx:id="trafficMapContainer" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+      <ScrollPane fx:id="trafficMapWrapper" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <content>
+            <Pane fx:id="trafficMapContainer" prefHeight="10000.0" prefWidth="10000.0" />
+         </content></ScrollPane>
    </center>
 </BorderPane>
