@@ -31,9 +31,9 @@ public class TrafficMap {
         Road road = new Road(startNode.getCenterPoint(), endNode.getCenterPoint());
         Edge edge = new Edge(startNode, endNode, road);
 
-        // Add ways from road to both nodes
-        startNode.addWay(road.getReverseWay(), road.getFowardWay());
-        endNode.addWay(road.getFowardWay(), road.getReverseWay());
+        // Add road to both nodes
+        startNode.addRoad(road);
+        endNode.addRoad(road);
 
         // Add edge to both nodes
         adjacentList.get(startNode).add(edge);

@@ -13,8 +13,12 @@ public class TrafficPoint {
         this.y = y;
     }
 
+    public double distance(TrafficPoint other) {
+        return Math.sqrt(Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2));
+    }
+
     public boolean isClose(TrafficPoint other) {
-        return Math.abs(x - other.x) < Constants.EPS && Math.abs(y - other.y) < Constants.EPS;
+        return distance(other) < Constants.EPS;
     }
 
     @Override

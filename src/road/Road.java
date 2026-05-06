@@ -6,8 +6,8 @@ import utility.TrafficVector;
 
 public class Road {
     private String roadId;
-    private Way fowardWay;
-    private Way reverseWay;
+    private Way rightWay;
+    private Way leftWay;
     private TrafficPoint startPoint;
     private TrafficPoint endPoint;
     private TrafficVector direction;
@@ -18,22 +18,22 @@ public class Road {
         this.endPoint = endPoint;
         this.startPoint = startPoint;
         this.direction = new TrafficVector(startPoint, endPoint).normalize();
-        this.fowardWay = new Way(IdGenerator.fowawrdWayId(roadId), direction);
-        this.reverseWay = new Way(IdGenerator.reverseWayId(roadId), direction.rotateVector(Math.PI));
+        this.rightWay = new Way(roadId, direction);
+        this.leftWay = new Way(roadId, direction.rotateVector(Math.PI));
         buildWays();
     }
 
     public void buildWays() {
-        fowardWay.buildLanes(startPoint, endPoint);
-        reverseWay.buildLanes(endPoint, startPoint);
+        rightWay.buildLanes(startPoint, endPoint);
+        leftWay.buildLanes(endPoint, startPoint);
     }
 
-    public Way getFowardWay() {
-        return fowardWay;
+    public Way getRightWay() {
+        return rightWay;
     }
 
-    public Way getReverseWay() {
-        return reverseWay;
+    public Way getLeftWay() {
+        return leftWay;
     }
 
     public String getRoadId() {

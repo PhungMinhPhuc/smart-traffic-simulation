@@ -7,15 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Lane {
-    private String laneId;
     private int index;
     private List<Vehicle> vehicleList;
     private TrafficPoint startPoint;
     private TrafficPoint endPoint;
 
 
-    public Lane(String id, int index, TrafficPoint startPoint, TrafficPoint endPoint) {
-        this.laneId = id;
+    public Lane(int index, TrafficPoint startPoint, TrafficPoint endPoint) {
         this.index = index;
         this.vehicleList = new ArrayList<>();
         this.startPoint = startPoint;

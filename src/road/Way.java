@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Way {
-    String wayId;
+    private String roadId;
     private TrafficLightState stateTrafficLight;
     private List<Lane> laneList;
     private TrafficVector direction;
 
-    public Way(String id, TrafficVector direction) {
-        this.wayId = id;
+    public Way(String roadId, TrafficVector direction) {
+        this.roadId = roadId;
         this.laneList = new ArrayList<>();
         this.stateTrafficLight = TrafficLightState.GREEN;
         this.direction = direction;
@@ -31,7 +31,7 @@ public class Way {
             TrafficPoint laneCenter = leftStart.moveBy(offset);
             TrafficPoint laneEnd = leftEnd.moveBy(offset);
 
-            Lane lane = new Lane(IdGenerator.LaneId(wayId, index), index, laneCenter, laneEnd);
+            Lane lane = new Lane(index, laneCenter, laneEnd);
 
             laneList.add(lane);
         }
@@ -47,6 +47,10 @@ public class Way {
 
     public List<Lane> getLaneList() {
         return laneList;
+    }
+
+    public String getRoadId() {
+        return roadId;
     }
 
     public void setStateTrafficLight(TrafficLightState stateTrafficLight) {
