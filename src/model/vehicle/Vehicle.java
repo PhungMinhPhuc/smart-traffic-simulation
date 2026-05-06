@@ -30,7 +30,8 @@ public class Vehicle {
 	}
 	
 	//"Move" the vehicle by updating its position and speed
-	//based on current speed, acceleration, and direction. The timeInterval parameter
+	//based on current speed, acceleration, and direction
+	// in a timeInterval passed as parameter
 	public void move(double timeInterval) {
 		this.position = this.direction.translatePoint(position, timeInterval*this.speed);
 		this.speed += this.acceleration * timeInterval;
