@@ -1,13 +1,21 @@
 package model.vehicle.behavior;
 
 import model.vehicle.Vehicle;
-import model.traffic.LightState;
 
-public interface DriverBehavior {
-	public void decide(Vehicle self, Vehicle ahead, double dist, boolean isRead);
-//    double decideAcceleration(Vehicle self, Vehicle ahead);
-//    double onRedLight(Vehicle self, LightState state, double distanceToLight);
-//    void onEmergency(Vehicle self, Vehicle emergencyVehicle);
-//    boolean shouldChangeLane(Vehicle self, Vehicle ahead);
-//    String getBehaviorName(); // For Basic GUI display, return The name of the behavior (e.g., "Normal", "Aggressive", "Emergency").
+public abstract class DriverBehavior {
+	
+	protected double sightDistance;
+	
+	  public void decide(Vehicle self, Vehicle ahead, double dist, boolean isRed) {
+		  if (self.isEmergency()) handleEmergency(self);
+		  else if (isRed && dist < sightDistance) handleRedLight(self, dist);  
+		  else if (ahead != null) handleFollowVehicle(self, ahead);
+		  else handleFreeWay(self);
+	  }
+	  
+	  protected abstract void handleFreeWay (Vehicle self);
+	  protected abstract void  handleFollowVehicle (Vehicle self, Vehicle ahead);
+	  protected abstract void handleRedLight (Vehicle self, double distance);
+	  protected abstract void handleEmergency (Vehicle self);
+      public abstract String getBehaviorName();
 }

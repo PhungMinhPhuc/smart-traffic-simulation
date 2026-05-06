@@ -25,7 +25,7 @@ public abstract class Vehicle {
     public Vehicle(String type, double maxSpeed, double length, double width, String sound, DriverBehavior behavior) {
         this.id = IdGenerator.vehicleId(type);
         this.maxSpeed = maxSpeed;
-        this.length = length;
+        this.length = length;	
         this.width = width;
         this.sound = sound;
         this.behavior = behavior;
@@ -38,16 +38,15 @@ public abstract class Vehicle {
     	// Lấy thông tin từ lane
         Vehicle ahead = getVehicleAhead();
         double distToLight = position.distanceTo(currentLane.getEndPoint());
-        boolean isRead = currentLane.isRedLight();
+        boolean isRed = currentLane.isRedLight();
         
         // Behavior quyết định hành động 
-        behavior.decide(this, ahead, distToLight, isRead);
+        behavior.decide(this, ahead, distToLight, isRed);
         
         // Cập nhật giá trị vật lý, tọa độ xe
         applyPhysics(deltaTime);
         move(deltaTime);
     }
-
     
     public void applyAcceleration(double a) {
     	this.acceleration = a;
