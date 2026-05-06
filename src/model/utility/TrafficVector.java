@@ -12,6 +12,10 @@ public class TrafficVector {
         this.x = end.getX() - start.getX();
         this.y = end.getY() - start.getY();
     }
+    
+    public TrafficVector clone() {
+		return new TrafficVector(this.x, this.y);
+	}
 
     public TrafficVector rotateVector(double radianAngle) {
         double cosAngle = Math.cos(radianAngle);

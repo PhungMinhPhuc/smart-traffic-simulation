@@ -3,6 +3,7 @@ package model.road;
 import java.util.ArrayList;
 
 import model.utility.TrafficPoint;
+import model.utility.TrafficVector;
 import model.vehicle.Vehicle;
 
 public class Lane {
@@ -23,19 +24,23 @@ public class Lane {
         this.positionInWay = positionInWay;
     }
 
-    public void addVehicle(Vehicle vehicle){
+    public void addVehicle(){
+        Vehicle vehicle = new Vehicle(startPoint.clone(), new TrafficVector(startPoint, endPoint));
         vehicleList.add(vehicle);
     }
 
-    public void removeVehicle(int vehicleId){
+    public void removeVehicle(String vehicleId){
         for(Vehicle vehicle : vehicleList){
-            if(vehicle.getId() == vehicleId){
+            if(vehicle.getId().equals(vehicleId)){
                 vehicleList.remove(vehicle);
                 return;
             }
         }
     }
 
+    public ArrayList<Vehicle> getVehicleList() {
+		return vehicleList;
+	}
     public TrafficPoint getStartPoint() {
         return startPoint;
     }

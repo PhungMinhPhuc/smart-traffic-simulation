@@ -1,11 +1,13 @@
 package application.scenes;
 import java.util.Arrays;
+
 import java.util.List;
 import java.util.Optional;
-
+import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
+import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
@@ -16,7 +18,9 @@ import javafx.scene.shape.Line;
 import model.map.TrafficMap;
 import model.node.*;
 import model.utility.TrafficPoint;
+import model.vehicle.Vehicle;
 import render.TrafficMapRenderer;
+import render.VehicleRenderer;
 
 public class MainSenceController {
 	//FXML elements
@@ -25,12 +29,15 @@ public class MainSenceController {
 	@FXML Button removeTrafficNodeButton;
 	@FXML Button addRoadButton;
 	@FXML Button removeRoadButton;
-	@FXML Label instructionsLabel; //For displaying instrictions to the user when they are adding or removing nodes and roads
+	@FXML Label instructionsLabel; //For displaying instructions to the user when they are adding or removing nodes and roads
 	@FXML ScrollPane trafficMapWrapper; //Create view port of the map
-	@FXML Pane trafficMapContainer; //Pane to draw the actual map on, will be placed inside the ScrollPane
+	@FXML Pane mapLayer; //Pane to draw the static map on, will be placed inside the 
+	@FXML Pane vehicleLayer; //Pane to draw dynamic Vehicle
+	@FXML Group trafficMapContainer;
 	
 	//Map and map renderer
 	private static TrafficMapRenderer trafficMapRenderer = new TrafficMapRenderer();
+	private static VehicleRenderer vehicleRenderer = new VehicleRenderer();
 	private static TrafficMap trafficMap = new TrafficMap();
 	
 	//Normal fields for functionalities
@@ -44,24 +51,20 @@ public class MainSenceController {
 		//Create defaultMap
 		createDefaultMap();
 		
-		//initializes base map
+		//initializes base mapLayer and vehicleLayr
 		renderTrafficMap();
+		renderDefaultVehicles();
 		
+		//config scrollPane and Panes
+		trafficMapWrapper.setPannable(true); //allow panning by dragging the mouse on the scroll pane
+		vehicleLayer.setMouseTransparent(true); //set vehicleLayer to not recognize mouse events
+
 		//set initial instruction
 		instructionsLabel.setWrapText(true);
 		DisplayInstruction("Click the buttons above to add or remove traffic nodes and roads.");
 		
-		//
-		trafficMapWrapper.setPannable(true);
-		
-		//print testing info to console
-//		for(Road roads : trafficMap.getRoadList()) {
-//			System.out.println("Road from (" + roads.getStartPoint().getX() + ", " + roads.getStartPoint().getY() + ") to (" +
-//					roads.getEndPoint().getX() + ", " + roads.getEndPoint().getY() + ")");
-//			System.out.println("Road id:" + roads.getId());
-//			System.out.println("Left lane id:" + roads.getLeftWay().getRoadId());
-//			System.out.println("Right lane id:" + roads.getRightWay().getRoadId());
-//		}
+		//start animation to move vehicles
+		startVehicleAnimation();
 	}
 	
 /**
@@ -75,19 +78,23 @@ public class MainSenceController {
 	private void createDefaultMap() {
 		TrafficNode node1 = new Junction(new TrafficPoint(400, 400),5);
 		TrafficNode node2 = new Junction(new TrafficPoint(800, 1000),3);
-		TrafficNode node3 = new Junction(new TrafficPoint(2000, 1600),4);
 		trafficMap.addNode(node1);
 		trafficMap.addNode(node2);
-		trafficMap.addNode(node3);
 		trafficMap.addConnection(node1, node2);
-		trafficMap.addConnection(node2, node3);
-		trafficMap.addConnection(node3, node1);
+		trafficMap.addDefaultVehicleToRoad(trafficMap.getRoadList().get(0), true);
 	}
-	//render map
+	//render mapLayer
 	private void renderTrafficMap() {
-		trafficMapContainer.getChildren().clear();
-		trafficMapContainer.getChildren().add(trafficMapRenderer.render(trafficMap));
+		mapLayer.getChildren().clear();
+		mapLayer.getChildren().add(trafficMapRenderer.render(trafficMap));
 		trafficMapWrapper.setContent(trafficMapContainer);
+	}
+	//render vehicleLayer
+	private void renderDefaultVehicles() {
+		vehicleLayer.getChildren().clear();
+		for(Vehicle veh : trafficMap.getVehicleList()) {
+			vehicleLayer.getChildren().add(vehicleRenderer.render(veh));
+		}
 	}
 	//clamp function for auto scrolling when dragging near the edge of the viewport
 	private double clamp(double value) {
@@ -95,7 +102,6 @@ public class MainSenceController {
 	    if (value > 1.0) return 1.0;
 	    return value;
 	}
-	
 	
 /**
  * Functions for app's functionalities
@@ -114,7 +120,7 @@ public class MainSenceController {
 
 	    DisplayInstruction("Click on the map to set the location of the new traffic node");
 
-	    trafficMapContainer.setOnMouseClicked((e) -> {//one shot event handler to get clicked point
+	    mapLayer.setOnMouseClicked((e) -> {//one shot event handler to get clicked point
 
 	        //Transform Scene coordinates to Local coordinates of that content
 	       Point2D localPoint = trafficMapWrapper.getContent().sceneToLocal(e.getSceneX(), e.getSceneY());
@@ -141,7 +147,7 @@ public class MainSenceController {
 	        }
 	        trafficMap.addNode(node);
 	        renderTrafficMap();
-	        trafficMapContainer.setOnMouseClicked(null); //remove event handler after one use
+	        mapLayer.setOnMouseClicked(null); //remove event handler after one use
 	    });
 	}
 	
@@ -151,7 +157,7 @@ public class MainSenceController {
 		DisplayInstruction("Click on the start node, then drag to the end node to create a new road");
 		
 		//One shot event handlers to add road by dragging from start node to end node
-		trafficMapContainer.setOnMousePressed((e)->{
+		mapLayer.setOnMousePressed((e)->{
 			if(!addingRoad) return; //not in adding road mode
 			
 			Point2D clickedPoint = trafficMapWrapper.getContent().sceneToLocal(e.getSceneX(), e.getSceneY());
@@ -160,11 +166,11 @@ public class MainSenceController {
 		
 			if(startNode != null) {
 				previewLine = new Line(localPoint.getX(), localPoint.getY(), localPoint.getX(), localPoint.getY());
-				trafficMapContainer.getChildren().add(previewLine);
+				mapLayer.getChildren().add(previewLine);
 			}
 		});
 		
-		trafficMapContainer.setOnMouseDragged((e)->{
+		mapLayer.setOnMouseDragged((e)->{
 			if(!addingRoad) return; //not in adding road mode
 			if(previewLine == null) return; //not started dragging from a node
 			
@@ -200,7 +206,7 @@ public class MainSenceController {
 			previewLine.setEndY(localPoint.getY());
 		});
 		
-		trafficMapContainer.setOnMouseReleased((e)->{
+		mapLayer.setOnMouseReleased((e)->{
 			Point2D releasedPoint = trafficMapWrapper.getContent().sceneToLocal(e.getSceneX(), e.getSceneY());
 			TrafficPoint localPoint = new TrafficPoint(releasedPoint.getX(), releasedPoint.getY()); //convert to custom TrafficPoint
 			
@@ -211,11 +217,11 @@ public class MainSenceController {
 			}
 			//clean up 
 	       if (previewLine != null) {
-	            trafficMapContainer.getChildren().remove(previewLine);
+	            mapLayer.getChildren().remove(previewLine);
 	        }
-			trafficMapContainer.setOnMousePressed(null);
-			trafficMapContainer.setOnMouseDragged(null);
-			trafficMapContainer.setOnMouseReleased(null);
+			mapLayer.setOnMousePressed(null);
+			mapLayer.setOnMouseDragged(null);
+			mapLayer.setOnMouseReleased(null);
 			startNode = null;
 			endNode = null;
 			previewLine = null;
@@ -228,7 +234,7 @@ public class MainSenceController {
 	public void removeNode(ActionEvent event) {
 		DisplayInstruction("Click on the node you want to remove");
 		//Event handler like addNode
-		trafficMapContainer.setOnMouseClicked((e)->{
+		mapLayer.setOnMouseClicked((e)->{
 			Point2D clickedPoint = trafficMapWrapper.getContent().sceneToLocal(e.getSceneX(), e.getSceneY());
 			TrafficPoint localPoint = new TrafficPoint(clickedPoint.getX(), clickedPoint.getY()); //convert to custom TrafficPoint
 			startNode = trafficMap.getNodeByPoint(localPoint);
@@ -236,7 +242,7 @@ public class MainSenceController {
 				trafficMap.removeNode(startNode);
 				renderTrafficMap();
 			}
-			trafficMapContainer.setOnMouseClicked(null); //remove event handler after one use
+			mapLayer.setOnMouseClicked(null); //remove event handler after one use
 			DisplayInstruction("");
 		});
 		
@@ -245,5 +251,31 @@ public class MainSenceController {
 			renderTrafficMap();
 		}
 	}
-	
+
+/**
+ * Functions for app's animation
+ */
+	//Timer ticks to update vehicle positions and re-render them at their new positions
+	// all the long variable is the current time in nanoseconds
+	public void startVehicleAnimation() {
+		AnimationTimer vehicleTimer = new AnimationTimer() {
+			private long lastFrameTimeNano = 0;
+			
+			@Override
+			public void handle(long now) {
+				if (lastFrameTimeNano == 0) {
+					lastFrameTimeNano = now;
+					return;
+				}
+				//time elapsed since last frame in seconds
+				double deltaTime = (now - lastFrameTimeNano) / 1e9; //convert from nanoseconds to seconds
+				lastFrameTimeNano = now; //update current time for the next frame
+				
+				//update vehicle positions based on their speed and the elapsed time
+				trafficMap.updateVehicles(deltaTime);
+				renderDefaultVehicles(); //re-render vehicles at their new positions
+			}
+		};
+		vehicleTimer.start();
+	}
 }

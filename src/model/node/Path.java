@@ -86,14 +86,18 @@ public class Path {
         vehicleList.add(v);
     }
 
-    public void removeVehicle(int vehicleId){
+    public void removeVehicle(String vehicleId){
         for(Vehicle v : vehicleList){
-            if(v.getId() == vehicleId){
+            if(v.getId().equals(vehicleId)){
                 vehicleList.remove(v);
                 return;
             }
         }
     }
+    
+    public ArrayList<Vehicle> getVehicleList() {
+		return vehicleList;
+	}
 
     public TrafficPoint getStartPoint() {
         return startPoint;

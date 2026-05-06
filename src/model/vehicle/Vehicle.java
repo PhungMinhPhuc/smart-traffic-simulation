@@ -1,15 +1,70 @@
 package model.vehicle;
 
-public class Vehicle {
-	private int id;
-	private static int vehicleQty = 0;
+import model.utility.TrafficPoint;
+import model.utility.TrafficVector;
+import generator.IdGenerator;
 
+public class Vehicle {
+
+	private String id;
+	private TrafficPoint position;
+	private double speed;
+	private double acceleration;
+	private TrafficVector direction; 
+
+	public Vehicle(TrafficPoint position,TrafficVector direction) {
+		this.id = IdGenerator.vehicleId("Demo Vehicle");
+		this.position = position;
+		this.speed = 0.0;
+		this.direction = direction.clone();
+		this.acceleration = 4.0;
+	}		
+	
 	public Vehicle() {
-		this.id = vehicleQty;
-		vehicleQty++;
+		this.id = IdGenerator.vehicleId("Demo Vehicle");
+		this.position = new TrafficPoint(0.0, 0.0);
+		this.speed = 0.0;
+		this.acceleration = 2.0;
+	}
+	
+	public void move(double timeInterval) {
+		this.position = this.direction.translatePoint(position, timeInterval*this.speed);
+		this.speed += this.acceleration * timeInterval;
+	}
+	
+	public void setDirection(TrafficVector direction) {
+		this.direction = direction.clone();
+	}
+	
+	public TrafficVector getDirection() {
+		return direction;
+	}
+	
+	public String getId() {
+		return id;
+	}
+	
+	public TrafficPoint getPosition() {
+		return position;
 	}
 
-	public int getId() {
-		return id;
+	public void setPosition(TrafficPoint position) {
+		this.position = position;
+	}
+
+	public double getSpeed() {
+		return speed;
+	}
+
+	public void setSpeed(double speed) {
+		this.speed = speed;
+	}
+
+	public double getAcceleration() {
+		return acceleration;
+	}
+
+	public void setAcceleration(double acceleration) {
+		this.acceleration = acceleration;
 	}
 }

@@ -5,10 +5,14 @@ import java.util.Map;
 
 import config.Constants;
 import model.node.TrafficNode;
+import model.road.Lane;
 import model.road.Road;
+import model.road.Way;
 import model.utility.TrafficPoint;
 import model.utility.TrafficVector;
+import model.vehicle.Vehicle;
 import model.node.Edge;
+import model.node.Path;
 
 import java.util.ArrayList;
 
@@ -75,6 +79,23 @@ public class TrafficMap {
         adjacentList.remove(removeNode);
     }
     
+    //Testing method 
+    public void addDefaultVehicleToRoad(Road road, boolean isRightWay) {
+		Way way = isRightWay ? road.getRightWay() : road.getLeftWay();
+		if(way.getLaneList().isEmpty()) {
+			System.out.println("No lane available on the way to add vehicle");
+			return;
+		}
+		//Add a default vehicle to the first lane of the way
+		way.getLaneList().get(0).addVehicle();
+	}
+    
+    public void updateVehicles(double timeInterval) {
+		for(Vehicle vehicle : getVehicleList()) {
+			vehicle.move(timeInterval);
+		}
+	}
+    
     //Get unique set of TraffiNode 
 	public ArrayList<TrafficNode> getTrafficNodeList() {
 		ArrayList<TrafficNode> trafficNodeList = new ArrayList<>();
@@ -97,6 +118,28 @@ public class TrafficMap {
 		return roadList;
 	}
 	
+	public ArrayList<Vehicle> getVehicleList(){
+		ArrayList<Vehicle> vehicleList = new ArrayList<>();
+		//Get vehicle in Lanes
+		for(Road road : getRoadList()) {
+			Way rightWay = road.getRightWay();
+			Way leftWay = road.getLeftWay();
+			for(Lane lane : rightWay.getLaneList()) {
+				vehicleList.addAll(lane.getVehicleList());
+			}
+			for(Lane lane : leftWay.getLaneList()) {
+				vehicleList.addAll(lane.getVehicleList());
+			}
+		}
+		//get Vehicle in nodes
+		for(TrafficNode node : adjacentList.keySet()) {
+			for(Path path : node.getPathList()) {
+				vehicleList.addAll(path.getVehicleList());
+			}
+		}
+		return vehicleList;
+	}
+	
 	public TrafficNode getNodeByPoint(TrafficPoint point) {
 		for(TrafficNode node : adjacentList.keySet()) {
 			if(node.containsPoint(point)) {
@@ -110,4 +153,6 @@ public class TrafficMap {
     public Map<TrafficNode, ArrayList<Edge>> getAdjacentList() {
         return adjacentList;
     }
+    
+
 }
