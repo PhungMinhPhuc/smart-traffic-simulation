@@ -51,6 +51,9 @@ public class MainSenceController {
 		instructionsLabel.setWrapText(true);
 		DisplayInstruction("Click the buttons above to add or remove traffic nodes and roads.");
 		
+		//
+		trafficMapWrapper.setPannable(true);
+		
 		//print testing info to console
 //		for(Road roads : trafficMap.getRoadList()) {
 //			System.out.println("Road from (" + roads.getStartPoint().getX() + ", " + roads.getStartPoint().getY() + ") to (" +
@@ -144,6 +147,7 @@ public class MainSenceController {
 	
 	public void addNewRoad(ActionEvent event) {
 		addingRoad = true;
+		trafficMapWrapper.setPannable(false); //disable panning while adding road to avoid conflicts with dragging to add road
 		DisplayInstruction("Click on the start node, then drag to the end node to create a new road");
 		
 		//One shot event handlers to add road by dragging from start node to end node
@@ -217,6 +221,7 @@ public class MainSenceController {
 			previewLine = null;
 			addingRoad = false;
 			DisplayInstruction("");
+			trafficMapWrapper.setPannable(true); //re-enable panning after adding road
 		});
 	}
 	

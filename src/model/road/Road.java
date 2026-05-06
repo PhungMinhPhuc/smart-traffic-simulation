@@ -44,24 +44,17 @@ public class Road {
         if (o1 != o2 && o3 != o4) {
             return true;
         }
-
-
         if (o1 == 0 && onSegment(p1, p2, q1)) return true;
-
         if (o2 == 0 && onSegment(p1, q2, q1)) return true;
-
         if (o3 == 0 && onSegment(p2, p1, q2)) return true;
-
         if (o4 == 0 && onSegment(p2, q1, q2)) return true;
-
         return false; // Không có điểm chung
     }
 
-    	//Cal orientation of 3 points (p, q, r)
-     	//0: Line up
-     	//1: ClockWise
-     	//2: CounterClockWise
-    
+	//Cal orientation of 3 points (p, q, r)
+ 	//0: Line up
+ 	//1: ClockWise
+ 	//2: CounterClockWise
     private int orientation(TrafficPoint p, TrafficPoint q, TrafficPoint r) {
         double val = (q.getY() - p.getY()) * (r.getX() - q.getX()) -
                      (q.getX() - p.getX()) * (r.getY() - q.getY());
