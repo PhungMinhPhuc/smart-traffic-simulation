@@ -90,6 +90,9 @@ public class TrafficMap {
 		way.getLaneList().get(0).addVehicle();
 	}
     
+    
+    //update the position of all vehicles in the map, 
+    // this method will be called in each time step of the simulation
     public void updateVehicles(double timeInterval) {
 		for(Vehicle vehicle : getVehicleList()) {
 			vehicle.move(timeInterval);

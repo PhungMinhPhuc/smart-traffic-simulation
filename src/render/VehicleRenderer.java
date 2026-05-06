@@ -7,6 +7,7 @@ import javafx.scene.shape.Circle;
 import model.vehicle.Vehicle;
 import config.Constants;
 
+//pseudo VehicleRenderer class for testing, renders a vehicle as a blue circle
 public class VehicleRenderer implements IRender<Vehicle> {
 	@Override
 	public Parent render(Vehicle vehicle) {

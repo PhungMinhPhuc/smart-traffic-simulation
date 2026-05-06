@@ -4,6 +4,8 @@ import model.utility.TrafficPoint;
 import model.utility.TrafficVector;
 import generator.IdGenerator;
 
+
+//psudeo Vehicle class for testing, not used in the final version
 public class Vehicle {
 
 	private String id;
@@ -27,6 +29,8 @@ public class Vehicle {
 		this.acceleration = 2.0;
 	}
 	
+	//"Move" the vehicle by updating its position and speed
+	//based on current speed, acceleration, and direction. The timeInterval parameter
 	public void move(double timeInterval) {
 		this.position = this.direction.translatePoint(position, timeInterval*this.speed);
 		this.speed += this.acceleration * timeInterval;
