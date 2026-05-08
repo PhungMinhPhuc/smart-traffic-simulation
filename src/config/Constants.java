@@ -3,6 +3,10 @@ package config;
 public final class Constants {
     private Constants() {}
 
+    // NODE CONFIG
+
+    public static final double NODE_RADIUS = 100.0;
+
     // LANE CONFIG
     public static final double LANE_WIDTH = 30.0;
     public static final int LANES_PER_WAY = 2;
