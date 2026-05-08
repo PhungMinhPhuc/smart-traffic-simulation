@@ -1,46 +1,44 @@
 package trafficmap;
 
-import node.Edge;
 import node.TrafficNode;
 import road.Road;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class TrafficMap {
-    private Map<TrafficNode, List<Edge>> adjacentList;
+    private List<TrafficNode> nodeList;
+    private List<Road> roadList;
 
     public TrafficMap() {
-        this.adjacentList = new HashMap<>();
+        this.nodeList = new ArrayList<>();
+        this.roadList = new ArrayList<>();
         System.out.println("Map created");
     }
 
     public void addNode(TrafficNode node) {
-        adjacentList.putIfAbsent(node, new ArrayList<>());
+        if (!nodeList.contains(node)) {
+            nodeList.add(node);
+        }
     }
 
-    public void addEdge(TrafficNode startNode, TrafficNode endNode) {
-
-        // Check node existence
-        if (!adjacentList.containsKey(startNode) || !adjacentList.containsKey(endNode)) {
+    public void addRoad(TrafficNode startNode, TrafficNode endNode) {
+        if (!nodeList.contains(startNode) || !nodeList.contains(endNode)) {
             throw new IllegalArgumentException("Node does not exist");
         }
-        // Create road and edge
-        Road road = new Road(startNode.getCenterPoint(), endNode.getCenterPoint());
-        Edge edge = new Edge(startNode, endNode, road);
 
-        // Add road to both nodes
+        Road road = new Road(startNode, endNode);
+        roadList.add(road);
+
         startNode.addRoad(road);
         endNode.addRoad(road);
-
-        // Add edge to both nodes
-        adjacentList.get(startNode).add(edge);
-        adjacentList.get(endNode).add(edge);
     }
 
-    public Map<TrafficNode, List<Edge>> getAdjacentList() {
-        return adjacentList;
+    public List<TrafficNode> getNodeList() {
+        return nodeList;
+    }
+
+    public List<Road> getRoadList() {
+        return roadList;
     }
 }
