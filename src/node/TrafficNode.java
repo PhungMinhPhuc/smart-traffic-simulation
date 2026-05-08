@@ -15,6 +15,7 @@ public class TrafficNode {
     protected TrafficPoint centerPoint;
     protected List<Path> pathList;
     protected List<Road> roadList;
+    private int pathCounter;
     public static int idCounter = 0;
 
     public TrafficNode(TrafficPoint centerPoint) {
@@ -22,81 +23,119 @@ public class TrafficNode {
         this.centerPoint = centerPoint;
         this.pathList = new ArrayList<>();
         this.roadList = new ArrayList<>();
+        this.pathCounter = 0;
     }
 
     public void addRoad(Road road){
-        //add road to the road list and then build the node again
+        buildPaths(road);
         roadList.add(road);
-        buildNode();
     }
 
     public void removeRoad(String roadId){
         for(Road road : roadList){
             if(road.getRoadId().equals(roadId)){
                 roadList.remove(road);
-                buildNode(); //if the road is removed, the node need to be built again
                 return;
             }
         }
     }
 
-    protected void buildNode(){
-        pathList.clear();
-        buildAllPaths();
-        buildAllConflictPoints();
+    // build paths when add new road
+    protected void buildPaths(Road road) {
+        Way roadEntryWay = getEntryWay(road);
+        Way roadExitWay = getExitWay(road);
+        ArrayList<Path> newPaths = new ArrayList<>();
+
+        // build paths between new road and each existing road
+        for (Road otherRoad : roadList) {
+            Way otherEntryWay = getEntryWay(otherRoad);
+            Way otherExitWay = getExitWay(otherRoad);
+
+            addPathsBetweenWays(roadEntryWay, otherExitWay, newPaths);
+            addPathsBetweenWays(otherEntryWay, roadExitWay, newPaths);
+        }
+
+        // build conflict points after building path
+        buildConflictPoints(newPaths);
     }
 
-    protected void buildAllPaths(){
-        ArrayList<Way> entryWays = new ArrayList<Way>();
-        ArrayList<Way> exitWays = new ArrayList<Way>();
-        for(Road road : roadList){
-            Way rightWay = road.getRightWay();
-            Way leftWay = road.getLeftWay();
+    // new paths will be added into pathList in this methods
+    private void addPathsBetweenWays(Way entryWay, Way exitWay, List<Path> newPaths) {
+        if (entryWay.getRoadId().equals(exitWay.getRoadId())) {
+            return;
+        }
 
-            //decide which way is entryway and which way is exit way by the distance from center point to start point of each way
-            if(centerPoint.distance(rightWay.getLaneList().get(0).getStartPoint()) //Right way is entryway
-                    > centerPoint.distance(leftWay.getLaneList().get(0).getStartPoint())){
-                entryWays.add(rightWay);
-                exitWays.add(leftWay);
-            } else {
-                entryWays.add(leftWay);
-                exitWays.add(rightWay);
-            }
+        for (Lane entryLane : entryWay.getLaneList()) {
+            for (Lane exitLane : exitWay.getLaneList()) {
 
-            //build path for each combination of entryway and exit way
-            for(Way entryWay : entryWays){
-                for(Way exitWay : exitWays){
-                    //Only combine by path entryway and exit way if they are not on the same road
-                    if(entryWay.getRoadId() != exitWay.getRoadId()){
-                        for(Lane entryLane : entryWay.getLaneList()){
-                            for(Lane exitLane : exitWay.getLaneList()){
-                                Path path = new Path(
-                                        IdGenerator.pathId(id, pathList.size()),
-                                        entryLane.getEndPoint(),
-                                        exitLane.getStartPoint());
-                                pathList.add(path);
-                            }
-                        }
-                    }
+                // check if path exists
+                if (findPath(entryLane.getEndPoint(), exitLane.getStartPoint()) != null) {
+                    continue;
+                }
+
+                Path path = new Path(
+                        IdGenerator.pathId(id, pathCounter++),
+                        entryLane.getEndPoint(),
+                        exitLane.getStartPoint()
+                );
+
+                pathList.add(path);
+
+                if (newPaths != null) {
+                    newPaths.add(path);
                 }
             }
         }
     }
 
+    private void buildConflictPoints(List<Path> newPaths) {
+        for (Path newPath : newPaths) {
+            for (Path existingPath : pathList) {
+                if (newPath.equals(existingPath)) {
+                    continue;
+                }
 
-    protected void buildAllConflictPoints(){
-        int length = pathList.size();
-        for(int i = 0; i < length; i++){
-            for(int j = i + 1; j < length; j++){
-                Path path1 = pathList.get(i);
-                Path path2 = pathList.get(j);
-                TrafficPoint conflictPoint = path1.findConflictPoint(path2);
-                if(conflictPoint != null){
-                    path1.addConflictPoint(path2, conflictPoint);
-                    path2.addConflictPoint(path1, conflictPoint);
+                TrafficPoint conflictPoint = newPath.findConflictPoint(existingPath);
+                if (conflictPoint != null) {
+                    newPath.addConflictPoint(existingPath, conflictPoint);
+                    existingPath.addConflictPoint(newPath, conflictPoint);
                 }
             }
         }
+    }
+
+    private Path findPath(TrafficPoint startPoint, TrafficPoint endPoint) {
+        for (Path path : pathList) {
+            if (path.getStartPoint().equals(startPoint) && path.getEndPoint().equals(endPoint)) {
+                return path;
+            }
+        }
+
+        return null;
+    }
+
+    private Way getEntryWay(Road road) {
+        Way rightWay = road.getRightWay();
+        Way leftWay = road.getLeftWay();
+
+        if (centerPoint.distance(rightWay.getLaneList().get(0).getStartPoint())
+                > centerPoint.distance(leftWay.getLaneList().get(0).getStartPoint())) {
+            return rightWay;
+        }
+
+        return leftWay;
+    }
+
+    private Way getExitWay(Road road) {
+        Way rightWay = road.getRightWay();
+        Way leftWay = road.getLeftWay();
+        Way entryWay = getEntryWay(road);
+
+        if (entryWay == rightWay) {
+            return leftWay;
+        }
+
+        return rightWay;
     }
 
     public void removePath(Path path) {
