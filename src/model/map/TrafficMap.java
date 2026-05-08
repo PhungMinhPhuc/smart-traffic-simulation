@@ -7,7 +7,8 @@ import model.vehicle.Vehicle;
 import java.util.*; 
 
 public class TrafficMap {
-    private Map<TrafficNode, List<Road>> adjacencyList;
+    private List<Road> roadList;
+    private List<TrafficNode> nodeList;
     private List<Vehicle> vehicles;
     private List<Road> allRoads; 
 

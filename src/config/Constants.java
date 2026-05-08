@@ -1,9 +1,28 @@
 package config;
+
+import javafx.scene.paint.Color;
+
 public final class Constants {
     private Constants() {}
 
     // LANE CONFIG
     public static final double LANE_WIDTH = 30.0;
+    public static final Color LANE_COLOR = Color.GRAY;
+
+    // LANE MARKING CONFIG
+    public static final double LANE_MARKING_WIDTH = 1.0;
+    public static final Color LANE_MARKING_COLOR = Color.WHITE;
+
+    //ROAD MARKING CONFIG
+
+
+    // STOP LINE CONFIG
+    public static final double STOP_LINE_WIDTH = 2.0;
+    public static final Color STOP_LINE_MARKING_COLOR = Color.WHITE;
+
+    // PATH CONFIG
+    public static final double PATH_WIDTH = 2.0;
+    public static final Color PATH_COLOR = Color.RED;
 
     // GEOMETRY / MATH
     public static final double EPS = 1e-9;

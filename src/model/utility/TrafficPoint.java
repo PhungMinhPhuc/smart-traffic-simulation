@@ -14,7 +14,7 @@ public class TrafficPoint {
 
     // Point + Vector = New Point
     public TrafficPoint add(TrafficVector v) {
-        return new TrafficPoint(this.x + v.dx, this.y + v.dy);
+        return new TrafficPoint(this.x + v.x, this.y + v.y);
     }
 
     // Point - Point = Vector
