@@ -13,6 +13,7 @@ public class TrafficVector {
         this.y = end.getY() - start.getY();
     }
     
+    @Override
     public TrafficVector clone() {
 		return new TrafficVector(this.x, this.y);
 	}

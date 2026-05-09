@@ -18,6 +18,7 @@ public class TrafficPoint {
 		return Double.compare(other.x, x) == 0 && Double.compare(other.y, y) == 0;
 	}
 	
+	@Override
 	public TrafficPoint clone() {
 		return new TrafficPoint(this.x, this.y);
 	}
