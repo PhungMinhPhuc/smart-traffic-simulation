@@ -83,18 +83,13 @@ public class Path {
 
 
     public void addVehicle(Vehicle vehicle){
-    	vehicle.setDirection(new TrafficVector(endPoint.getX() - startPoint.getX(), endPoint.getY() - startPoint.getY()));
-        vehicle.setPosition(startPoint.clone());
-    	vehicleList.add(vehicle);
+    	if(!vehicleList.contains(vehicle)) {
+    		vehicleList.add(vehicle);
+    	}
     }
 
-    public void removeVehicle(String vehicleId){
-        for(Vehicle v : vehicleList){
-            if(v.getId().equals(vehicleId)){
-                vehicleList.remove(v);
-                return;
-            }
-        }
+    public void removeVehicle(Vehicle vehicle){
+    	vehicleList.remove(vehicle);
     }
     
     @Override

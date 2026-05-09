@@ -27,9 +27,9 @@ public class Lane {
     
     //pseudo code for adding and removing vehicle, not used in the final version
     public void addVehicle(Vehicle newVehicle){
-    	newVehicle.setDirection(new TrafficVector(startPoint, endPoint));
-    	newVehicle.setPosition(startPoint.clone());
-		vehicleList.add(newVehicle);
+    	if(!vehicleList.contains(newVehicle)) {
+			vehicleList.add(newVehicle);
+		}
 	}
     public void addVehicle(){
         Vehicle vehicle = new Vehicle(startPoint.clone(), new TrafficVector(startPoint, endPoint));

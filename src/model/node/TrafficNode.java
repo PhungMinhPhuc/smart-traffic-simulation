@@ -1,6 +1,7 @@
 package model.node;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import config.Constants;
 import generator.IdGenerator;
@@ -8,6 +9,7 @@ import model.road.Lane;
 import model.road.Road;
 import model.road.Way;
 import model.utility.TrafficPoint;
+import model.utility.TrafficVector;
 import model.vehicle.Vehicle;
 import model.observer.ITrafficObsever;
 
@@ -24,15 +26,20 @@ public abstract class TrafficNode implements ITrafficObsever {
     
     @Override
 	public void checkVehicleLeaving() {
-    	for(Path path : this.getPathList()) {
-			for(Vehicle vehicle : path.getVehicleList()) {
+     	for(Iterator<Path> pathIterator = this.getPathList().iterator(); pathIterator.hasNext(); ) {
+    		Path path = pathIterator.next();
+			for(Iterator<Vehicle> vehicleIterator = path.getVehicleList().iterator(); vehicleIterator.hasNext(); ) {
+				Vehicle vehicle = vehicleIterator.next();
 				if(vehicle.getPosition().distance(path.getEndPoint()) < Constants.MIN_DISTANCE_TO_END_POINT) { //if vehicle get close enough to path's endPoint
 					//store conected lanes for vehicles to enter after leaving the node
-			    	ArrayList<Lane> connectedLanes = new ArrayList<Lane>(); 
+		    			ArrayList<Lane> connectedLanes = new ArrayList<Lane>(); 
 					//get the lane connectd to this path
-					for(Road road : roadList) {
-						for(Way way : new Way[] {road.getLeftWay(), road.getRightWay()}) {
-							for(Lane lane : way.getLaneList()) {
+					for(Iterator<Road> roadIterator = roadList.iterator(); roadIterator.hasNext(); ) {
+						Road road = roadIterator.next();
+						for(Iterator<Way> wayIterator = java.util.Arrays.asList(road.getLeftWay(), road.getRightWay()).iterator(); wayIterator.hasNext(); ) {
+							Way way = wayIterator.next();
+							for(Iterator<Lane> laneIterator = way.getLaneList().iterator(); laneIterator.hasNext(); ) {
+								Lane lane = laneIterator.next();
 								if(lane.getStartPoint().equals(path.getEndPoint())) {
 									connectedLanes.add(lane);
 								}
@@ -43,15 +50,16 @@ public abstract class TrafficNode implements ITrafficObsever {
 					if(!connectedLanes.isEmpty()) {
 						int randomIndex = (int)(Math.random() * connectedLanes.size());
 						Lane chosenLane = connectedLanes.get(randomIndex);
-						path.getVehicleList().remove(vehicle); //remove vehicle from the path
+						vehicle.setPosition(chosenLane.getStartPoint().clone()); //set vehicle position to the start point of the chosen lane
+						vehicle.setDirection(new TrafficVector(chosenLane.getEndPoint().getX() - chosenLane.getStartPoint().getX(), chosenLane.getEndPoint().getY() - chosenLane.getStartPoint().getY())); //set vehicle direction to the direction from path's end point to lane's start point
 						chosenLane.addVehicle(vehicle); //add vehicle to the chosen lane
+						vehicleIterator.remove(); //remove vehicle from the path
 					} else {
-						path.getVehicleList().remove(vehicle); //remove vehicle from the path if there is no connected lane for it to enter
+						vehicleIterator.remove(); //remove vehicle from the path if there is no connected lane for it to enter
 					}
 				}
 			}
 		}
-		
 	}
     
     /**
