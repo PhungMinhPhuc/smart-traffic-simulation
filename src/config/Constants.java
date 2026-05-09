@@ -3,8 +3,10 @@ package config;
 public final class Constants {
     private Constants() {}
 
-    // NODE CONFIG
+    //CALCULATE CONFIG
+    public static final double CALCULATE_DISTANCE = 5;
 
+    // NODE CONFIG
     public static final double NODE_RADIUS = 100.0;
 
     // LANE CONFIG

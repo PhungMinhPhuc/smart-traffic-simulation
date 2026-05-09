@@ -2,13 +2,18 @@ package road;
 
 import config.Constants;
 import generator.IdGenerator;
+import node.Path;
 import node.TrafficNode;
+import observer.ITrafficObserver;
 import utility.TrafficPoint;
 import utility.TrafficVector;
+import vehicle.Vehicle;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
-public class Road {
+public class Road implements ITrafficObserver {
     private String roadId;
     private TrafficNode startNode;
     private TrafficNode endNode;
@@ -37,6 +42,31 @@ public class Road {
     }
 
     @Override
+    public void checkVehicleLeaving() {
+        List<Lane> laneList = getLaneList();
+        for (Lane lane : laneList) {
+            Vehicle vehicle = lane.getVehicleAtLaneEnd();
+            if (vehicle != null) {
+                // do sth with vehicle
+                lane.removeVehicle(vehicle);
+                TrafficNode incomingNode = lane.getEndPoint().distance(startPoint) < lane.getEndPoint().distance(endPoint)
+                                            ? startNode : endNode;
+                List<Path> connectedPathList = new ArrayList<>();
+                for (Path path : incomingNode.getPathList()) {
+                    if (path.getStartPoint().equals(lane.getEndPoint())) {
+                        connectedPathList.add(path);
+                    }
+                }
+                if (!connectedPathList.isEmpty()) {
+                    int randomIndex = (int)(Math.random() * connectedPathList.size());
+                    Path chosenPath = connectedPathList.get(randomIndex);
+                    chosenPath.addVehicle(vehicle);
+                }
+            }
+        }
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Road road = (Road) o;
@@ -46,6 +76,12 @@ public class Road {
     @Override
     public int hashCode() {
         return Objects.hashCode(roadId);
+    }
+
+    public List<Lane> getLaneList() {
+        List<Lane> laneList = rightWay.getLaneList();
+        laneList.addAll(leftWay.getLaneList());
+        return laneList;
     }
 
     public Way getRightWay() {

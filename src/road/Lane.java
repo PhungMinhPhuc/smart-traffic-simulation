@@ -1,6 +1,8 @@
 package road;
 
+import config.Constants;
 import utility.TrafficPoint;
+import utility.TrafficVector;
 import vehicle.Vehicle;
 
 import java.util.ArrayList;
@@ -20,7 +22,18 @@ public class Lane {
         this.endPoint = endPoint.clone();
     }
 
+    public Vehicle getVehicleAtLaneEnd() {
+        for (Vehicle vehicle : vehicleList) {
+            if (vehicle.getPosition().distance(endPoint) <= Constants.CALCULATE_DISTANCE) {
+                return vehicle;
+            }
+        }
+        return null;
+    }
+
     public void addVehicle(Vehicle vehicle) {
+        vehicle.setDirection(startPoint, endPoint);
+        vehicle.setPosition(startPoint);
         vehicleList.add(vehicle);
     }
 

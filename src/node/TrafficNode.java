@@ -1,16 +1,19 @@
 package node;
 
+import config.Constants;
 import generator.IdGenerator;
+import observer.ITrafficObserver;
 import road.Road;
 import utility.TrafficPoint;
 import road.Lane;
 import road.Way;
+import vehicle.Vehicle;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class TrafficNode {
+public class TrafficNode implements ITrafficObserver {
     protected String id;
     protected TrafficPoint centerPoint;
     protected List<Path> pathList;
@@ -157,6 +160,30 @@ public class TrafficNode {
         }
     }
 
+    @Override
+    public void checkVehicleLeaving() {
+        for (Path path : pathList) {
+            List<Vehicle> toRemoveVehicle = new ArrayList<>();
+            List<Vehicle> vehicleList = path.getVehicleList();
+            for (Vehicle vehicle : vehicleList) {
+                if (path.getEndPoint().distance(vehicle.getPosition()) <= Constants.CALCULATE_DISTANCE) {
+
+                    toRemoveVehicle.add(vehicle);
+
+                    for (Road road : roadList) {
+                        List<Lane> laneList = road.getLaneList();
+                        for (Lane lane : laneList) {
+                            if (lane.getStartPoint().equals(path.getEndPoint())) {
+                                lane.addVehicle(vehicle);
+                            }
+                        }
+                    }
+                }
+            }
+            vehicleList.removeIf(toRemoveVehicle::contains);
+        }
+    }
+
     // override equals  hashCode to use containsKey of Map
     @Override
     public boolean equals(Object o) {
@@ -184,5 +211,9 @@ public class TrafficNode {
 
     public List<Road> getRoadList() {
         return roadList;
+    }
+
+    public List<Path> getPathList() {
+        return pathList;
     }
 }

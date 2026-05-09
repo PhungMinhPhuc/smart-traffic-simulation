@@ -106,6 +106,8 @@ public class Path {
     }
 
     public void addVehicle(Vehicle vehicle) {
+        vehicle.setDirection(startPoint, endPoint);
+        vehicle.setPosition(startPoint);
         vehicleList.add(vehicle);
     }
 
@@ -137,4 +139,7 @@ public class Path {
         this.endPoint = endPoint.clone();
     }
 
+    public List<Vehicle> getVehicleList() {
+        return vehicleList;
+    }
 }
