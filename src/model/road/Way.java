@@ -9,13 +9,11 @@ import model.utility.TrafficVector;
 public class Way {
     private ArrayList<Lane> laneList = new ArrayList<Lane>();
     private LightState stateTrafficLight;
-    public final int LANECOUNT;
     private String roadId;
 
 
     public Way(LightState lightState, int laneCount,boolean isRightWay,TrafficPoint roadStartPoint, TrafficPoint roadEndPoint, String roadId){
         this.stateTrafficLight = lightState;
-        this.LANECOUNT = laneCount;
         this.roadId = roadId;
         //Create lanes base on the lane count and the position of the road
         TrafficVector vectorRoad = new TrafficVector(roadStartPoint, roadEndPoint);
