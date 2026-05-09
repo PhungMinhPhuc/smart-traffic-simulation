@@ -13,12 +13,13 @@ public class TrafficPoint {
         this.y = y;
     }
 
-    public double distance(TrafficPoint other) {
-        return Math.sqrt(Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2));
+    @Override
+    public TrafficPoint clone() {
+        return new TrafficPoint(this.x, this.y);
     }
 
-    public boolean isClose(TrafficPoint other) {
-        return distance(other) < Constants.EPS;
+    public double distance(TrafficPoint other) {
+        return Math.sqrt(Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2));
     }
 
     @Override
