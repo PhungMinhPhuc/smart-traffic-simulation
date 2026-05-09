@@ -6,6 +6,8 @@ import node.TrafficNode;
 import utility.TrafficPoint;
 import utility.TrafficVector;
 
+import java.util.Objects;
+
 public class Road {
     private String roadId;
     private TrafficNode startNode;
@@ -32,6 +34,18 @@ public class Road {
     public void buildWays() {
         rightWay.buildLanes(startPoint, endPoint);
         leftWay.buildLanes(endPoint, startPoint);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Road road = (Road) o;
+        return Objects.equals(roadId, road.getRoadId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(roadId);
     }
 
     public Way getRightWay() {

@@ -26,18 +26,6 @@ public class Path {
         this.conflictPointList= new HashMap<>();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Path path = (Path) o;
-        return Objects.equals(id, path.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
-
     public void addConflictPoint(Path conflictPath, TrafficPoint conflictPoint) {
         conflictPointList.put(conflictPath, conflictPoint);
     }
@@ -100,6 +88,23 @@ public class Path {
         conflictPointList.remove(path);
     }
 
+    public void clearConflictPoints() {
+        conflictPointList.clear();
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Path path = (Path) o;
+        return Objects.equals(id, path.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+
     public void addVehicle(Vehicle vehicle) {
         vehicleList.add(vehicle);
     }
@@ -118,6 +123,10 @@ public class Path {
 
     public TrafficPoint getEndPoint() {
         return endPoint;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public void setStartPoint(TrafficPoint startPoint) {
