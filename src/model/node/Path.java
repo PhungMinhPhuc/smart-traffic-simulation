@@ -82,9 +82,10 @@ public class Path {
     }
 
 
-    public void addVehicle(Vehicle v){
-    	v.setDirection(new TrafficVector(endPoint.getX() - startPoint.getX(), endPoint.getY() - startPoint.getY()));
-        vehicleList.add(v);
+    public void addVehicle(Vehicle vehicle){
+    	vehicle.setDirection(new TrafficVector(endPoint.getX() - startPoint.getX(), endPoint.getY() - startPoint.getY()));
+        vehicle.setPosition(startPoint.clone());
+    	vehicleList.add(vehicle);
     }
 
     public void removeVehicle(String vehicleId){
