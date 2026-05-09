@@ -6,6 +6,8 @@ import model.road.Lane;
 import model.utility.TrafficPoint;
 // import model.map.Vector2D;
 import model.vehicle.behavior.DriverBehavior;
+import java.util.Queue;
+import java.util.LinkedList;
 
 public abstract class Vehicle {
     protected String id;
@@ -23,6 +25,9 @@ public abstract class Vehicle {
     protected Lane currentLane;
     protected Path currentPath;
     protected boolean isEmergency;
+    
+    // Path selection and navigation
+    protected Queue<Path> plannedPath;  // Queue of paths the vehicle intends to follow
 
     public Vehicle(String type, double maxSpeed, double length, double width, String sound, DriverBehavior behavior) {
         this.id = IdGenerator.vehicleId(type);
@@ -34,6 +39,7 @@ public abstract class Vehicle {
         this.speed = 0;
         this.acceleration = 0;
         this.isEmergency = false;
+        this.plannedPath = new LinkedList<>();
     }
 
     // Logic processing separated from Drawing (This method is called every frame to update the vehicle's state)
