@@ -20,8 +20,8 @@ public class Path {
 
     public Path(String id, TrafficPoint startPoint, TrafficPoint endPoint) {
         this.id = id;
-        this.startPoint = startPoint;
-        this.endPoint = endPoint;
+        this.startPoint = startPoint.clone();
+        this.endPoint = endPoint.clone();
         this.vehicleList = new ArrayList<>();
         this.conflictPointList= new HashMap<>();
     }
@@ -130,11 +130,11 @@ public class Path {
     }
 
     public void setStartPoint(TrafficPoint startPoint) {
-        this.startPoint = startPoint;
+        this.startPoint = startPoint.clone();
     }
 
     public void setEndPoint(TrafficPoint endPoint) {
-        this.endPoint = endPoint;
+        this.endPoint = endPoint.clone();
     }
 
 }

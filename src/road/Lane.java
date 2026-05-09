@@ -16,8 +16,8 @@ public class Lane {
     public Lane(int index, TrafficPoint startPoint, TrafficPoint endPoint) {
         this.index = index;
         this.vehicleList = new ArrayList<>();
-        this.startPoint = startPoint;
-        this.endPoint = endPoint;
+        this.startPoint = startPoint.clone();
+        this.endPoint = endPoint.clone();
     }
 
     public void addVehicle(Vehicle vehicle) {
@@ -33,7 +33,7 @@ public class Lane {
     }
 
     public void setStartPoint(TrafficPoint startPoint) {
-        this.startPoint = startPoint;
+        this.startPoint = startPoint.clone();
     }
 
     public TrafficPoint getEndPoint() {
@@ -41,7 +41,7 @@ public class Lane {
     }
 
     public void setEndPoint(TrafficPoint endPoint) {
-        this.endPoint = endPoint;
+        this.endPoint = endPoint.clone();
     }
 
     public int getIndex() {

@@ -18,7 +18,7 @@ public class Way {
         this.roadId = roadId;
         this.laneList = new ArrayList<>();
         this.stateTrafficLight = TrafficLightState.GREEN;
-        this.direction = direction;
+        this.direction = direction.clone();
     }
 
     public void buildLanes(TrafficPoint leftStart, TrafficPoint leftEnd) {

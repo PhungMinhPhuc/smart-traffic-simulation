@@ -1,7 +1,7 @@
 package utility;
 
 public class TrafficVector {
-    private  double x;
+    private double x;
     private double y;
 
     public TrafficVector(double x, double y) {
@@ -11,6 +11,11 @@ public class TrafficVector {
 
     public TrafficVector (TrafficPoint start, TrafficPoint end) {
         this(end.getX() - start.getX(), end.getY() - start.getY());
+    }
+
+    @Override
+    public TrafficVector clone() {
+        return new TrafficVector(this.x, this.y);
     }
 
     public double length() {

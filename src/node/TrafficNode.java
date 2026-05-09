@@ -20,7 +20,7 @@ public class TrafficNode {
 
     public TrafficNode(TrafficPoint centerPoint) {
         this.id = IdGenerator.nodeId(idCounter++);
-        this.centerPoint = centerPoint;
+        this.centerPoint = centerPoint.clone();
         this.pathList = new ArrayList<>();
         this.roadList = new ArrayList<>();
         this.pathCounter = 0;
@@ -175,7 +175,7 @@ public class TrafficNode {
     }
 
     public void setCenterPoint(TrafficPoint centerPoint) {
-        this.centerPoint = centerPoint;
+        this.centerPoint = centerPoint.clone();
     }
 
     public String getId() {
