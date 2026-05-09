@@ -37,6 +37,14 @@ public class Vehicle {
 		this.speed += this.acceleration * timeInterval;
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null || getClass() != obj.getClass()) return false;
+		Vehicle other = (Vehicle) obj;
+		return id.equals(other.id);
+	}
+
 	public void setDirection(TrafficVector direction) {
 		this.direction = direction.clone();
 	}

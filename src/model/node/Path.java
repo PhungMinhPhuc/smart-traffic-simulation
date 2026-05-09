@@ -20,7 +20,6 @@ public class Path {
         this.id = id;
     }
 
-
 	public TrafficPoint findConflictPoint(Path otherPath) {
         // Calculate conflict point using Cramer
         TrafficPoint thisStart = this.getStartPoint();
@@ -94,6 +93,18 @@ public class Path {
             }
         }
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null || getClass() != obj.getClass()) return false;
+		Path other = (Path) obj;
+		return id.equals(other.id);
+	}
+    
+    public Map<Path, TrafficPoint> getConflictPointList() {
+		return conflictPointList;
+	}
     
     public ArrayList<Vehicle> getVehicleList() {
 		return vehicleList;

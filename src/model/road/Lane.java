@@ -25,19 +25,14 @@ public class Lane {
     }
 
     
-    //psudo code for adding and removing vehicle, not used in the final version
+    //pseudo code for adding and removing vehicle, not used in the final version
     public void addVehicle(){
         Vehicle vehicle = new Vehicle(startPoint.clone(), new TrafficVector(startPoint, endPoint));
         vehicleList.add(vehicle);
     }
 
-    public void removeVehicle(String vehicleId){
-        for(Vehicle vehicle : vehicleList){
-            if(vehicle.getId().equals(vehicleId)){
-                vehicleList.remove(vehicle);
-                return;
-            }
-        }
+    public void removeVehicle(Vehicle vehicle){
+		vehicleList.remove(vehicle);
     }
 
     public ArrayList<Vehicle> getVehicleList() {

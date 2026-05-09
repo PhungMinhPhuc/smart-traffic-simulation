@@ -10,6 +10,14 @@ public class TrafficPoint {
 		this.y = y;
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj) return true;
+		if(obj == null || getClass() != obj.getClass()) return false;
+		TrafficPoint other = (TrafficPoint) obj;
+		return Double.compare(other.x, x) == 0 && Double.compare(other.y, y) == 0;
+	}
+	
 	public TrafficPoint clone() {
 		return new TrafficPoint(this.x, this.y);
 	}

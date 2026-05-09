@@ -4,25 +4,45 @@ import generator.IdGenerator;
 import config.Constants;
 import model.traffic.LightState;
 import model.utility.TrafficPoint;
+import model.utility.TrafficVector;
+import model.node.TrafficNode;
 
 public class Road {
-    private Way rightWay;
+	private Way rightWay;
     private Way leftWay;
     private TrafficPoint startPoint;
     private TrafficPoint endPoint;
+    private TrafficNode startNode;
+    private TrafficNode endNode;
     private String id;
 
-    public Road(TrafficPoint startPoint, TrafficPoint endPoint, int laneCountPerWay, LightState lightStateRightWay, LightState lightStateLeftWay){
-        this.startPoint = startPoint;
+    public Road(TrafficNode startNode, TrafficNode endNode, int laneCountPerWay, LightState lightStateRightWay, LightState lightStateLeftWay){
+        this.startNode = startNode;
+        this.endNode = endNode;
+        
+        //calculate road start and end point by the center point of start and end node, 
+        //and the direction vector from start node to end node
+        TrafficVector directionVector = new TrafficVector(startNode.getCenterPoint(), endNode.getCenterPoint());
+        this.startPoint = directionVector.translatePoint(startNode.getCenterPoint(),Constants.JUNCTION_RADIUS);
+        this.endPoint = directionVector.translatePoint(endNode.getCenterPoint(),-Constants.JUNCTION_RADIUS);
+        
         this.id = IdGenerator.roadId();
         this.rightWay = new Way(lightStateRightWay, laneCountPerWay, true, startPoint, endPoint,id); 
         this.leftWay = new Way(lightStateLeftWay, laneCountPerWay, false, startPoint, endPoint,id);
     }
 
-    public Road(TrafficPoint startPoint, TrafficPoint endPoint){
-        this.startPoint = startPoint;
-        this.endPoint = endPoint;
+    public Road(TrafficNode startNode, TrafficNode endNode){
+        this.startNode = startNode;
+        this.endNode = endNode;
+        
+        //calculate road start and end point by the center point of start and end node, 
+        //and the direction vector from start node to end node
+        TrafficVector directionVector = new TrafficVector(startNode.getCenterPoint(), endNode.getCenterPoint());
+        this.startPoint = directionVector.translatePoint(startNode.getCenterPoint(),Constants.JUNCTION_RADIUS);
+        this.endPoint = directionVector.translatePoint(endNode.getCenterPoint(),-Constants.JUNCTION_RADIUS);
         this.id = IdGenerator.roadId();
+        
+        //default setting for Road constructor with default lane count and traffic light state
         this.rightWay = new Way(LightState.GREEN, Constants.DEFAULT_LANE_COUNT, true, startPoint, endPoint, id);
         this.leftWay = new Way(LightState.GREEN, Constants.DEFAULT_LANE_COUNT, false, startPoint, endPoint, id);
     }
@@ -69,7 +89,29 @@ public class Road {
                q.getY() <= Math.max(p.getY(), r.getY()) && q.getY() >= Math.min(p.getY(), r.getY());
     }
     
-    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Road other = (Road) obj;
+        return id.equals(other.id);
+    }
+
+    public TrafficNode getStartNode() {
+		return startNode;
+	}
+
+	public void setStartNode(TrafficNode startNode) {
+		this.startNode = startNode;
+	}
+
+	public TrafficNode getEndNode() {
+		return endNode;
+	}
+
+	public void setEndNode(TrafficNode endNode) {
+		this.endNode = endNode;
+	}
     public TrafficPoint getStartPoint() {
         return startPoint;
     }
