@@ -67,5 +67,9 @@ public abstract class DriverBehavior {
         }
     }
     
+    protected void handleEmergency(Vehicle self) {
+    	attemptLaneChange(self);
+    }
+    
     public abstract String getBehaviorName();
 }

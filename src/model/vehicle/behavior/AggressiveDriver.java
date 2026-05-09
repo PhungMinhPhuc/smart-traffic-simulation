@@ -20,6 +20,11 @@ public class AggressiveDriver extends DriverBehavior {
     }
 
     @Override
+    public void handleEmergency(Vehicle self) {
+    	
+    }
+    
+    @Override
     public String getBehaviorName() {
         return "Aggressive";
     }
