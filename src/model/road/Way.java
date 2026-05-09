@@ -1,8 +1,8 @@
-package road;
+package model.road;
 
-import generator.IdGenerator;
-import utility.TrafficPoint;
-import utility.TrafficVector;
+import model.traffic.LightState;
+import model.utility.TrafficPoint;
+import model.utility.TrafficVector;
 import config.Constants;
 
 import java.util.ArrayList;
@@ -10,28 +10,28 @@ import java.util.List;
 
 public class Way {
     private String roadId;
-    private TrafficLightState stateTrafficLight;
+    private LightState stateTrafficLight;
     private List<Lane> laneList;
     private TrafficVector direction;
 
     public Way(String roadId, TrafficVector direction) {
         this.roadId = roadId;
         this.laneList = new ArrayList<>();
-        this.stateTrafficLight = TrafficLightState.GREEN;
+        this.stateTrafficLight = LightState.GREEN;
         this.direction = direction.clone();
     }
 
     public void buildLanes(TrafficPoint leftStart, TrafficPoint leftEnd) {
-        TrafficVector normalVector = direction.rotateVector(-Math.PI/2);
+        TrafficVector normalVector = direction.rotateVector(Math.PI/2);
 
-        for (int index = 0; index < Constants.LANES_PER_WAY; index++) {
+        for (int index = 0; index < Constants.DEFAULT_LANE_COUNT; index++) {
             double offsetValue = (index + 0.5) * Constants.LANE_WIDTH;
             TrafficVector offset = normalVector.scale(offsetValue);
 
-            TrafficPoint laneCenter = leftStart.moveBy(offset);
+            TrafficPoint laneStart = leftStart.moveBy(offset);
             TrafficPoint laneEnd = leftEnd.moveBy(offset);
 
-            Lane lane = new Lane(index, laneCenter, laneEnd);
+            Lane lane = new Lane(index, laneStart, laneEnd);
 
             laneList.add(lane);
         }
@@ -53,11 +53,11 @@ public class Way {
         return roadId;
     }
 
-    public void setStateTrafficLight(TrafficLightState stateTrafficLight) {
+    public void setStateTrafficLight(LightState stateTrafficLight) {
         this.stateTrafficLight = stateTrafficLight;
     }
 
-    public TrafficLightState getStateTrafficLight() {
+    public LightState getStateTrafficLight() {
         return stateTrafficLight;
     }
 }

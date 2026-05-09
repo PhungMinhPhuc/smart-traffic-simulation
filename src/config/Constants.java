@@ -1,17 +1,18 @@
 package config;
 
 public final class Constants {
+
     private Constants() {}
 
     //CALCULATE CONFIG
     public static final double CALCULATE_DISTANCE = 5;
 
     // NODE CONFIG
-    public static final double NODE_RADIUS = 100.0;
+    public static final double JUNCTION_RADIUS = 70.0;
 
     // LANE CONFIG
-    public static final double LANE_WIDTH = 30.0;
-    public static final int LANES_PER_WAY = 2;
+    public static final double LANE_WIDTH = 15.0;
+    public static final int DEFAULT_LANE_COUNT = 2;
 
     // GEOMETRY / MATH
     public static final double EPS = 1e-9;

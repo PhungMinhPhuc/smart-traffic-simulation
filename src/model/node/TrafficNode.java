@@ -1,13 +1,13 @@
-package node;
+package model.node;
 
 import config.Constants;
 import generator.IdGenerator;
-import observer.ITrafficObserver;
-import road.Road;
-import utility.TrafficPoint;
-import road.Lane;
-import road.Way;
-import vehicle.Vehicle;
+import model.observer.ITrafficObserver;
+import model.road.Road;
+import model.utility.TrafficPoint;
+import model.road.Lane;
+import model.road.Way;
+import model.vehicle.Vehicle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,26 +18,23 @@ public class TrafficNode implements ITrafficObserver {
     protected TrafficPoint centerPoint;
     protected List<Path> pathList;
     protected List<Road> roadList;
-    private int pathCounter;
-    public static int idCounter = 0;
 
     public TrafficNode(TrafficPoint centerPoint) {
-        this.id = IdGenerator.nodeId(idCounter++);
+        this.id = IdGenerator.nodeId();
         this.centerPoint = centerPoint.clone();
         this.pathList = new ArrayList<>();
         this.roadList = new ArrayList<>();
-        this.pathCounter = 0;
     }
 
     /**
-     * - When adding a new road to the node,
-     * we need to create new paths between the entry way of the new road and all existing exit ways,
-     * and new paths between the exit way of the new road and all existing entry ways.
+     * - When adding a new model.road to the model.node,
+     * we need to create new paths between the entry way of the new model.road and all existing exit ways,
+     * and new paths between the exit way of the new model.road and all existing entry ways.
      * - Then rebuild the conflict points for all paths after adding new paths.
      * @param newRoad
      */
     public void addRoad(Road newRoad){
-        //access the current road list and create current entry/exit ways
+        //access the current model.road list and create current entry/exit ways
         ArrayList<Way> entryWays = new ArrayList<Way>();
         ArrayList<Way> exitWays = new ArrayList<Way>();
         for(Road road : roadList){
@@ -55,7 +52,7 @@ public class TrafficNode implements ITrafficObserver {
             }
         }
 
-        //create new entry/exit ways for the new road to be added
+        //create new entry/exit ways for the new model.road to be added
         Way newEntryWay;
         Way newExitWay;
         //decide which way is entry way and which way is exit way by the distance from center point to start point of each way
@@ -75,7 +72,7 @@ public class TrafficNode implements ITrafficObserver {
                             IdGenerator.pathId(id,pathList.size()),
                             entryLane.getEndPoint(),
                             exitLane.getStartPoint());
-                    pathList.add(path); //add new path to node's pathList
+                    pathList.add(path); //add new path to model.node's pathList
                 }
             }
         }
@@ -87,28 +84,28 @@ public class TrafficNode implements ITrafficObserver {
                             IdGenerator.pathId(id,pathList.size()),
                             entryLane.getEndPoint(),
                             exitLane.getStartPoint());
-                    pathList.add(path); //add new path to node's pathList
+                    pathList.add(path); //add new path to model.node's pathList
                 }
             }
         }
 
-        //add road to the road list and then build the conflict points again
+        //add model.road to the model.road list and then build the conflict points again
         roadList.add(newRoad);
         buildAllConflictPoints(); //rebuild conflict points after adding new paths
     }
 
     /**
-     * - When removing a road from the node,
-     * we need to remove all paths connected to the entry way and exit way of the road to be removed.
+     * - When removing a model.road from the model.node,
+     * we need to remove all paths connected to the entry way and exit way of the model.road to be removed.
      * - If a path have start point equal to the end point of a lane in the entry way to be removed,
      * or have end point equal to the start point of a lane in the exit way to be removed,
      * => then this path should be removed from the path list.
-     * - Then rebuild the conflict points for all paths after removing the road.
+     * - Then rebuild the conflict points for all paths after removing the model.road.
      * @param roadToRemove
      */
     public void removeRoad(Road roadToRemove){
         if(!roadList.contains(roadToRemove)) {
-            System.out.println("The road to be removed is not connected to this node");
+            System.out.println("The model.road to be removed is not connected to this model.node");
             return;
         }
         Way entryWayToRemove;
@@ -122,7 +119,7 @@ public class TrafficNode implements ITrafficObserver {
             entryWayToRemove = roadToRemove.getLeftWay();
             exitWayToRemove = roadToRemove.getRightWay();
         }
-        //remove all paths connected to the entry way and exit way of the road to be removed
+        //remove all paths connected to the entry way and exit way of the model.road to be removed
         ArrayList<Path> existingPaths = new ArrayList<Path>(pathList); //create a copy of the path list to avoid ConcurrentModificationException
         for(Path path : existingPaths) {
             for(Lane entryLane : entryWayToRemove.getLaneList()) {
@@ -137,7 +134,7 @@ public class TrafficNode implements ITrafficObserver {
             }
         }
 
-        //remove road from the road list and then build the conflict points again
+        //remove model.road from the model.road list and then build the conflict points again
         roadList.remove(roadToRemove);
         buildAllConflictPoints();
     }
@@ -170,11 +167,12 @@ public class TrafficNode implements ITrafficObserver {
 
                     toRemoveVehicle.add(vehicle);
 
-                    for (Road road : roadList) {
+                    roadLoop: for (Road road : roadList) {
                         List<Lane> laneList = road.getLaneList();
                         for (Lane lane : laneList) {
                             if (lane.getStartPoint().equals(path.getEndPoint())) {
                                 lane.addVehicle(vehicle);
+                                break roadLoop;
                             }
                         }
                     }
@@ -182,6 +180,12 @@ public class TrafficNode implements ITrafficObserver {
             }
             vehicleList.removeIf(toRemoveVehicle::contains);
         }
+    }
+
+    public boolean containsPoint(TrafficPoint point) {
+        //check if the point is within a certain distance from the center point, if it is, then it is considered as containing the point
+        double distance = centerPoint.distance(point);
+        return distance <= Constants.JUNCTION_RADIUS;
     }
 
     // override equals  hashCode to use containsKey of Map

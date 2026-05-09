@@ -1,6 +1,4 @@
-package utility;
-
-import config.Constants;
+package model.utility;
 
 import java.util.Objects;
 

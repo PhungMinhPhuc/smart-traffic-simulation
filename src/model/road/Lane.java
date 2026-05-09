@@ -1,9 +1,8 @@
-package road;
+package model.road;
 
 import config.Constants;
-import utility.TrafficPoint;
-import utility.TrafficVector;
-import vehicle.Vehicle;
+import model.utility.TrafficPoint;
+import model.vehicle.Vehicle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +28,11 @@ public class Lane {
             }
         }
         return null;
+    }
+
+    public void addVehicle() {
+        Vehicle vehicle = new Vehicle();
+        addVehicle(vehicle);
     }
 
     public void addVehicle(Vehicle vehicle) {
@@ -59,5 +63,9 @@ public class Lane {
 
     public int getIndex() {
         return index;
+    }
+
+    public List<Vehicle> getVehicleList() {
+        return vehicleList;
     }
 }

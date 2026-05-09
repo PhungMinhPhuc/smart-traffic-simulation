@@ -1,13 +1,13 @@
-package road;
+package model.road;
 
 import config.Constants;
 import generator.IdGenerator;
-import node.Path;
-import node.TrafficNode;
-import observer.ITrafficObserver;
-import utility.TrafficPoint;
-import utility.TrafficVector;
-import vehicle.Vehicle;
+import model.node.Path;
+import model.node.TrafficNode;
+import model.observer.ITrafficObserver;
+import model.utility.TrafficPoint;
+import model.utility.TrafficVector;
+import model.vehicle.Vehicle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,15 +22,14 @@ public class Road implements ITrafficObserver {
     private TrafficPoint startPoint;
     private TrafficPoint endPoint;
     private TrafficVector direction;
-    public static int roadIdCounter = 0;
 
     public Road(TrafficNode startNode, TrafficNode endNode) {
-        this.roadId = IdGenerator.roadId(roadIdCounter++);
+        this.roadId = IdGenerator.roadId();
         this.startNode = startNode;
         this.endNode = endNode;
         this.direction = new TrafficVector(startNode.getCenterPoint(), endNode.getCenterPoint()).normalize();
-        this.startPoint = startNode.getCenterPoint().moveBy(direction.scale(Constants.NODE_RADIUS));
-        this.endPoint = startNode.getCenterPoint().moveBy(direction.scale(Constants.NODE_RADIUS).rotateVector(Math.PI));
+        this.startPoint = startNode.getCenterPoint().moveBy(direction.scale(Constants.JUNCTION_RADIUS));
+        this.endPoint = endNode.getCenterPoint().moveBy(direction.scale(Constants.JUNCTION_RADIUS).rotateVector(Math.PI));
         this.rightWay = new Way(roadId, direction);
         this.leftWay = new Way(roadId, direction.rotateVector(Math.PI));
         buildWays();
@@ -47,7 +46,7 @@ public class Road implements ITrafficObserver {
         for (Lane lane : laneList) {
             Vehicle vehicle = lane.getVehicleAtLaneEnd();
             if (vehicle != null) {
-                // do sth with vehicle
+                // do sth with model.vehicle
                 lane.removeVehicle(vehicle);
                 TrafficNode incomingNode = lane.getEndPoint().distance(startPoint) < lane.getEndPoint().distance(endPoint)
                                             ? startNode : endNode;
@@ -66,6 +65,48 @@ public class Road implements ITrafficObserver {
         }
     }
 
+    //Check if this road conflicts with another road (i.e., they intersect)
+    public boolean checkConflict(Road otherRoad) {
+        TrafficPoint p1 = this.startPoint;
+        TrafficPoint q1 = this.endPoint;
+        TrafficPoint p2 = otherRoad.getStartPoint();
+        TrafficPoint q2 = otherRoad.getEndPoint();
+
+        //4 orientation needed for general and special cases
+        int o1 = orientation(p1, q1, p2);
+        int o2 = orientation(p1, q1, q2);
+        int o3 = orientation(p2, q2, p1);
+        int o4 = orientation(p2, q2, q1);
+
+
+        if (o1 != o2 && o3 != o4) {
+            return true;
+        }
+        if (o1 == 0 && onSegment(p1, p2, q1)) return true;
+        if (o2 == 0 && onSegment(p1, q2, q1)) return true;
+        if (o3 == 0 && onSegment(p2, p1, q2)) return true;
+        if (o4 == 0 && onSegment(p2, q1, q2)) return true;
+        return false;
+    }
+
+    //Cal orientation of 3 points (p, q, r)
+    //0: Line up
+    //1: ClockWise
+    //2: CounterClockWise
+    private int orientation(TrafficPoint p, TrafficPoint q, TrafficPoint r) {
+        double val = (q.getY() - p.getY()) * (r.getX() - q.getX()) -
+                (q.getX() - p.getX()) * (r.getY() - q.getY());
+
+        if (Math.abs(val) < 1e-9) return 0; // Line up
+        return (val > 0) ? 1 : 2;
+    }
+
+    // Check if point q lies on the segment pr
+    private boolean onSegment(TrafficPoint p, TrafficPoint q, TrafficPoint r) {
+        return q.getX() <= Math.max(p.getX(), r.getX()) && q.getX() >= Math.min(p.getX(), r.getX()) &&
+                q.getY() <= Math.max(p.getY(), r.getY()) && q.getY() >= Math.min(p.getY(), r.getY());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -79,7 +120,8 @@ public class Road implements ITrafficObserver {
     }
 
     public List<Lane> getLaneList() {
-        List<Lane> laneList = rightWay.getLaneList();
+        List<Lane> laneList = new ArrayList<>();
+        laneList.addAll(rightWay.getLaneList());
         laneList.addAll(leftWay.getLaneList());
         return laneList;
     }

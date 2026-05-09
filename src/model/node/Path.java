@@ -1,7 +1,7 @@
-package node;
+package model.node;
 
-import utility.TrafficPoint;
-import vehicle.Vehicle;
+import model.utility.TrafficPoint;
+import model.vehicle.Vehicle;
 import config.Constants;
 
 import java.util.ArrayList;
