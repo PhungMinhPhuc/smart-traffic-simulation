@@ -1,13 +1,19 @@
 package model.road;
 
 import generator.IdGenerator;
+
+import java.util.ArrayList;
+
 import config.Constants;
 import model.traffic.LightState;
 import model.utility.TrafficPoint;
 import model.utility.TrafficVector;
+import model.vehicle.Vehicle;
+import model.node.Path;
 import model.node.TrafficNode;
+import model.observer.ITrafficObsever;
 
-public class Road {
+public class Road implements ITrafficObsever{
 	private Way rightWay;
     private Way leftWay;
     private TrafficPoint startPoint;
@@ -46,7 +52,7 @@ public class Road {
         this.rightWay = new Way(LightState.GREEN, Constants.DEFAULT_LANE_COUNT, true, startPoint, endPoint, id);
         this.leftWay = new Way(LightState.GREEN, Constants.DEFAULT_LANE_COUNT, false, startPoint, endPoint, id);
     }
-    
+
     //Check if this road conflicts with another road (i.e., they intersect)
     public boolean checkConflict(Road otherRoad) {
         TrafficPoint p1 = this.startPoint;
@@ -88,6 +94,61 @@ public class Road {
         return q.getX() <= Math.max(p.getX(), r.getX()) && q.getX() >= Math.min(p.getX(), r.getX()) &&
                q.getY() <= Math.max(p.getY(), r.getY()) && q.getY() >= Math.min(p.getY(), r.getY());
     }
+    
+	@Override
+	public void checkVehicleLeaving() {
+		//check right way
+		for(Lane lane : rightWay.getLaneList()) {
+			for(Vehicle vehicle : lane.getVehicleList()) {
+				if(vehicle.getPosition().distance(lane.getEndPoint()) < 5) { //if vehicle get close enough to lane's endPoint
+					//store connected Path for vehicle to enter afer leaving the road
+					ArrayList<Path> connectedPaths = new ArrayList<Path>();
+					for(Path path : this.getStartNode().getPathList()) { //Left way goes to Road's start node
+						if(path.getStartPoint().equals(lane.getEndPoint())) {
+							connectedPaths.add(path);
+						}
+					}
+					
+					//choose randomly one of the connected paths for the vehicle to enter, if there is no connected path, then the vehicle will be removed from the lane
+					if(!connectedPaths.isEmpty()) {
+						int randomIndex = (int)(Math.random() * connectedPaths.size());
+						Path chosenPath = connectedPaths.get(randomIndex);
+						lane.getVehicleList().remove(vehicle); //remove vehicle from the lane
+						chosenPath.addVehicle(vehicle); //add vehicle to the chosen path
+					} 
+					else {
+						lane.getVehicleList().remove(vehicle); //remove vehicle from the lane if there is no connected path for it to enter
+					}
+				}
+			}
+		}
+		
+		//check left way
+		for(Lane lane : leftWay.getLaneList()) {
+			for(Vehicle vehicle : lane.getVehicleList()) {
+				if(vehicle.getPosition().distance(lane.getEndPoint()) < 1e-9) { //if vehicle get close enough to lane's endPoint
+					//store connected Path for vehicle to enter afer leaving the road
+					ArrayList<Path> connectedPaths = new ArrayList<Path>();
+					for(Path path : this.getEndNode().getPathList()) { //Left way goes to Road's end node
+						if(path.getStartPoint().equals(lane.getEndPoint())) {
+							connectedPaths.add(path);
+						}
+					}
+					
+					//choose randomly one of the connected paths for the vehicle to enter, if there is no connected path, then the vehicle will be removed from the lane
+					if(!connectedPaths.isEmpty()) {
+						int randomIndex = (int)(Math.random() * connectedPaths.size());
+						Path chosenPath = connectedPaths.get(randomIndex);
+						chosenPath.addVehicle(vehicle); //add vehicle to the chosen path
+						lane.getVehicleList().remove(vehicle); //remove vehicle from the lane
+					} 
+					else {
+						lane.getVehicleList().remove(vehicle); //remove vehicle from the lane if there is no connected path for it to enter
+					}
+				}
+			}
+		}
+	}
     
     @Override
     public boolean equals(Object obj) {

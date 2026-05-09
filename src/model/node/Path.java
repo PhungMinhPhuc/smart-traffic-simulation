@@ -2,6 +2,7 @@ package model.node;
 
 import java.util.ArrayList;
 import model.utility.TrafficPoint;
+import model.utility.TrafficVector;
 import model.vehicle.Vehicle;
 
 import java.util.HashMap;
@@ -81,8 +82,10 @@ public class Path {
     }
 
 
-    public void addVehicle(Vehicle v){
-        vehicleList.add(v);
+    public void addVehicle(Vehicle vehicle){
+    	vehicle.setDirection(new TrafficVector(endPoint.getX() - startPoint.getX(), endPoint.getY() - startPoint.getY()));
+        vehicle.setPosition(startPoint.clone());
+    	vehicleList.add(vehicle);
     }
 
     public void removeVehicle(String vehicleId){

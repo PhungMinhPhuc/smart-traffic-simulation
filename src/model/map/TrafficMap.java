@@ -88,6 +88,18 @@ public class TrafficMap {
 		}
 	}
     
+    public void updateNodes() {
+    	for(TrafficNode node : nodeList) {
+			node.checkVehicleLeaving();;
+		}
+    }
+    
+    public void updateRoads() {
+		for(Road road : roadList) {
+			road.checkVehicleLeaving();
+		}
+	}
+    
     //Get unique set of TraffiNode 
 	public ArrayList<TrafficNode> getTrafficNodeList() {
 		return nodeList;
