@@ -2,7 +2,6 @@ package model.vehicle;
 
 import generator.BehaviorGenerator;
 import model.map.Point;
-import model.vehicle.behavior.DriverBehavior;
 import sound.SoundPlayer;
 
 public class Ambulance extends Vehicle {
@@ -13,7 +12,7 @@ public class Ambulance extends Vehicle {
 
         public Ambulance(Point position) {
         super("Ambulance", DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND, position);
-        this.setBehavior(BehaviorGenerator.getBehavior(BehaviorGenerator.BehaviorType.EMERGENCY));
+        this.setBehavior(BehaviorGenerator.getRandomBehavior());
     }
 
     @Override

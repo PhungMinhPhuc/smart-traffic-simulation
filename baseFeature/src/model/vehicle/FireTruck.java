@@ -12,7 +12,7 @@ public class FireTruck extends Vehicle {
 
         public FireTruck(Point position) {
         super("FireTruck", DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND, position);
-        this.setBehavior(BehaviorGenerator.getBehavior(BehaviorGenerator.BehaviorType.EMERGENCY));
+        this.setBehavior(BehaviorGenerator.getRandomBehavior());
     }
 
     @Override

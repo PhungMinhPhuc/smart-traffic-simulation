@@ -3,6 +3,7 @@ package generator;
 import java.util.Random;
 import model.map.Point;
 import model.vehicle.*;
+import model.vehicle.behavior.*;
 
 public class VehicleGenerator {
     public enum VehicleType {
@@ -12,7 +13,7 @@ public class VehicleGenerator {
 
     static final Random Rand = new Random();
 
-     public static Vehicle getVehicle(VehicleType type, Point coordinate) {
+     public static Vehicle getVehicle(VehicleType type, Point coordinate, DriverBehavior driverBehavior) {
         switch (type) {
             case FIRETRUCK:
                 return new FireTruck(coordinate);
@@ -30,6 +31,10 @@ public class VehicleGenerator {
         VehicleType[] types = VehicleType.values();
         // Chọn ngẫu nhiên index từ 0 đến độ dài của mảng enum
         VehicleType randomType = types[Rand.nextInt(types.length)];
-        return getVehicle(randomType, coordinate);
+        if (randomType == VehicleType.FIRETRUCK || randomType == VehicleType.AMBULANCE) {
+            return getVehicle(randomType, coordinate, BehaviorGenerator.getRandomBehavior_EmergencyIncluded());
+        }
+        else 
+            return getVehicle(randomType, coordinate, BehaviorGenerator.getRandomBehavior());
     }
 }

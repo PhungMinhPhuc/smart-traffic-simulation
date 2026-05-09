@@ -6,7 +6,7 @@ import java.util.Random;
 public class BehaviorGenerator {
     
     public enum BehaviorType {
-        NORMAL, EMERGENCY, AGGRESSIVE
+        NORMAL, AGGRESSIVE, EMERGENCY
     }
 
     static final Random Rand = new Random();
@@ -22,8 +22,16 @@ public class BehaviorGenerator {
         }
     }
 
-    public static DriverBehavior getRandomBehavior() {
+    public static DriverBehavior getRandomBehavior_EmergencyIncluded() {
         BehaviorType[] types = BehaviorType.values();
+        // Chọn ngẫu nhiên index từ 0 đến độ dài của mảng enum
+        BehaviorType randomType = types[Rand.nextInt(types.length)];
+        return getBehavior(randomType);
+    }
+
+    public static DriverBehavior getRandomBehavior() {
+        // Loại bỏ EMERGENCY khỏi lựa chọn ngẫu nhiên
+        BehaviorType[] types = {BehaviorType.NORMAL, BehaviorType.AGGRESSIVE};
         // Chọn ngẫu nhiên index từ 0 đến độ dài của mảng enum
         BehaviorType randomType = types[Rand.nextInt(types.length)];
         return getBehavior(randomType);
