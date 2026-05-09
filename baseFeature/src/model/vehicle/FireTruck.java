@@ -1,6 +1,7 @@
 package model.vehicle;
 
-import model.vehicle.behavior.DriverBehavior;
+import generator.BehaviorGenerator;
+import model.map.Point;
 import sound.SoundPlayer;
 
 public class FireTruck extends Vehicle {
@@ -9,9 +10,9 @@ public class FireTruck extends Vehicle {
     private static final double DEFAULT_LENGTH = 55.0;
     private static final double DEFAULT_MAX_SPEED = 110.0;
 
-    public FireTruck(DriverBehavior behavior) {
-        super("FireTruck", DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND, behavior);
-        this.isEmergency = true;
+        public FireTruck(Point position) {
+        super("FireTruck", DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND, position);
+        this.setBehavior(BehaviorGenerator.getBehavior(BehaviorGenerator.BehaviorType.EMERGENCY));
     }
 
     @Override

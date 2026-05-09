@@ -1,5 +1,7 @@
 package model.vehicle;
 
+import generator.BehaviorGenerator;
+import model.map.Point;
 import model.vehicle.behavior.DriverBehavior;
 import sound.SoundPlayer;
 
@@ -9,9 +11,9 @@ public class Ambulance extends Vehicle {
     private static final double DEFAULT_LENGTH = 45.0;
     private static final double DEFAULT_MAX_SPEED = 120.0;
 
-    public Ambulance(DriverBehavior behavior) {
-        super("Ambulance", DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND, behavior);
-        this.isEmergency = true;
+        public Ambulance(Point position) {
+        super("Ambulance", DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND, position);
+        this.setBehavior(BehaviorGenerator.getBehavior(BehaviorGenerator.BehaviorType.EMERGENCY));
     }
 
     @Override

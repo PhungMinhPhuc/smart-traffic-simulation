@@ -22,18 +22,18 @@ public abstract class Vehicle {
     // Environmental context
     protected Lane currentLane;
     protected Path currentPath;
-    protected boolean isEmergency;
+    protected boolean isEmergency = false;
 
-    public Vehicle(String type, double maxSpeed, double length, double width, String sound, DriverBehavior behavior) {
+    public Vehicle(String type, double maxSpeed, double length, double width, String sound, Point position) {
         this.id = IdGenerator.vehicleId(type);
         this.maxSpeed = maxSpeed;
         this.length = length;
         this.width = width;
         this.sound = sound;
-        this.behavior = behavior;
+        this.type = type;
+        this.position = position;
         this.speed = 0;
         this.acceleration = 0;
-        this.isEmergency = false;
     }
 
     // Logic processing separated from Drawing (This method is called every frame to update the vehicle's state)
@@ -136,6 +136,10 @@ public abstract class Vehicle {
 
     public void setAcceleration(double acceleration) {
         this.acceleration = acceleration;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public double getMaxSpeed() {

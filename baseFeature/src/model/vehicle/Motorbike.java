@@ -1,6 +1,7 @@
 package model.vehicle;
 
-import model.vehicle.behavior.DriverBehavior;
+import generator.BehaviorGenerator;
+import model.map.Point;
 import sound.SoundPlayer;
 
 public class Motorbike extends Vehicle {
@@ -9,9 +10,9 @@ public class Motorbike extends Vehicle {
     private static final double DEFAULT_LENGTH = 20.0;
     private static final double DEFAULT_MAX_SPEED = 90.0;
 
-    public Motorbike(DriverBehavior behavior) {
-        super("Motorbike", DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND, behavior);
-        this.isEmergency = false;
+        public Motorbike(Point position) {
+        super("Motorbike", DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND, position);
+        this.setBehavior(BehaviorGenerator.getRandomBehavior());
     }
 
     @Override

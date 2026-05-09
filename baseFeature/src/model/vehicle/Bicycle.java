@@ -1,7 +1,8 @@
 package model.vehicle;
 
-import model.vehicle.behavior.DriverBehavior;
 import sound.SoundPlayer;
+import generator.BehaviorGenerator;
+import model.map.Point;
 
 public class Bicycle extends Vehicle {
     private static final String DEFAULT_SOUND = "BicycleSound.wav";
@@ -9,9 +10,9 @@ public class Bicycle extends Vehicle {
     private static final double DEFAULT_LENGTH = 18.0;
     private static final double DEFAULT_MAX_SPEED = 25.0;
 
-    public Bicycle(DriverBehavior behavior) {
-        super("Bicycle", DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND, behavior);
-        this.isEmergency = false;
+    public Bicycle(Point position) {
+        super("Bicycle", DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND, position);
+        this.setBehavior(BehaviorGenerator.getRandomBehavior());
     }
 
     @Override
