@@ -1,4 +1,4 @@
-package application;
+package main.java;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -13,9 +13,9 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		
 		try {
-			Parent root = FXMLLoader.load(getClass().getResource("scenes/MainScene.fxml"));
+			Parent root = FXMLLoader.load(getClass().getResource("/main/resources/MainScene.fxml"));
 			Scene scene = new Scene(root);
-			scene.getStylesheets().add(getClass().getResource("scenes/MainSceneStyle.css").toExternalForm());
+			scene.getStylesheets().add(getClass().getResource("/main/resources/MainSceneStyle.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.show();
 		} catch(Exception e) {

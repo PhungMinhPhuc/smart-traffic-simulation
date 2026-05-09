@@ -1,4 +1,4 @@
-package application.scenes;
+package main.java;
 import java.util.Arrays;
 
 import java.util.List;
@@ -22,7 +22,7 @@ import model.vehicle.Vehicle;
 import render.TrafficMapRenderer;
 import render.VehicleRenderer;
 
-public class MainSenceController {
+public class MainSceneController {
 	//FXML elements
 	@FXML VBox editingSideBar;
 	@FXML Button addTrafficNodeButton;
