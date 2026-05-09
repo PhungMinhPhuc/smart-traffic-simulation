@@ -26,7 +26,7 @@ public abstract class TrafficNode implements ITrafficObsever {
 	public void checkVehicleLeaving() {
     	for(Path path : this.getPathList()) {
 			for(Vehicle vehicle : path.getVehicleList()) {
-				if(vehicle.getPosition().distance(path.getEndPoint()) < 5) { //if vehicle get close enough to path's endPoint
+				if(vehicle.getPosition().distance(path.getEndPoint()) < Constants.MIN_DISTANCE_TO_END_POINT) { //if vehicle get close enough to path's endPoint
 					//store conected lanes for vehicles to enter after leaving the node
 			    	ArrayList<Lane> connectedLanes = new ArrayList<Lane>(); 
 					//get the lane connectd to this path

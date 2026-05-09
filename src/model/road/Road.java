@@ -100,10 +100,10 @@ public class Road implements ITrafficObsever{
 		//check right way
 		for(Lane lane : rightWay.getLaneList()) {
 			for(Vehicle vehicle : lane.getVehicleList()) {
-				if(vehicle.getPosition().distance(lane.getEndPoint()) < 5) { //if vehicle get close enough to lane's endPoint
+				if(vehicle.getPosition().distance(lane.getEndPoint()) < Constants.MIN_DISTANCE_TO_END_POINT) { //if vehicle get close enough to lane's endPoint
 					//store connected Path for vehicle to enter afer leaving the road
 					ArrayList<Path> connectedPaths = new ArrayList<Path>();
-					for(Path path : this.getStartNode().getPathList()) { //Left way goes to Road's start node
+					for(Path path : this.getStartNode().getPathList()) { //Right way goes to Road's start node
 						if(path.getStartPoint().equals(lane.getEndPoint())) {
 							connectedPaths.add(path);
 						}
@@ -126,7 +126,7 @@ public class Road implements ITrafficObsever{
 		//check left way
 		for(Lane lane : leftWay.getLaneList()) {
 			for(Vehicle vehicle : lane.getVehicleList()) {
-				if(vehicle.getPosition().distance(lane.getEndPoint()) < 1e-9) { //if vehicle get close enough to lane's endPoint
+				if(vehicle.getPosition().distance(lane.getEndPoint()) < Constants.MIN_DISTANCE_TO_END_POINT) { //if vehicle get close enough to lane's endPoint
 					//store connected Path for vehicle to enter afer leaving the road
 					ArrayList<Path> connectedPaths = new ArrayList<Path>();
 					for(Path path : this.getEndNode().getPathList()) { //Left way goes to Road's end node

@@ -7,4 +7,7 @@ public final class Constants {
 	
 	//Junction configurations
 	public static final double JUNCTION_RADIUS = 70.0;
+	
+	//animation configurations
+	public static final double MIN_DISTANCE_TO_END_POINT = 2.0;
 }
