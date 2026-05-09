@@ -5,24 +5,21 @@ import model.vehicle.Vehicle;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
-import java.util.List;
 import config.Constants;
 
 public class Path {
     private String id;
     private TrafficPoint startPoint;
     private TrafficPoint endPoint;
-    private double width;
-    private List<Vehicle> vehicleList; // List of vehicles currently performing a turn on this path
-    private Map<Path, TrafficPoint> conflictPointMap;
+    private Map<Path, TrafficPoint> conflictPointList; //the key is the path that has conflict with this path, the value is the conflict point of the two paths
+    private ArrayList<Vehicle> vehicleList = new ArrayList<Vehicle>();
 
-    public Path(String id, TrafficPoint start, TrafficPoint end, double width) {
+    public Path(String id, TrafficPoint start, TrafficPoint end) {
         this.id = id;
-        this.startPoint = start;
-        this.endPoint = end;
-        this.width = width;
+        this.startPoint = start.clone();
+        this.endPoint = end.clone();
         this.vehicleList = new ArrayList<>();
-        this.conflictPointMap = new HashMap<>();
+        this.conflictPointList = new HashMap<>();
     }
 
     // Finds the intersection point between this path and another using Cramer's Rule.
@@ -60,7 +57,7 @@ public class Path {
 
     // Calculates the distance from the start of this path to the conflict point with another path (for Time to Collision)
     public double getDistanceToConflict(Path otherPath) {
-        TrafficPoint conflictPoint = conflictPointMap.get(otherPath);
+        TrafficPoint conflictPoint = conflictPointList.get(otherPath);
         if (conflictPoint == null) return Double.MAX_VALUE;
         return startPoint.distanceTo(conflictPoint);
     }
@@ -77,11 +74,11 @@ public class Path {
     // Management Methods
 
     public void addConflictPoint(Path other, TrafficPoint intersect) {
-        conflictPointMap.put(other, intersect);
+        conflictPointList.put(other, intersect);
     }
 
     public void removeConflictPoint(Path path){
-        conflictPointMap.remove(path);
+        conflictPointList.remove(path);
     }
 
     public void addVehicle(Vehicle v) {
@@ -118,27 +115,19 @@ public class Path {
         this.endPoint = endPoint;
     }
 
-    public double getWidth() {
-        return width;
-    }
-
-    public void setWidth(double width) {
-        this.width = width;
-    }
-
-    public List<Vehicle> getVehicleList() {
+    public ArrayList<Vehicle> getVehicleList() {
         return vehicleList;
     }
 
-    public void setVehicleList(List<Vehicle> vehicleList) {
-        this.vehicleList = vehicleList;
-    }
+    public Map<Path, TrafficPoint> getConflictPointList() {
+		return conflictPointList;
+	}
 
-    public Map<Path, TrafficPoint> getConflictPointMap() {
-        return conflictPointMap;
-    }
-
-    public void setConflictPointMap(Map<Path, TrafficPoint> conflictPointMap) {
-        this.conflictPointMap = conflictPointMap;
-    }
+    @Override
+    public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null || getClass() != obj.getClass()) return false;
+		Path other = (Path) obj;
+		return id.equals(other.id);
+	}
 }

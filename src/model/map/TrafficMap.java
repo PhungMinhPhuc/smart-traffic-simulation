@@ -1,114 +1,128 @@
 package model.map;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
+import config.Constants;
 import model.node.TrafficNode;
+import model.road.Lane;
 import model.road.Road;
-import model.node.Junction;
+import model.road.Way;
+import model.utility.TrafficPoint;
+import model.utility.TrafficVector;
 import model.vehicle.Vehicle;
-import java.util.*; 
+import model.node.Path;
+
+import java.util.ArrayList;
 
 public class TrafficMap {
-    private List<Road> roadList;
-    private List<TrafficNode> nodeList;
-    private List<Vehicle> vehicles;
-    private List<Road> allRoads; 
+    private ArrayList<TrafficNode> nodeList = new ArrayList<>();
+    private ArrayList<Road> roadList = new ArrayList<>();
 
-    public TrafficMap() {
-        this.adjacencyList = new HashMap<>();
-        this.vehicles = new ArrayList<>();
-        this.allRoads = new ArrayList<>();
-    }
-
-    // If the node isn't in the list, add it with an empty list of roads
     public void addNode(TrafficNode node) {
-        adjacencyList.putIfAbsent(node, new ArrayList<>());
+        nodeList.add(node);
     }
 
-    public void addRoad(Road road) {
-        TrafficNode start = road.getStartNode();
-        TrafficNode end = road.getEndNode();
-        addNode(start);
-        addNode(end);
-        adjacencyList.get(start).add(road);
-        adjacencyList.get(end).add(road);
-        
-        // Register the road inside the nodes
-        start.addRoad(road);
-        end.addRoad(road);
-        
-        // Initialize the junctions so traffic lights are created and cycles begin
-        if (start instanceof Junction) {
-            ((Junction) start).initializeJunction();
+    public void addConnection(TrafficNode startNode, TrafficNode endNode) {
+        // Check node existence
+        if (!nodeList.contains(startNode) || !nodeList.contains(endNode)) {
+            System.out.println("One or both nodes do not exist in the map");
+            return;
         }
-        if (end instanceof Junction) {
-            ((Junction) end).initializeJunction();
-        }
-        
-        if (!allRoads.contains(road)) {
-            allRoads.add(road);
-        }
-    }
-
-    // Find all roads connected to a specific node
-    public List<Road> getConnectedRoads(TrafficNode node) {
-        return adjacencyList.getOrDefault(node, new ArrayList<>());
-    }
-
-    public void addVehicle(Vehicle vehicle) {
-        vehicles.add(vehicle);
-    }
-
-    public void update(double deltaTime) {
-        // Update Junctions (Traffic Lights)
-        for (TrafficNode node : adjacencyList.keySet()) {
-            if (node instanceof Junction) {
-                ((Junction) node).update(deltaTime);
-            }
-        }
-
-        // Update Road segments
-        for (Road road : allRoads) {
-            road.update();
-        }
-        
-        // Update Vehicles
-        List<Vehicle> vehicleCopy = new ArrayList<>(vehicles);
-        for (Vehicle v : vehicleCopy) {
-            v.update(deltaTime);
-        }
-    }
-
-    public TrafficNode findNodeAt(model.utility.TrafficPoint p, double threshold) {
-    // Iterate through all nodes (keys in the adjacency list)
-        for (TrafficNode node : adjacencyList.keySet()) {
-            if (node.getCenterPoint().distanceTo(p) < threshold) {
-                return node;
-            }
-        }
-        return null;
+      
+		Road newRoad = new Road(startNode, endNode); //Use the constructor with default lane count and traffic light state
+		
+		//check colision with existing roads
+		for(Road existingRoad : getRoadList()) {
+			if(existingRoad.checkConflict(newRoad)) {
+				System.out.println("New road conflicts with existing road:" + existingRoad.getId());
+				return;
+			}
+		}
+		
+		//add new road to map's roadList
+		roadList.add(newRoad);
+		
+		//add new road to the start and end node's road list
+		newRoad.getStartNode().addRoad(newRoad);
+		newRoad.getEndNode().addRoad(newRoad);
     }
     
-    // Getters and Setters
-    public Map<TrafficNode, List<Road>> getAdjacencyList() {
-        return adjacencyList;
-    }
+    public void removeNode(TrafficNode removeNode) {
+        if (removeNode == null || !nodeList.contains(removeNode)) {
+            return;
+        }
 
-    public void setAdjacencyList(Map<TrafficNode, List<Road>> adjacencyList) {
-        this.adjacencyList = adjacencyList;
-    }
+        //create snapshot(clone) of the connected roads to avoid concurrent modification exception when removing roads from the node's road list
+        ArrayList<Road> connectedRoads = new ArrayList<>(removeNode.getRoadList());
+        for (Road road : connectedRoads) {
+            // remove the roads connected to the node from the map's road list
+            roadList.remove(road);
 
-    public List<Vehicle> getVehicles() {
-        return vehicles;
-    }
+            // remove the roads connected to the removeNode from all connected nodes' road list
+            road.getStartNode().removeRoad(road);
+            road.getEndNode().removeRoad(road);
+        }
 
-    public void setVehicles(List<Vehicle> vehicles) {
-        this.vehicles = vehicles;
+        // remove the node from the map's node list
+        nodeList.remove(removeNode);
     }
+    
+    //Testing method 
+    public void addDefaultVehicleToRoad(Road road, boolean isRightWay) {
+		Way way = isRightWay ? road.getRightWay() : road.getLeftWay();
+		if(way.getLaneList().isEmpty()) {
+			System.out.println("No lane available on the way to add vehicle");
+			return;
+		}
+        //
+	}
+    
+    
+    //update the position of all vehicles in the map, 
+    // this method will be called in each time step of the simulation
+    public void updateVehicles(double timeInterval) {
 
-    public List<Road> getAllRoads() {
-        return allRoads;
-    }
+	}
+    
+    //Get unique set of TraffiNode 
+	public ArrayList<TrafficNode> getTrafficNodeList() {
+		return nodeList;
+	}
 
-    public void setAllRoads(List<Road> allRoads) {
-        this.allRoads = allRoads;
-    }
+	//Get unique set of Road
+	public ArrayList<Road> getRoadList() {
+		return roadList;
+	}
+	
+	public ArrayList<Vehicle> getVehicleList(){
+		ArrayList<Vehicle> vehicleList = new ArrayList<>();
+		//get all vehicles from all lanes of all roads
+		for(Road road : roadList) {
+			for(Lane lane : road.getRightWay().getLaneList()) {
+				vehicleList.addAll(lane.getVehicleList());
+			}
+			for(Lane lane : road.getLeftWay().getLaneList()) {
+				vehicleList.addAll(lane.getVehicleList());
+			}
+		}
+		
+		//get vehicle from all paths of all nodes
+		for(TrafficNode node : nodeList) {
+			for(Path path : node.getPathList()) {
+				vehicleList.addAll(path.getVehicleList());
+			}
+		}
+		
+		return vehicleList;
+	}
+	
+	public TrafficNode getNodeByPoint(TrafficPoint point) {
+		for(TrafficNode node : nodeList) {
+			if(node.containsPoint(point)) {
+				return node;
+			}
+		}
+		return null; //no node found at the point
+	}
 }

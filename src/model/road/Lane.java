@@ -6,24 +6,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Lane {
-    private String id;
     private int index;
-    private Way parentWay;
     private TrafficPoint startPoint;
     private TrafficPoint endPoint;
-    
-    // List of vehicles currently in this lane.  Usually ordered from the one closest to the exit to the one furthest away.
     private List<Vehicle> vehicleList;
-    
-    // Current status of the traffic light at the end of this lane
     private boolean isRedLight = false;
 
-    public Lane(String id, int index, Way parentWay, TrafficPoint startPoint, TrafficPoint endPoint) {
-        this.id = id;
+    public Lane(int index, TrafficPoint startPoint, TrafficPoint endPoint) {
         this.index = index;
-        this.parentWay = parentWay;
-        this.startPoint = startPoint;
-        this.endPoint = endPoint;
+        this.startPoint = startPoint.clone();
+        this.endPoint = endPoint.clone();
         this.vehicleList = new ArrayList<>();
     }
 
@@ -62,17 +54,6 @@ public class Lane {
         return null;
     }
 
-    // Offset = 1 (Right), offset = -1 (Left)
-    public Lane getNeighborLane(int offset) {
-        int neighborIndex = this.index + offset;
-        List<Lane> allLanes = parentWay.getLaneList();
-        
-        if (neighborIndex >= 0 && neighborIndex < allLanes.size()) {
-            return allLanes.get(neighborIndex);
-        }
-        return null;
-    }
-
     // Returns the angle (direction) of the lane.
     public double getAngle() {
         return startPoint.angleTo(endPoint);
@@ -84,28 +65,12 @@ public class Lane {
     }
     
     // Getters and Setters
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public int getIndex() {
         return index;
     }
 
     public void setIndex(int index) {
         this.index = index;
-    }
-
-    public Way getParentWay() {
-        return parentWay;
-    }
-
-    public void setParentWay(Way parentWay) {
-        this.parentWay = parentWay;
     }
 
     public TrafficPoint getStartPoint() {
@@ -139,5 +104,4 @@ public class Lane {
     public void setRedLight(boolean isRedLight) {
         this.isRedLight = isRedLight;
     }
-
 }

@@ -5,11 +5,8 @@ apache-maven-3.9.6
 maven.zip
 implementation_plan.md
 pom.xml
-observer
-src/renderer
 src/event
 src/core
 src/controller
-sound
-Main.java
 target
+.vscode

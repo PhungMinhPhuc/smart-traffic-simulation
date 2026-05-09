@@ -1,79 +1,60 @@
 package model.road;
 
+import java.util.ArrayList;
+import config.Constants;
 import model.traffic.LightState;
-import model.traffic.TrafficLight;
 import model.utility.TrafficPoint;
 import model.utility.TrafficVector;
 
-import java.util.ArrayList;
-import java.util.List;
-import config.Constants;
-
-// Represents one direction of travel on a road. Manages multiple parallel lanes and the traffic light for this direction.
 public class Way {
-    private String id;
-    private List<Lane> laneList;
-    private TrafficPoint startPoint;
-    private TrafficPoint endPoint;
-    private TrafficLight trafficLight; // Current state of the traffic light for this direction
+    private ArrayList<Lane> laneList = new ArrayList<Lane>();
+    private LightState stateTrafficLight;
+    private String roadId;
 
-    public Way(String id, TrafficPoint start, TrafficPoint end, int numberOfLanes) {
-        this.id = id;
-        this.startPoint = start;
-        this.endPoint = end;
-        this.laneList = new ArrayList<>();
-        this.trafficLight = new TrafficLight(1); // Default = full timer
-        generateLanes(numberOfLanes);
-    }
 
-    // Generates parallel lanes using perpendicular vector offsets. Lanes are indexed from 0 (innermost/left) to n-1 (outermost/right).
-    public void generateLanes(int numberOfLanes) {
-        TrafficVector direction = endPoint.subtract(startPoint);
-        TrafficVector normal = direction.getPerpendicular().normalize();
-        for (int i = 0; i < numberOfLanes; i++) {
-            // Calculate the offset for the center of this specific lane. Formula: (i + 0.5) * width ensures the first lane is shifted by half-width
-            double offsetDist = (i + 0.5) * Constants.LANE_WIDTH;
-            TrafficVector offsetVector = normal.multiply(offsetDist);
+    public Way(LightState lightState, int laneCount,boolean isRightWay,TrafficPoint roadStartPoint, TrafficPoint roadEndPoint, String roadId){
+        this.stateTrafficLight = lightState;
+        this.roadId = roadId;
+        //Create lanes base on the lane count and the position of the road
+        TrafficVector vectorRoad = new TrafficVector(roadStartPoint, roadEndPoint);
+        if(isRightWay){
+           TrafficVector translateVector = vectorRoad.rotateVector(Math.toRadians(-90));
+            translateVector = translateVector.scaleVector(Constants.LANE_WIDTH/2.0);
+            for(int i = 0; i < laneCount; i++){
+                int j = 2*i + 1;
+              //Vectors of the right way's lanes have the opposite direction compared to the road
+                TrafficPoint laneStartPoint = new TrafficPoint(roadEndPoint.getX() + translateVector.getX() * j, roadEndPoint.getY() + translateVector.getY() * j);
+                TrafficPoint laneEndPoint = new TrafficPoint(roadStartPoint.getX() + translateVector.getX() * j, roadStartPoint.getY() + translateVector.getY() * j);
+                laneList.add(new Lane(i, laneStartPoint, laneEndPoint));
+            }
+        }
+        else{
+            TrafficVector translateVector = vectorRoad.rotateVector(Math.toRadians(90));
+            translateVector = translateVector.scaleVector(Constants.LANE_WIDTH/2.0);
 
-            // Shift both start and end points to create a parallel line
-            TrafficPoint laneStart = startPoint.add(offsetVector);
-            TrafficPoint laneEnd = endPoint.add(offsetVector);
-
-            // Create the lane with an index and a reference back to this Way
-            Lane lane = new Lane(id + "_L" + i, i, this, laneStart, laneEnd);
-            laneList.add(lane);
+            for(int i = 0; i < laneCount; i++){
+                int j = 2*i + 1;
+              //Vectors of the left way's lanes have the same direction to the road
+                TrafficPoint laneStartPoint = new TrafficPoint(roadStartPoint.getX() + translateVector.getX() * j, roadStartPoint.getY() + translateVector.getY() * j);
+                TrafficPoint laneEndPoint = new TrafficPoint(roadEndPoint.getX() + translateVector.getX() * j, roadEndPoint.getY() + translateVector.getY() * j);
+                laneList.add(new Lane(i, laneStartPoint, laneEndPoint));
+            }
         }
     }
 
-    // Updates the traffic light state and notifies all lanes. In a Smart City, this is called by the TrafficController.
-    public void setTrafficLight(TrafficLight newState) {
-        this.trafficLight = newState;
-        boolean redSignal = (newState.getCurrentState() == LightState.RED);
-        
-        // Push the red light status to all lanes so vehicles know to stop
-        for (Lane lane : laneList) {
-            lane.setRedLight(redSignal);
-        }
+    public void setStateTrafficLight(LightState stateTrafficLight) {
+        this.stateTrafficLight = stateTrafficLight;
     }
 
-    // Getters
-    public String getId() {
-        return id;
+    public LightState getStateTrafficLight() {
+        return stateTrafficLight;
     }
 
-    public List<Lane> getLaneList() {
+    public ArrayList<Lane> getLaneList() {
         return laneList;
     }
 
-    public TrafficLight getTrafficLight() {
-        return trafficLight;
-    }
-
-    public TrafficPoint getStartPoint() {
-        return startPoint;
-    }
-
-    public TrafficPoint getEndPoint() {
-        return endPoint;
+    public String getRoadId() {
+        return roadId;
     }
 }

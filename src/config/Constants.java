@@ -6,15 +6,19 @@ public final class Constants {
     private Constants() {}
 
     // LANE CONFIG
-    public static final double LANE_WIDTH = 30.0;
+    public static final double LANE_WIDTH = 15.0;
     public static final Color LANE_COLOR = Color.GRAY;
+    public static final int DEFAULT_LANE_COUNT = 2;
 
     // LANE MARKING CONFIG
     public static final double LANE_MARKING_WIDTH = 1.0;
     public static final Color LANE_MARKING_COLOR = Color.WHITE;
 
-    //ROAD MARKING CONFIG
+    // ROAD MARKING CONFIG
 
+
+    // JUNCTION CONFIG
+    public static final double JUNCTION_RADIUS = 70.0;
 
     // STOP LINE CONFIG
     public static final double STOP_LINE_WIDTH = 2.0;

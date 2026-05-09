@@ -55,4 +55,17 @@ public class TrafficVector {
         TrafficVector resizedDirection = direction.scaleVector(distance);
         return new TrafficPoint(point.getX() + resizedDirection.x, point.getY() + resizedDirection.y);
     }
+
+    @Override
+    public TrafficVector clone() {
+		return new TrafficVector(this.x, this.y);
+	}
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
 }

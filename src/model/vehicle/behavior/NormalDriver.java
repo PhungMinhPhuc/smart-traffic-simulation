@@ -61,25 +61,7 @@ public class NormalDriver implements DriverBehavior {
     // Yield to Emergency Vehicles. Logic: Slow down significantly or change lane to allow the ambulance to pass.
     @Override
     public void onEmergency(Vehicle self, Vehicle emergencyVehicle) {
-        // If an ambulance is nearby
-        double dist = self.getPosition().distanceTo(emergencyVehicle.getPosition());
-        if (dist < SAFE_DISTANCE) {
-            Lane currentLane = self.getCurrentLane();
-            Lane leftLane = currentLane.getNeighborLane(-1);
-            Lane rightLane = currentLane.getNeighborLane(1);
-            boolean moved = false;
-            if (leftLane != null && leftLane.isEmptyAhead(self, SAFE_DISTANCE)){
-                self.setCurrentLane(leftLane);
-                moved = true;
-            }
-            else if (rightLane != null && rightLane.isEmptyAhead(self, SAFE_DISTANCE)){
-                self.setCurrentLane(rightLane);
-                moved = true;
-            }
-            if (!moved){
-                self.setAcceleration(BRAKING_STRENGTH); 
-            }
-        }
+
     }
 
     // Overtaking. Logic: If a car is slow in front, check if the neighbor lane is better
