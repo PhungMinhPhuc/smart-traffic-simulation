@@ -17,16 +17,16 @@ public class Vehicle {
 	public Vehicle(TrafficPoint position,TrafficVector direction) {
 		this.id = IdGenerator.vehicleId("Demo Vehicle");
 		this.position = position;
-		this.speed = 0.0;
+		this.speed = 70.0;
 		this.direction = direction.clone();
-		this.acceleration = 4.0;
+		this.acceleration = 0.0;
 	}		
 	
 	public Vehicle() {
 		this.id = IdGenerator.vehicleId("Demo Vehicle");
 		this.position = new TrafficPoint(0.0, 0.0);
-		this.speed = 0.0;
-		this.acceleration = 2.0;
+		this.speed = 70.0;
+		this.acceleration = 0.0;
 	}
 	
 	//"Move" the vehicle by updating its position and speed

@@ -273,6 +273,8 @@ public class MainSenceController {
 				
 				//update vehicle positions based on their speed and the elapsed time
 				trafficMap.updateVehicles(deltaTime);
+				trafficMap.updateNodes();
+				trafficMap.updateRoads();
 				renderDefaultVehicles(); //re-render vehicles at their new positions
 			}
 		};

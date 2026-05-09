@@ -8,9 +8,11 @@ import model.road.Lane;
 import model.road.Road;
 import model.road.Way;
 import model.utility.TrafficPoint;
+import model.vehicle.Vehicle;
+import model.observer.ITrafficObsever;
 
-public abstract class TrafficNode {
-    protected TrafficPoint centerPoint;
+public abstract class TrafficNode implements ITrafficObsever {
+	protected TrafficPoint centerPoint;
     protected ArrayList<Path> pathList = new ArrayList<Path>();
     protected ArrayList<Road> roadList = new ArrayList<Road>();
     protected String id;
@@ -19,6 +21,38 @@ public abstract class TrafficNode {
         centerPoint = (TrafficPoint)point.clone();
         id = IdGenerator.nodeId();
     }
+    
+    @Override
+	public void checkVehicleLeaving() {
+    	for(Path path : this.getPathList()) {
+			for(Vehicle vehicle : path.getVehicleList()) {
+				if(vehicle.getPosition().distance(path.getEndPoint()) < 5) { //if vehicle get close enough to path's endPoint
+					//store conected lanes for vehicles to enter after leaving the node
+			    	ArrayList<Lane> connectedLanes = new ArrayList<Lane>(); 
+					//get the lane connectd to this path
+					for(Road road : roadList) {
+						for(Way way : new Way[] {road.getLeftWay(), road.getRightWay()}) {
+							for(Lane lane : way.getLaneList()) {
+								if(lane.getStartPoint().equals(path.getEndPoint())) {
+									connectedLanes.add(lane);
+								}
+							}
+						}
+					}
+					//choose randomly one of the connected lanes for the vehicle to enter, if there is no connected lane, then the vehicle will be removed from the path
+					if(!connectedLanes.isEmpty()) {
+						int randomIndex = (int)(Math.random() * connectedLanes.size());
+						Lane chosenLane = connectedLanes.get(randomIndex);
+						path.getVehicleList().remove(vehicle); //remove vehicle from the path
+						chosenLane.addVehicle(vehicle); //add vehicle to the chosen lane
+					} else {
+						path.getVehicleList().remove(vehicle); //remove vehicle from the path if there is no connected lane for it to enter
+					}
+				}
+			}
+		}
+		
+	}
     
     /**
      * - When adding a new road to the node, 
