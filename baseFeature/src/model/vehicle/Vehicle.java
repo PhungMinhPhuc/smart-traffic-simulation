@@ -114,14 +114,6 @@ public abstract class Vehicle {
         this.id = id;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public Point getPosition() {
         return position;
     }
@@ -150,32 +142,12 @@ public abstract class Vehicle {
         return maxSpeed;
     }
 
-    public void setMaxSpeed(double maxSpeed) {
-        this.maxSpeed = maxSpeed;
-    }
-
     public double getLength() {
         return length;
     }
 
-    public void setLength(double length) {
-        this.length = length;
-    }
-
     public double getWidth() {
         return width;
-    }
-
-    public void setWidth(double width) {
-        this.width = width;
-    }
-
-    public String getSound() {
-        return sound;
-    }
-
-    public void setSound(String sound) {
-        this.sound = sound;
     }
 
     public DriverBehavior getBehavior() {
@@ -209,4 +181,6 @@ public abstract class Vehicle {
     public void setEmergency(boolean isEmergency) {
         this.isEmergency = isEmergency;
     }
+
+    public abstract void makeSound();
 }

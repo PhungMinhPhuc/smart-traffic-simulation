@@ -1,6 +1,7 @@
 package model.vehicle;
 
 import model.vehicle.behavior.DriverBehavior;
+import sound.SoundPlayer;
 
 public class Car extends Vehicle {
     private static final String DEFAULT_SOUND = "CarSound.wav";
@@ -15,5 +16,10 @@ public class Car extends Vehicle {
     @Override
     public String toString() {
         return "Car [" + behavior.getBehaviorName() + "]";
+    }
+
+    @Override
+    public void makeSound() {
+        SoundPlayer.playSound(DEFAULT_SOUND);
     }
 }
