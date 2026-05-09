@@ -34,6 +34,27 @@ public class TrafficMap {
         endNode.addRoad(road);
     }
 
+    public void removeNode(TrafficNode removeNode) {
+        if (removeNode == null || !nodeList.contains(removeNode)) {
+            return;
+        }
+
+        //create snapshot(clone) of the connected roads to avoid concurrent modification exception when removing roads from the node's road list
+        ArrayList<Road> connectedRoads = new ArrayList<>(removeNode.getRoadList());
+        for (Road road : connectedRoads) {
+            // remove the roads connected to the node from the map's road list
+            roadList.remove(road);
+
+            // remove the roads connected to the removeNode from all connected nodes' road list
+            road.getStartNode().removeRoad(road);
+            road.getEndNode().removeRoad(road);
+        }
+
+        // remove the node from the map's node list
+        nodeList.remove(removeNode);
+    }
+
+
     public List<TrafficNode> getNodeList() {
         return nodeList;
     }
