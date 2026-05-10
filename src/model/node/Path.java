@@ -72,7 +72,6 @@ public class Path {
     }
 
     // Management Methods
-
     public void addConflictPoint(Path other, TrafficPoint intersect) {
         conflictPointList.put(other, intersect);
     }
@@ -81,8 +80,12 @@ public class Path {
         conflictPointList.remove(path);
     }
 
-    public void addVehicle(Vehicle v) {
-        if (!vehicleList.contains(v)) vehicleList.add(v);
+    public void addVehicle(Vehicle vehicle) {
+        if (!vehicleList.contains(vehicle)){
+        vehicle.setPosition(startPoint.clone());
+        vehicle.setCurrentPath(this);
+    	vehicleList.add(vehicle);
+        }
     }
 
     public void removeVehicle(Vehicle v) {

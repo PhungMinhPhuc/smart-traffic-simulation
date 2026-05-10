@@ -1,4 +1,5 @@
 package model.map;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -75,14 +76,19 @@ public class TrafficMap {
 			System.out.println("No lane available on the way to add vehicle");
 			return;
 		}
-        //
+		//Add a default vehicle to the first lane of the way
+		Lane lane = way.getLaneList().get(0);
+		Vehicle vehicle = new Vehicle(lane.getStartPoint().clone(), new TrafficVector(lane.getStartPoint(), lane.getEndPoint()));
+		lane.addVehicle(vehicle);
 	}
     
     
     //update the position of all vehicles in the map, 
     // this method will be called in each time step of the simulation
     public void updateVehicles(double timeInterval) {
-
+		for(Vehicle vehicle : getVehicleList()) {
+			vehicle.update(timeInterval);
+		}
 	}
     
     //Get unique set of TraffiNode 

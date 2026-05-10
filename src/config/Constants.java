@@ -47,4 +47,6 @@ public final class Constants {
     // SIMULATION CONFIG
     public static final int TICK_RATE_MS = 1000;
 
+    // GUI CONFIG
+    public static final double MIN_DISTANCE_TO_END_POINT = 5.0;
 }

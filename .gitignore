@@ -10,3 +10,4 @@ src/core
 src/controller
 target
 .vscode
+LANE_CHANGE_GUIDE.md
