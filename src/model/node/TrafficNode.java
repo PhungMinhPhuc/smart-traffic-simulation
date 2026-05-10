@@ -8,12 +8,12 @@ import generator.IdGenerator;
 import model.road.Lane;
 import model.road.Road;
 import model.road.Way;
+import model.trafficUpdate.ITrafficUpdate;
 import model.utility.TrafficPoint;
 import model.utility.TrafficVector;
 import model.vehicle.Vehicle;
-import model.observer.ITrafficObsever;
 
-public abstract class TrafficNode implements ITrafficObsever {
+public abstract class TrafficNode implements ITrafficUpdate {
 	protected TrafficPoint centerPoint;
     protected ArrayList<Path> pathList = new ArrayList<Path>();
     protected ArrayList<Road> roadList = new ArrayList<Road>();

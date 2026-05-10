@@ -7,14 +7,14 @@ import java.util.Iterator;
 
 import config.Constants;
 import model.traffic.LightState;
+import model.trafficUpdate.ITrafficUpdate;
 import model.utility.TrafficPoint;
 import model.utility.TrafficVector;
 import model.vehicle.Vehicle;
 import model.node.Path;
 import model.node.TrafficNode;
-import model.observer.ITrafficObsever;
 
-public class Road implements ITrafficObsever{
+public class Road implements ITrafficUpdate{
 	private Way rightWay;
     private Way leftWay;
     private TrafficPoint startPoint;
