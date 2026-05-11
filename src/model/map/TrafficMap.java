@@ -1,10 +1,12 @@
 package model.map;
 
+import config.Constants;
 import model.node.Path;
 import model.node.TrafficNode;
 import model.road.Lane;
 import model.road.Road;
 import model.road.Way;
+import model.utility.TrafficGeometry;
 import model.utility.TrafficPoint;
 import model.vehicle.Vehicle;
 
@@ -21,9 +23,14 @@ public class TrafficMap {
         System.out.println("Map created");
     }
 
-    public void addNode(TrafficNode node) {
-        if (!nodeList.contains(node)) {
-            nodeList.add(node);
+    public void addNode(TrafficNode newNode) {
+        if (!nodeList.contains(newNode)) {
+            for (TrafficNode node : nodeList) {
+                if (TrafficGeometry.intersectsCircle(newNode.getCenterPoint(), Constants.JUNCTION_RADIUS, node.getCenterPoint(), Constants.JUNCTION_RADIUS)) {
+                    return;
+                }
+            }
+            nodeList.add(newNode);
         }
     }
 

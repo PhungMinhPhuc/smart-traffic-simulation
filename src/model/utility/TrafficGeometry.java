@@ -118,5 +118,7 @@ public final class TrafficGeometry {
         return new double[] { min, max };
     }
 
-
+    public static boolean intersectsCircle(TrafficPoint aCenter, double aRadius, TrafficPoint bCenter, double bRadius) {
+        return aCenter.distance(bCenter) <= aRadius + bRadius;
+    }
 }
