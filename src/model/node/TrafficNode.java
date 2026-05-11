@@ -2,7 +2,7 @@ package model.node;
 
 import config.Constants;
 import generator.IdGenerator;
-import model.observer.ITrafficObserver;
+import model.traffic_update.ITrafficUpdate;
 import model.road.Road;
 import model.utility.TrafficPoint;
 import model.road.Lane;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class TrafficNode implements ITrafficObserver {
+public class TrafficNode implements ITrafficUpdate {
     protected String id;
     protected TrafficPoint centerPoint;
     protected List<Path> pathList;

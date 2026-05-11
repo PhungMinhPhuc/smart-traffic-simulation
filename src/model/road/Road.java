@@ -4,7 +4,7 @@ import config.Constants;
 import generator.IdGenerator;
 import model.node.Path;
 import model.node.TrafficNode;
-import model.observer.ITrafficObserver;
+import model.traffic_update.ITrafficUpdate;
 import model.utility.TrafficPoint;
 import model.utility.TrafficVector;
 import model.vehicle.Vehicle;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Road implements ITrafficObserver {
+public class Road implements ITrafficUpdate {
     private String roadId;
     private TrafficNode startNode;
     private TrafficNode endNode;
