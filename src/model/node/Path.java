@@ -1,8 +1,8 @@
 package model.node;
 
 import model.utility.TrafficPoint;
+import model.utility.TrafficGeometry;
 import model.vehicle.Vehicle;
-import config.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,51 +37,7 @@ public class Path {
         TrafficPoint otherStart = otherPath.getStartPoint();
         TrafficPoint otherEnd = otherPath.getEndPoint();
 
-        double thisStartX = thisStart.getX();
-        double thisStartY = thisStart.getY();
-        double thisEndX = thisEnd.getX();
-        double thisEndY = thisEnd.getY();
-
-        double otherStartX = otherStart.getX();
-        double otherStartY = otherStart.getY();
-        double otherEndX = otherEnd.getX();
-        double otherEndY = otherEnd.getY();
-
-        // Main determinant
-        double determinant = (thisStartX - thisEndX) * (otherStartY - otherEndY) - (thisStartY - thisEndY) * (otherStartX - otherEndX);
-
-        if (Math.abs(determinant) < Constants.EPS) {
-            return null;
-        }
-
-        // Determinant of each Path
-        double thisDeterminant = thisStartX * thisEndY - thisStartY * thisEndX;
-        double otherDeterminant = otherStartX * otherEndY - otherStartY * otherEndX;
-
-        double conflictPointX =
-                (thisDeterminant * (otherStartX - otherEndX) - (thisStartX - thisEndX) * otherDeterminant) / determinant;
-
-        double conflictPointY =
-                (thisDeterminant * (otherStartY - otherEndY) - (thisStartY - thisEndY) * otherDeterminant) / determinant;
-
-        boolean isOnThisPath = isPointOnSegment(conflictPointX, conflictPointY, thisStartX, thisStartY, thisEndX, thisEndY);
-
-        boolean isOnOtherPath = isPointOnSegment(conflictPointX, conflictPointY, otherStartX, otherStartY, otherEndX, otherEndY);
-
-        if (isOnThisPath && isOnOtherPath) {
-            return new TrafficPoint(conflictPointX, conflictPointY);
-        }
-
-        return null;
-    }
-
-    private boolean isPointOnSegment(double pointX, double pointY, double startX, double startY, double endX, double endY) {
-        double minX = Math.min(startX, endX) - Constants.EPS;
-        double maxX = Math.max(startX, endX) + Constants.EPS;
-        double minY = Math.min(startY, endY) - Constants.EPS;
-        double maxY = Math.max(startY, endY) + Constants.EPS;
-
-        return pointX >= minX && pointX <= maxX && pointY >= minY && pointY <= maxY;
+        return TrafficGeometry.intersectsLines(thisStart, thisEnd, otherStart, otherEnd);
     }
 
     public void removeConflictPoint(Path path) {
@@ -91,7 +47,6 @@ public class Path {
     public void clearConflictPoints() {
         conflictPointList.clear();
     }
-
 
     @Override
     public boolean equals(Object o) {
