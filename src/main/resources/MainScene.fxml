@@ -16,6 +16,8 @@
             <Button fx:id="addTrafficNodeButton" alignment="CENTER" mnemonicParsing="false" onAction="#addNewNode" text="Add Traffic Node" />
             <Button fx:id="removeTrafficNodeButton" mnemonicParsing="false" onAction="#removeNode" text="Remove Traffic Node" />
             <Button fx:id="addRoadButton" mnemonicParsing="false" onAction="#addNewRoad" text="Add Road" />
+            <Button fx:id="resumeSimulationButton" mnemonicParsing="false" onAction="#resumeSimulation" text="Resume Simulation" />
+            <Button fx:id="pauseSimulationButton" mnemonicParsing="false" onAction="#pauseSimulation" text="Pause Simulation" />
             <Label fx:id="instructionsLabel" text="">
                <font>
                   <Font name="System Bold" size="15.0" />

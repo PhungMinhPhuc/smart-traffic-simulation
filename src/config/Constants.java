@@ -32,4 +32,5 @@ public final class Constants {
 
     // SIMULATION CONFIG
     public static final int TICK_RATE_MS = 1000;
+    public static final double NANOS_PER_SECOND = 1e9; // 1 sec = 1e9 nano sec
 }

@@ -3,6 +3,8 @@ import java.util.Arrays;
 
 import java.util.List;
 import java.util.Optional;
+
+import config.Constants;
 import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -29,6 +31,8 @@ public class MainSceneController {
 	@FXML Button removeTrafficNodeButton;
 	@FXML Button addRoadButton;
 	@FXML Button removeRoadButton;
+	@FXML Button resumeSimulationButton;
+	@FXML Button pauseSimulationButton;
 	@FXML Label instructionsLabel; //For displaying instructions to the user when they are adding or removing nodes and roads
 	@FXML ScrollPane trafficMapWrapper; //Create view port of the map
 	@FXML Pane mapLayer; //Pane to draw the static map on, will be placed inside the 
@@ -39,13 +43,18 @@ public class MainSceneController {
 	private static TrafficMapRenderer trafficMapRenderer = new TrafficMapRenderer();
 	private static VehicleRenderer vehicleRenderer = new VehicleRenderer();
 	private static TrafficMap trafficMap = new TrafficMap();
-	
+
 	//Normal fields for functionalities
 	Boolean addingRoad = false; //flag to indicate if currently in the process of adding a road
 	Line previewLine = null; //line to show the road being dragged out when adding a new road by dragging from start node to end node
 	TrafficNode startNode = null; //placeHolder for TrafficNode for event handlers when adding or removing roads and nodes
-	TrafficNode endNode = null; 
-	
+	TrafficNode endNode = null;
+
+	// Fields for pause/resume simulation
+	private AnimationTimer vehicleTimer;
+	private long lastFrameTimeNano = 0;
+	private boolean simulationPaused = false;
+
 	@FXML
 	private void initialize() { //auto run when the scene is loaded
 		//Create defaultMap
@@ -258,9 +267,7 @@ public class MainSceneController {
 	//Timer ticks to update vehicle positions and re-render them at their new positions
 	// all the long variable is the current time in nanoseconds
 	public void startVehicleAnimation() {
-		AnimationTimer vehicleTimer = new AnimationTimer() {
-			private long lastFrameTimeNano = 0;
-			
+		vehicleTimer = new AnimationTimer() {
 			@Override
 			public void handle(long now) {
 				if (lastFrameTimeNano == 0) {
@@ -268,7 +275,7 @@ public class MainSceneController {
 					return;
 				}
 				//time elapsed since last frame in seconds
-				double deltaTime = (now - lastFrameTimeNano) / 1e9; //convert from nanoseconds to seconds
+				double deltaTime = (now - lastFrameTimeNano) / Constants.NANOS_PER_SECOND; //convert from nanoseconds to seconds
 				lastFrameTimeNano = now; //update current time for the next frame
 				
 				//update vehicle positions based on their speed and the elapsed time
@@ -279,5 +286,22 @@ public class MainSceneController {
 			}
 		};
 		vehicleTimer.start();
+	}
+
+	public void pauseSimulation(ActionEvent event) {
+		if (vehicleTimer != null && !simulationPaused) {
+			vehicleTimer.stop();
+			simulationPaused = true;
+			DisplayInstruction("Simulation paused");
+		}
+	}
+
+	public void resumeSimulation(ActionEvent event) {
+		if (vehicleTimer != null && simulationPaused) {
+			simulationPaused = false;
+			lastFrameTimeNano = 0;
+			vehicleTimer.start();
+			DisplayInstruction("");
+		}
 	}
 }
