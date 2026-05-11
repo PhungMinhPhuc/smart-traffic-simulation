@@ -10,7 +10,7 @@ import model.vehicle.behavior.DriverBehavior;
 import java.util.Queue;
 import java.util.LinkedList;
 
-public class Vehicle {
+public abstract class Vehicle {
     protected String id;
     protected String type;
     protected TrafficPoint position;
@@ -21,44 +21,44 @@ public class Vehicle {
     protected double width;
     protected String sound;
     protected DriverBehavior behavior;
-	private TrafficVector direction; 
-    
+    protected TrafficVector direction;
+
     // Environmental context
     protected Lane currentLane;
     protected Path currentPath;
     protected boolean isEmergency;
-    
+
     // Lane change state management
-    protected Lane targetLane;           // Lane vehicle is changing to
-    protected boolean isChangingLane;    // Whether vehicle is in the process of changing lanes
+    protected Lane targetLane; // Lane vehicle is changing to
+    protected boolean isChangingLane; // Whether vehicle is in the process of changing lanes
     protected double laneChangeProgress; // 0 to 1: progress of lane change
     protected TrafficPoint laneChangeStartPosition; // Starting position when lane change began
     protected double laneChangeDuration; // Time (in seconds) for the lane change to complete
-    protected double laneChangeElapsed;  // Time elapsed since lane change started
+    protected double laneChangeElapsed; // Time elapsed since lane change started
     protected static final double LANE_CHANGE_DURATION = 1.5; // Default: 1.5 seconds to change lanes
-    
+
     // Path selection and navigation
-    protected Queue<Path> plannedPath;  // Queue of paths the vehicle intends to follow
+    protected Queue<Path> plannedPath; // Queue of paths the vehicle intends to follow
 
+    public Vehicle(String type, double maxSpeed, double length, double width, String sound) {
+        this.id = IdGenerator.vehicleId(type);
+        this.maxSpeed = maxSpeed;
+        this.length = length;
+        this.width = width;
+        this.sound = sound;
+        this.speed = 0;
+        this.acceleration = 0;
+        this.isEmergency = false;
+        this.plannedPath = new LinkedList<>();
 
-	public Vehicle(TrafficPoint position,TrafficVector direction) {
-		this.id = IdGenerator.vehicleId("Demo Vehicle");
-		this.position = position;
-		this.speed = 70.0;
-		this.maxSpeed = 100.0;
-		this.direction = direction.clone();
-		this.acceleration = 0.0;
-		this.plannedPath = new LinkedList<>();
-		this.isChangingLane = false;
-		this.laneChangeProgress = 0;
-	}		
-	
-	public Vehicle() {
-		this.id = IdGenerator.vehicleId("Demo Vehicle");
-		this.position = new TrafficPoint(0.0, 0.0);
-		this.speed = 70.0;
-		this.acceleration = 0.0;
-	}
+        // Initialize lane change state
+        this.targetLane = null;
+        this.isChangingLane = false;
+        this.laneChangeProgress = 0;
+        this.laneChangeStartPosition = null;
+        this.laneChangeDuration = LANE_CHANGE_DURATION;
+        this.laneChangeElapsed = 0;
+    }
 
     public Vehicle(String type, double maxSpeed, double length, double width, String sound, DriverBehavior behavior) {
         this.id = IdGenerator.vehicleId(type);
@@ -71,7 +71,7 @@ public class Vehicle {
         this.acceleration = 0;
         this.isEmergency = false;
         this.plannedPath = new LinkedList<>();
-        
+
         // Initialize lane change state
         this.targetLane = null;
         this.isChangingLane = false;
@@ -81,16 +81,17 @@ public class Vehicle {
         this.laneChangeElapsed = 0;
     }
 
-    // Logic processing separated from Drawing (This method is called every frame to update the vehicle's state)
+    // Logic processing separated from Drawing (This method is called every frame to
+    // update the vehicle's state)
     public void update(double deltaTime) {
         // Update lane change progress if in the middle of changing lanes
         if (isChangingLane) {
             updateLaneChange(deltaTime);
         }
-        
+
         // Sense the environment
         Vehicle ahead = getVehicleAhead();
-        
+
         // Decide acceleration based on Behavior (Strategy Pattern)
         if (behavior != null) {
             this.acceleration = behavior.decideAcceleration(this, ahead);
@@ -102,40 +103,43 @@ public class Vehicle {
     private void applyPhysics(double deltaTime) {
         speed += acceleration * deltaTime;
         // Clamp speed between 0 and maxSpeed
-        if (speed < 0) speed = 0;
-        if (speed > maxSpeed) speed = maxSpeed;
+        if (speed < 0)
+            speed = 0;
+        if (speed > maxSpeed)
+            speed = maxSpeed;
     }
 
     // Calculates the next position based on current segment (Lane or Path).
     public void move(double deltaTime) {
         TrafficPoint target = getTargetPoint();
         if (target != null) {
-            this.position = this.position.moveTowards(target, speed * deltaTime);
+            this.position = this.position.translatePoint(target, speed * deltaTime);
         }
     }
-    
+
     // Initiates a lane change to the target lane
     public void initiateLaneChange(Lane newLane) {
-        if (newLane == null || newLane == currentLane) return;
-        
+        if (newLane == null || newLane == currentLane)
+            return;
+
         this.targetLane = newLane;
         this.isChangingLane = true;
         this.laneChangeProgress = 0;
         this.laneChangeElapsed = 0;
         this.laneChangeStartPosition = this.position.clone();
     }
-    
+
     // Updates the lane change progress
     private void updateLaneChange(double deltaTime) {
         laneChangeElapsed += deltaTime;
         laneChangeProgress = Math.min(1.0, laneChangeElapsed / laneChangeDuration);
-        
+
         // When lane change is complete
         if (laneChangeProgress >= 1.0) {
             completeLaneChange();
         }
     }
-    
+
     // Completes the lane change - switches the current lane
     private void completeLaneChange() {
         if (currentLane != null) {
@@ -147,7 +151,7 @@ public class Vehicle {
         laneChangeProgress = 0;
         laneChangeElapsed = 0;
         laneChangeStartPosition = null;
-        
+
         if (currentLane != null) {
             currentLane.addVehicle(this);
         }
@@ -156,39 +160,44 @@ public class Vehicle {
     // Calculates the angle the vehicle is currently facing (GUI)
     public double getRotation() {
         TrafficPoint target = getTargetPoint();
-        if (target != null) 
+        if (target != null)
             return position.angleTo(target);
-        else 
+        else
             return 0;
     }
 
     // Helper to identify what the vehicle is aiming for.
     public TrafficPoint getTargetPoint() {
-        // If vehicle is changing lanes, return interpolated point between current and target lane
+        // If vehicle is changing lanes, return interpolated point between current and
+        // target lane
         if (isChangingLane && targetLane != null && currentLane != null) {
             TrafficPoint currentLaneEnd = currentLane.getEndPoint();
             TrafficPoint targetLaneEnd = targetLane.getEndPoint();
-            
+
             // Linear interpolation between the two lane end points
             double x = currentLaneEnd.getX() + (targetLaneEnd.getX() - currentLaneEnd.getX()) * laneChangeProgress;
             double y = currentLaneEnd.getY() + (targetLaneEnd.getY() - currentLaneEnd.getY()) * laneChangeProgress;
-            
+
             return new TrafficPoint(x, y);
         }
-        
+
         // Normal case: not changing lanes
-        if (currentLane != null) return currentLane.getEndPoint();
-        if (currentPath != null) return currentPath.getEndPoint();
+        if (currentLane != null)
+            return currentLane.getEndPoint();
+        if (currentPath != null)
+            return currentPath.getEndPoint();
         return null;
     }
 
     // Asks the current Lane or Path for the vehicle immediately in front.
     private Vehicle getVehicleAhead() {
-        if (currentLane != null) return currentLane.getVehicleAhead(this);
-        if (currentPath != null) return currentPath.getVehicleAhead(this);
+        if (currentLane != null)
+            return currentLane.getVehicleAhead(this);
+        if (currentPath != null)
+            return currentPath.getVehicleAhead(this);
         return null;
     }
-    
+
     // Attempts to change lanes if the driver decides to overtake
     // Returns true if lane change was initiated, false otherwise
     public boolean tryChangeLane(Lane newLane) {
@@ -196,20 +205,23 @@ public class Vehicle {
         if (isChangingLane || newLane == null || newLane == currentLane) {
             return false;
         }
-        
+
         // Check if new lane is reasonably close (only adjacent lanes allowed)
-        if (currentLane == null) return false;
-        
+        if (currentLane == null)
+            return false;
+
         initiateLaneChange(newLane);
         return true;
     }
-    
+
     // Gets the adjacent lane (useful for overtaking maneuvers)
     // direction: -1 for left lane, 1 for right lane (relative to vehicle direction)
     public Lane getAdjacentLane(int direction) {
-        if (currentLane == null) return null;
+        if (currentLane == null)
+            return null;
         // This would require access to the Way object which contains all lanes
-        // For now, return null - this can be implemented when the vehicle has access to the road/way
+        // For now, return null - this can be implemented when the vehicle has access to
+        // the road/way
         return null;
     }
 
@@ -335,6 +347,7 @@ public class Vehicle {
     }
 
     public void setCurrentLane(Lane currentLane) {
+        this.currentPath = null;  // Clear current path when moving to lane
         this.currentLane = currentLane;
     }
 
@@ -343,6 +356,7 @@ public class Vehicle {
     }
 
     public void setCurrentPath(Path currentPath) {
+        this.currentLane = null;  // Clear current lane when moving to path
         this.currentPath = currentPath;
     }
 
@@ -353,28 +367,28 @@ public class Vehicle {
     public void setEmergency(boolean isEmergency) {
         this.isEmergency = isEmergency;
     }
-    
+
     // Lane change getters and setters
     public Lane getTargetLane() {
         return targetLane;
     }
-    
+
     public void setTargetLane(Lane targetLane) {
         this.targetLane = targetLane;
     }
-    
+
     public boolean isChangingLane() {
         return isChangingLane;
     }
-    
+
     public void setChangingLane(boolean isChangingLane) {
         this.isChangingLane = isChangingLane;
     }
-    
+
     public double getLaneChangeProgress() {
         return laneChangeProgress;
     }
-    
+
     public void setLaneChangeProgress(double progress) {
         this.laneChangeProgress = Math.max(0, Math.min(1, progress));
     }

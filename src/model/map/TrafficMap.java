@@ -1,10 +1,5 @@
 package model.map;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import config.Constants;
 import model.node.TrafficNode;
 import model.road.Lane;
 import model.road.Road;
@@ -13,6 +8,7 @@ import model.utility.TrafficPoint;
 import model.utility.TrafficVector;
 import model.vehicle.Vehicle;
 import model.node.Path;
+import model.vehicle.Car;
 
 import java.util.ArrayList;
 
@@ -31,9 +27,9 @@ public class TrafficMap {
             return;
         }
       
-		Road newRoad = new Road(startNode, endNode); //Use the constructor with default lane count and traffic light state
+		Road newRoad = new Road(startNode, endNode); // Use the constructor with default lane count and traffic light state
 		
-		//check colision with existing roads
+		// Check collision with existing roads
 		for(Road existingRoad : getRoadList()) {
 			if(existingRoad.checkConflict(newRoad)) {
 				System.out.println("New road conflicts with existing road:" + existingRoad.getId());
@@ -41,10 +37,10 @@ public class TrafficMap {
 			}
 		}
 		
-		//add new road to map's roadList
+		// Add new road to map's roadList
 		roadList.add(newRoad);
 		
-		//add new road to the start and end node's road list
+		// Add new road to the start and end node's road list
 		newRoad.getStartNode().addRoad(newRoad);
 		newRoad.getEndNode().addRoad(newRoad);
     }
@@ -54,22 +50,22 @@ public class TrafficMap {
             return;
         }
 
-        //create snapshot(clone) of the connected roads to avoid concurrent modification exception when removing roads from the node's road list
+        // Create snapshot(clone) of the connected roads to avoid concurrent modification exception when removing roads from the node's road list
         ArrayList<Road> connectedRoads = new ArrayList<>(removeNode.getRoadList());
         for (Road road : connectedRoads) {
-            // remove the roads connected to the node from the map's road list
+            // Remove the roads connected to the node from the map's road list
             roadList.remove(road);
 
-            // remove the roads connected to the removeNode from all connected nodes' road list
+            // Remove the roads connected to the removeNode from all connected nodes' road list
             road.getStartNode().removeRoad(road);
             road.getEndNode().removeRoad(road);
         }
 
-        // remove the node from the map's node list
+        // Remove the node from the map's node list
         nodeList.remove(removeNode);
     }
     
-    //Testing method 
+    // Testing method 
     public void addDefaultVehicleToRoad(Road road, boolean isRightWay) {
 		Way way = isRightWay ? road.getRightWay() : road.getLeftWay();
 		if(way.getLaneList().isEmpty()) {
@@ -78,16 +74,27 @@ public class TrafficMap {
 		}
 		//Add a default vehicle to the first lane of the way
 		Lane lane = way.getLaneList().get(0);
-		Vehicle vehicle = new Vehicle(lane.getStartPoint().clone(), new TrafficVector(lane.getStartPoint(), lane.getEndPoint()));
+		Vehicle vehicle = new Car(lane.getStartPoint().clone(), new TrafficVector(lane.getStartPoint(), lane.getEndPoint()));
 		lane.addVehicle(vehicle);
 	}
     
     
-    //update the position of all vehicles in the map, 
-    // this method will be called in each time step of the simulation
+    // Update the position of all vehicles in the map, this method will be called in each time step of the simulation
     public void updateVehicles(double timeInterval) {
 		for(Vehicle vehicle : getVehicleList()) {
 			vehicle.update(timeInterval);
+		}
+		
+		// Check if vehicles are leaving roads and transitioning to paths
+		for(Road road : roadList) {
+			road.checkVehicleLeaving();
+		}
+		
+		// Check if vehicles on paths have reached the end and transition to next road lanes
+		for(TrafficNode node : nodeList) {
+			for(Path path : node.getPathList()) {
+				path.checkVehiclesReachedEnd(node);
+			}
 		}
 	}
     
@@ -103,7 +110,7 @@ public class TrafficMap {
 	
 	public ArrayList<Vehicle> getVehicleList(){
 		ArrayList<Vehicle> vehicleList = new ArrayList<>();
-		//get all vehicles from all lanes of all roads
+		// Get all vehicles from all lanes of all roads
 		for(Road road : roadList) {
 			for(Lane lane : road.getRightWay().getLaneList()) {
 				vehicleList.addAll(lane.getVehicleList());
@@ -113,7 +120,7 @@ public class TrafficMap {
 			}
 		}
 		
-		//get vehicle from all paths of all nodes
+		// Get vehicle from all paths of all nodes
 		for(TrafficNode node : nodeList) {
 			for(Path path : node.getPathList()) {
 				vehicleList.addAll(path.getVehicleList());

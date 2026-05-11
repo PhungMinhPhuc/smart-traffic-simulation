@@ -1,17 +1,19 @@
 package model.node;
 
 import model.utility.TrafficPoint;
+import model.utility.TrafficVector;
 import model.vehicle.Vehicle;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
+import model.road.*;
 import config.Constants;
 
 public class Path {
     private String id;
     private TrafficPoint startPoint;
     private TrafficPoint endPoint;
-    private Map<Path, TrafficPoint> conflictPointList; //the key is the path that has conflict with this path, the value is the conflict point of the two paths
+    private Map<Path, TrafficPoint> conflictPointList;
     private ArrayList<Vehicle> vehicleList = new ArrayList<Vehicle>();
 
     public Path(String id, TrafficPoint start, TrafficPoint end) {
@@ -34,7 +36,7 @@ public class Path {
         double denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
 
         // If denominator is 0, paths are parallel
-        if (Math.abs(denom) < 1e-9) return null;
+        if (Math.abs(denom) < Constants.EPS) return null;
 
         // Calculate intersection point coordinates
         double intersectX = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / denom;
@@ -90,6 +92,24 @@ public class Path {
 
     public void removeVehicle(Vehicle v) {
         vehicleList.remove(v);
+    }
+    
+    public void checkVehiclesReachedEnd(TrafficNode endNode) {
+        java.util.Iterator<Vehicle> vehicleIterator = vehicleList.iterator();
+        while(vehicleIterator.hasNext()) {
+            Vehicle vehicle = vehicleIterator.next();
+            if(vehicle.getPosition().distanceTo(endPoint) < Constants.MIN_DISTANCE_TO_END_POINT) {
+                Lane nextLane = endNode.getLaneAtPoint(endPoint);
+                if(nextLane != null) {
+                    vehicle.setPosition(endPoint.clone());
+                    // Set vehicle direction to match the lane's direction
+                    vehicle.setDirection(new TrafficVector(nextLane.getStartPoint(), nextLane.getEndPoint()));
+                    vehicle.setCurrentLane(nextLane);
+                    nextLane.addVehicle(vehicle);
+                } 
+                vehicleIterator.remove();
+            }
+        }
     }
 
     

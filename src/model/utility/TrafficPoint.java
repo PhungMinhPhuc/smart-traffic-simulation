@@ -7,7 +7,7 @@ public class TrafficPoint {
     private double x;
     private double y;
 
-    public TrafficPoint(double x, double y){
+    public TrafficPoint(double x, double y) {
         this.x = x;
         this.y = y;
     }
@@ -23,29 +23,32 @@ public class TrafficPoint {
     }
 
     // Calculate the distance to another point (collision + distance keeping)
-    public double distanceTo(TrafficPoint other){
+    public double distanceTo(TrafficPoint other) {
         return Math.sqrt(Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2));
-    } 
+    }
 
-    // Calculate the angle to another point in Radians (rotate the vehicles img towards its target)
-    public double angleTo(TrafficPoint other){
+    // Calculate the angle to another point in Radians (rotate the vehicles img
+    // towards its target)
+    public double angleTo(TrafficPoint other) {
         return Math.atan2(other.y - this.y, other.x - this.x);
     }
 
-    // Returns a new Point that is moved from the current point toward a target point by a specific distance
-    public TrafficPoint moveTowards(TrafficPoint target, double distance) {
+    // Returns a new Point that is moved from the current point toward a target
+    // point by a specific distance
+    public TrafficPoint translatePoint(TrafficPoint target, double distance) {
         double currentDist = this.distanceTo(target);
         if (currentDist <= distance) {
             return new TrafficPoint(target.x, target.y);
         }
-            
+
         double ratio = distance / currentDist;
         double newX = this.x + (target.x - this.x) * ratio;
         double newY = this.y + (target.y - this.y) * ratio;
         return new TrafficPoint(newX, newY);
     }
 
-    // Returns a new Point offset perpendicularly to the direction toward a target (parallel lanes)
+    // Returns a new Point offset perpendicularly to the direction toward a target
+    // (parallel lanes)
     public TrafficPoint getOffsetPoint(TrafficPoint target, double lanewidth) {
         // Direction vector (dx, dy)
         double dx = target.x - this.x;
@@ -55,7 +58,8 @@ public class TrafficPoint {
         double length = Math.sqrt(dx * dx + dy * dy);
 
         // Handle edge case (start and target are the same point)
-        if (length < Constants.EPS) return new TrafficPoint(this.x, this.y);
+        if (length < Constants.EPS)
+            return new TrafficPoint(this.x, this.y);
 
         // Normalize to get Unit Vector
         double uX = dx / length;
@@ -84,11 +88,13 @@ public class TrafficPoint {
     public void setY(double y) {
         this.y = y;
     }
-    
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         TrafficPoint point = (TrafficPoint) o;
         // Use a small epsilon to handle double precision errors
         return Math.abs(point.x - x) < Constants.EPS && Math.abs(point.y - y) < Constants.EPS;
@@ -104,8 +110,8 @@ public class TrafficPoint {
         return String.format("(%.2f, %.2f)", x, y);
     }
 
-    @Override	
-	public TrafficPoint clone() {
-		return new TrafficPoint(this.x, this.y);
-	}
+    @Override
+    public TrafficPoint clone() {
+        return new TrafficPoint(this.x, this.y);
+    }
 }

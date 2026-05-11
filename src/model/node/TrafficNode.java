@@ -163,6 +163,25 @@ public abstract class TrafficNode {
 		return distance <= Constants.JUNCTION_RADIUS; 
 	}
     
+    // Find the lane that starts at a given point
+    public Lane getLaneAtPoint(TrafficPoint point) {
+        for(Road road : roadList) {
+            // Check right way
+            for(Lane lane : road.getRightWay().getLaneList()) {
+                if(lane.getStartPoint().equals(point)) {
+                    return lane;
+                }
+            }
+            // Check left way
+            for(Lane lane : road.getLeftWay().getLaneList()) {
+                if(lane.getStartPoint().equals(point)) {
+                    return lane;
+                }
+            }
+        }
+        return null;
+    }
+    
     public TrafficPoint getCenterPoint() {
         return centerPoint;
     }

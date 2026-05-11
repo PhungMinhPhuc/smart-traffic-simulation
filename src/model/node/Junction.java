@@ -1,60 +1,26 @@
 package model.node;
 
-import model.traffic.TrafficLight;
 import model.utility.TrafficPoint;
-import model.road.Road;
-import model.road.Way;
-import model.traffic.LightState;
-import config.Constants;
+
+import java.util.ArrayList;
 
 public class Junction extends TrafficNode {
-    
-    private int currentGreenRoadIndex = 0;
-    private double timer = 0;
-    private final int roadNum;
 
-    public Junction(TrafficPoint centerPoint, int roadNum) {
+    public Junction(TrafficPoint centerPoint) {
         super(centerPoint);
-        this.roadNum = roadNum;
     }
 
-    // Sets all lights to RED initially.
-    // private void initializeLights() {
-    //     for (Road road : roadList) {
-    //         getIncomingWay(road).getTrafficLight().setState(LightState.RED);
-    //     }
-    // }
-
-    private Way getIncomingWay(Road road) {
-        if (road.getStartNode().equals(this))
-            return road.getLeftWay();
-        else 
-            return road.getRightWay();
+    public Path getRandomPathFromPoint(TrafficPoint point) {
+        ArrayList<Path> connectedPaths = new ArrayList<>();
+        for(Path path : this.getPathList()) {
+            if(path.getStartPoint().equals(point)) {
+                connectedPaths.add(path);
+            }
+        }
+        
+        if(connectedPaths.isEmpty()) return null;
+        
+        int randomIndex = (int)(Math.random() * connectedPaths.size());
+        return connectedPaths.get(randomIndex);
     }
-
-    // // Handles the Traffic Light cycle. Rotates green lights among the connected roads (Automatic Control)
-    // public void update(double deltaTime) {
-    //     timer += deltaTime;
-
-    //     // Current road being managed
-    //     Road activeRoad = roadList.get(currentGreenRoadIndex);
-    //     TrafficLight activeLight = getIncomingWay(activeRoad).getTrafficLight();
-
-    //     if (timer < Constants.GREEN_DURATION) {
-    //         activeLight.setState(LightState.GREEN);
-    //     } else if (timer < Constants.GREEN_DURATION + Constants.YELLOW_DURATION) {
-    //         activeLight.setState(LightState.YELLOW);
-    //     } else {
-    //         // End of cycle for this road, move to the next one
-    //         activeLight.setState(LightState.RED);
-    //         timer = 0;
-    //         currentGreenRoadIndex = (currentGreenRoadIndex + 1) % roadList.size();
-    //     }
-    // }
-
-    // // Manual override for traffic lights (Click to change).
-    // public void manualSwitch(Road road) {
-    //     Way incoming = getIncomingWay(road);
-    //     incoming.getTrafficLight().changeColor();
-    // }
 }

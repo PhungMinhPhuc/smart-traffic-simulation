@@ -2,10 +2,14 @@ package model.road;
 
 import generator.IdGenerator;
 import config.Constants;
-import model.traffic.LightState;
+import model.traffic.*;
 import model.utility.TrafficPoint;
 import model.utility.TrafficVector;
+import model.vehicle.*;
+import model.node.Junction;
 import model.node.TrafficNode;
+import model.node.Path;
+import java.util.Iterator;
 
 public class Road {
 	private Way rightWay;
@@ -89,6 +93,29 @@ public class Road {
                q.getY() <= Math.max(p.getY(), r.getY()) && q.getY() >= Math.min(p.getY(), r.getY());
     }
     
+    private void checkLaneVehicles(Way way, TrafficNode targetNode) {
+        for (Lane lane : way.getLaneList()) {
+            for (Iterator<Vehicle> vehicleIterator = lane.getVehicleList().iterator(); vehicleIterator.hasNext();) {
+                Vehicle vehicle = vehicleIterator.next();
+                if (vehicle.getPosition().distanceTo(lane.getEndPoint()) < Constants.MIN_DISTANCE_TO_END_POINT) {
+                    Path chosenPath = ((Junction) targetNode).getRandomPathFromPoint(lane.getEndPoint());
+
+                    if (chosenPath != null) {
+                        vehicle.setPosition(chosenPath.getStartPoint().clone());
+                        vehicle.setDirection(new TrafficVector(chosenPath.getStartPoint(), chosenPath.getEndPoint()));
+                        chosenPath.addVehicle(vehicle);
+                    }
+                    vehicleIterator.remove();
+                }
+            }
+        }
+    }
+
+    public void checkVehicleLeaving() {
+        checkLaneVehicles(rightWay, this.getStartNode());
+        checkLaneVehicles(leftWay, this.getEndNode());
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

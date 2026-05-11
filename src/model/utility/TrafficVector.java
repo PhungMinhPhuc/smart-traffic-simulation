@@ -14,25 +14,26 @@ public class TrafficVector {
         this.x = to.getX() - from.getX();
         this.y = to.getY() - from.getY();
     }
-    
+
     public double length() {
         return Math.sqrt(x * x + y * y);
     }
-    
+
     public TrafficVector normalize() {
         double len = length();
-        if (len < Constants.EPS) return new TrafficVector(0, 0);
+        if (len < Constants.EPS)
+            return new TrafficVector(0, 0);
         return new TrafficVector(x / len, y / len);
     }
-    
+
     public TrafficVector multiply(double scalar) {
         return new TrafficVector(x * scalar, y * scalar);
     }
-    
+
     public TrafficVector getPerpendicular() {
         return new TrafficVector(-y, x);
     }
-    
+
     public TrafficVector rotateVector(double radianAngle) {
         double cosAngle = Math.cos(radianAngle);
         double sinAngle = Math.sin(radianAngle);
@@ -41,7 +42,7 @@ public class TrafficVector {
         return new TrafficVector(newX, newY);
     }
 
-    public TrafficVector scaleVector(double newLength) {
+    public TrafficVector scale(double newLength) {
         double currentLength = length();
         if (currentLength < Constants.EPS) {
             return new TrafficVector(0, 0);
@@ -52,14 +53,14 @@ public class TrafficVector {
 
     public TrafficPoint translatePoint(TrafficPoint point, double distance) {
         TrafficVector direction = new TrafficVector(this.x, this.y).normalize();
-        TrafficVector resizedDirection = direction.scaleVector(distance);
+        TrafficVector resizedDirection = direction.scale(distance);
         return new TrafficPoint(point.getX() + resizedDirection.x, point.getY() + resizedDirection.y);
     }
 
     @Override
     public TrafficVector clone() {
-		return new TrafficVector(this.x, this.y);
-	}
+        return new TrafficVector(this.x, this.y);
+    }
 
     public double getX() {
         return x;
@@ -67,5 +68,9 @@ public class TrafficVector {
 
     public double getY() {
         return y;
+    }
+
+    public double getAngle() {
+        return Math.atan2(this.y, this.x);
     }
 }

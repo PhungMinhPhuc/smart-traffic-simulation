@@ -72,12 +72,12 @@ public class MainSceneController {
 	}
 	//createDefaultMap		
 	private void createDefaultMap() {
-		TrafficNode node1 = new Junction(new TrafficPoint(400, 400),5);
-		TrafficNode node2 = new Junction(new TrafficPoint(800, 1000),3);
+		TrafficNode node1 = new Junction(new TrafficPoint(400, 400));
+		TrafficNode node2 = new Junction(new TrafficPoint(400, 1000));
 		trafficMap.addNode(node1);
 		trafficMap.addNode(node2);
 		trafficMap.addConnection(node1, node2);
-		trafficMap.addDefaultVehicleToRoad(trafficMap.getRoadList().get(0), true);
+		// trafficMap.addDefaultVehicleToRoad(trafficMap.getRoadList().get(0), true);
 	}
 	//render mapLayer
 	private void renderTrafficMap() {
@@ -112,7 +112,7 @@ public class MainSceneController {
 
 	        //Convert to custom TrafficPoint
 	        TrafficPoint lastClickedPoint = new TrafficPoint(localPoint.getX(), localPoint.getY());
-	        trafficMap.addNode(new Junction(lastClickedPoint,100));
+	        trafficMap.addNode(new Junction(lastClickedPoint));
 	        renderTrafficMap();
 	        mapLayer.setOnMouseClicked(null); //remove event handler after one use
 	    });
@@ -227,6 +227,7 @@ public class MainSceneController {
 	public void startVehicleAnimation() {
 		AnimationTimer vehicleTimer = new AnimationTimer() {
 			private long lastFrameTimeNano = 0;
+			private long lastVehicleAddTimeNano = 0;
 			
 			@Override
 			public void handle(long now) {
@@ -236,8 +237,13 @@ public class MainSceneController {
 				}
 				//time elapsed since last frame in seconds
 				double deltaTime = (now - lastFrameTimeNano) / 1e9; //convert from nanoseconds to seconds
+				double deltaTimeSinceLastVehicleAdd = (now - lastVehicleAddTimeNano) / 1e9;
 				lastFrameTimeNano = now; //update current time for the next frame
-				
+
+				if(deltaTimeSinceLastVehicleAdd >= 5) { //add a new vehicle every 5 seconds
+					trafficMap.addDefaultVehicleToRoad(trafficMap.getRoadList().get(0), true);
+					lastVehicleAddTimeNano = now; //update last vehicle add time
+				}
 				//update vehicle positions based on their speed and the elapsed time
 				trafficMap.updateVehicles(deltaTime);
 				renderDefaultVehicles(); //re-render vehicles at their new positions
