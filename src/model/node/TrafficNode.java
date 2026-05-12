@@ -48,9 +48,11 @@ public abstract class TrafficNode implements IVehicleTransition {
     }
 
     /**
-     * Computes the distance from center where a road with the given lane count should start.
+     * Computes the distance from center where a road with the given lane count
+     * should start.
      * Uses sqrt(R² - W²) so wider roads start closer to center.
-     * R = max(currentRadius, halfWidth + ROAD_MARKING_OFFSET) to handle new wider roads.
+     * R = max(currentRadius, halfWidth + ROAD_MARKING_OFFSET) to handle new wider
+     * roads.
      */
     public double computeRoadStartDistance(int laneCountPerWay) {
         double halfWidth = Constants.LANE_WIDTH * laneCountPerWay;
@@ -143,6 +145,7 @@ public abstract class TrafficNode implements IVehicleTransition {
 
         roadList.remove(roadToRemove);
         buildAllConflictPoints();
+        updateRadius(); // Recalculate radius based on widest road
     }
 
     public void buildAllConflictPoints() {
