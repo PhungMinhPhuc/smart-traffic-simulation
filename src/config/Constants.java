@@ -3,7 +3,8 @@ package config;
 import javafx.scene.paint.Color;
 
 public final class Constants {
-    private Constants() {}
+    private Constants() {
+    }
 
     // LANE CONFIG
     public static final double LANE_WIDTH = 15.0;
@@ -15,7 +16,6 @@ public final class Constants {
     public static final Color LANE_MARKING_COLOR = Color.WHITE;
 
     // ROAD MARKING CONFIG
-
 
     // JUNCTION CONFIG
     public static final double JUNCTION_RADIUS = 70.0;
@@ -46,6 +46,7 @@ public final class Constants {
 
     // SIMULATION CONFIG
     public static final int TICK_RATE_MS = 1000;
+    public static final double NANOS_PER_SECOND = 1e9; // 1 sec = 1e9 nano sec
 
     // GUI CONFIG
     public static final double MIN_DISTANCE_TO_END_POINT = 5.0;

@@ -25,7 +25,6 @@ public abstract class Vehicle {
 
     // Environmental context
     protected Lane currentLane;
-    protected Path currentPath;
     protected boolean isEmergency;
 
     // Lane change state management
@@ -114,6 +113,9 @@ public abstract class Vehicle {
         TrafficPoint target = getTargetPoint();
         if (target != null) {
             this.position = this.position.translatePoint(target, speed * deltaTime);
+        } else if (direction != null) {
+            // No lane context (e.g., on a junction path) — move along direction vector
+            this.position = direction.translatePoint(this.position, speed * deltaTime);
         }
     }
 
@@ -162,8 +164,9 @@ public abstract class Vehicle {
         TrafficPoint target = getTargetPoint();
         if (target != null)
             return position.angleTo(target);
-        else
-            return 0;
+        if (direction != null)
+            return direction.getAngle();
+        return 0;
     }
 
     // Helper to identify what the vehicle is aiming for.
@@ -184,8 +187,6 @@ public abstract class Vehicle {
         // Normal case: not changing lanes
         if (currentLane != null)
             return currentLane.getEndPoint();
-        if (currentPath != null)
-            return currentPath.getEndPoint();
         return null;
     }
 
@@ -193,8 +194,6 @@ public abstract class Vehicle {
     private Vehicle getVehicleAhead() {
         if (currentLane != null)
             return currentLane.getVehicleAhead(this);
-        if (currentPath != null)
-            return currentPath.getVehicleAhead(this);
         return null;
     }
 
@@ -256,6 +255,10 @@ public abstract class Vehicle {
 
     public void setDirection(TrafficVector direction) {
         this.direction = direction;
+    }
+
+    public void setDirection(TrafficPoint startPoint, TrafficPoint endPoint) {
+        this.direction = new TrafficVector(startPoint, endPoint);
     }
 
     public TrafficPoint getLaneChangeStartPosition() {
@@ -347,17 +350,7 @@ public abstract class Vehicle {
     }
 
     public void setCurrentLane(Lane currentLane) {
-        this.currentPath = null;  // Clear current path when moving to lane
         this.currentLane = currentLane;
-    }
-
-    public Path getCurrentPath() {
-        return currentPath;
-    }
-
-    public void setCurrentPath(Path currentPath) {
-        this.currentLane = null;  // Clear current lane when moving to path
-        this.currentPath = currentPath;
     }
 
     public boolean isEmergency() {

@@ -22,7 +22,8 @@ public class Way {
             translateVector = translateVector.scale(Constants.LANE_WIDTH / 2.0);
             for (int i = 0; i < laneCount; i++) {
                 int j = 2 * i + 1;
-                // Vectors of the right way's lanes have the opposite direction compared to the road
+                // Vectors of the right way's lanes have the opposite direction compared to the
+                // road
                 TrafficPoint laneStartPoint = new TrafficPoint(roadEndPoint.getX() + translateVector.getX() * j,
                         roadEndPoint.getY() + translateVector.getY() * j);
                 TrafficPoint laneEndPoint = new TrafficPoint(roadStartPoint.getX() + translateVector.getX() * j,

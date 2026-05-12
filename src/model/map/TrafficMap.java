@@ -1,23 +1,33 @@
 package model.map;
 
-import model.node.TrafficNode;
-import model.road.Lane;
-import model.road.Road;
-import model.road.Way;
-import model.utility.TrafficPoint;
-import model.utility.TrafficVector;
-import model.vehicle.Vehicle;
-import model.node.Path;
-import model.vehicle.Car;
+import config.Constants;
+import model.node.*;
+import model.road.*;
+import model.utility.*;
+import model.vehicle.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class TrafficMap {
-    private ArrayList<TrafficNode> nodeList = new ArrayList<>();
-    private ArrayList<Road> roadList = new ArrayList<>();
+    private List<TrafficNode> nodeList;
+    private List<Road> roadList;
 
-    public void addNode(TrafficNode node) {
-        nodeList.add(node);
+    public TrafficMap() {
+        this.nodeList = new ArrayList<>();
+        this.roadList = new ArrayList<>();
+        System.out.println("Map created");
+    }
+
+    public void addNode(TrafficNode newNode) {
+        if (!nodeList.contains(newNode)) {
+            for (TrafficNode node : nodeList) {
+                if (TrafficGeometry.intersectsCircle(newNode.getCenterPoint(), Constants.JUNCTION_RADIUS, node.getCenterPoint(), Constants.JUNCTION_RADIUS)) {
+                    return;
+                }
+            }
+            nodeList.add(newNode);
+        }
     }
 
     public void addConnection(TrafficNode startNode, TrafficNode endNode) {
@@ -50,13 +60,13 @@ public class TrafficMap {
             return;
         }
 
-        // Create snapshot(clone) of the connected roads to avoid concurrent modification exception when removing roads from the node's road list
+        // Create snapshot (clone) of the connected roads to avoid concurrent modification exception when removing roads from the node's road list
         ArrayList<Road> connectedRoads = new ArrayList<>(removeNode.getRoadList());
         for (Road road : connectedRoads) {
             // Remove the roads connected to the node from the map's road list
             roadList.remove(road);
 
-            // Remove the roads connected to the removeNode from all connected nodes' road list
+            // Remove the roads connected to the removeNode from all connected nodes road list
             road.getStartNode().removeRoad(road);
             road.getEndNode().removeRoad(road);
         }
@@ -85,30 +95,27 @@ public class TrafficMap {
 			vehicle.update(timeInterval);
 		}
 		
-		// Check if vehicles are leaving roads and transitioning to paths
+		// Transition vehicles between roads and paths
 		for(Road road : roadList) {
-			road.checkVehicleLeaving();
+			road.transitionVehicles();
 		}
 		
-		// Check if vehicles on paths have reached the end and transition to next road lanes
 		for(TrafficNode node : nodeList) {
-			for(Path path : node.getPathList()) {
-				path.checkVehiclesReachedEnd(node);
-			}
+			node.transitionVehicles();
 		}
 	}
     
     //Get unique set of TraffiNode 
-	public ArrayList<TrafficNode> getTrafficNodeList() {
+	public List<TrafficNode> getTrafficNodeList() {
 		return nodeList;
 	}
 
 	//Get unique set of Road
-	public ArrayList<Road> getRoadList() {
+	public List<Road> getRoadList() {
 		return roadList;
 	}
 	
-	public ArrayList<Vehicle> getVehicleList(){
+	public List<Vehicle> getVehicleList(){
 		ArrayList<Vehicle> vehicleList = new ArrayList<>();
 		// Get all vehicles from all lanes of all roads
 		for(Road road : roadList) {

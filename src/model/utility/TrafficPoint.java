@@ -13,7 +13,7 @@ public class TrafficPoint {
     }
 
     // Point + Vector = New Point
-    public TrafficPoint add(TrafficVector v) {
+    public TrafficPoint moveByVector(TrafficVector v) {
         return new TrafficPoint(this.x + v.x, this.y + v.y);
     }
 

@@ -1,7 +1,6 @@
 package model.road;
 
 import model.utility.TrafficPoint;
-import model.utility.TrafficVector;
 import model.vehicle.Vehicle;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +24,7 @@ public class Lane {
         if (!vehicleList.contains(vehicle)) {
             vehicleList.add(vehicle);
             vehicle.setCurrentLane(this);
+            vehicle.setDirection(startPoint, endPoint);
             vehicle.setPosition(startPoint.clone());
         }
     }
@@ -33,40 +33,18 @@ public class Lane {
     public void removeVehicle(Vehicle vehicle) {
         vehicleList.remove(vehicle);
     }
-    
-        // Check if lane is free ahead
-        public boolean isEmptyAhead(Vehicle self, double checkDistance) {
-            for (Vehicle v : vehicleList) {
-                if (v != self) {
-                    double dist = v.getPosition().distanceTo(self.getPosition());
-                    if (dist > 0 && dist < checkDistance) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
 
     // Finds the vehicle directly in front of the given vehicle (Keep Distance)
     public Vehicle getVehicleAhead(Vehicle current) {
         int index = vehicleList.indexOf(current);
-        // If the vehicle is found and is not the first one (index 0 is the leader (closest to the endPoint))
+        // If the vehicle is found and is not the first one (index 0 is the leader
+        // (closest to the endPoint))
         if (index > 0) {
             return vehicleList.get(index - 1);
         }
         return null;
     }
 
-    // Returns the angle (direction) of the lane.
-    public double getAngle() {
-        return startPoint.angleTo(endPoint);
-    }
-
-    // Returns the total length of the lane.
-    public double getLength() {
-        return startPoint.distanceTo(endPoint);
-    }
-    
     // Getters and Setters
     public int getIndex() {
         return index;
