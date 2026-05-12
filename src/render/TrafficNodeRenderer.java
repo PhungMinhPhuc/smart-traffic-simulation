@@ -3,7 +3,6 @@ package render;
 import config.Constants;
 import javafx.scene.Group;
 import javafx.scene.Parent;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import model.node.TrafficNode;
 

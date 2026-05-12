@@ -24,17 +24,15 @@ public class Road implements IVehicleTransition {
         this.startNode = startNode;
         this.endNode = endNode;
 
-        // Calculate the radius needed for this road's lane count
-        double startRadius = startNode.computeRadiusForLaneCount(laneCountPerWay);
-        double endRadius = endNode.computeRadiusForLaneCount(laneCountPerWay);
+        // Calculate distance from center where this road should start
+        double startDistance = startNode.computeRoadStartDistance(laneCountPerWay);
+        double endDistance = endNode.computeRoadStartDistance(laneCountPerWay);
 
         // Calculate road start and end point by the center point of start and end node,
         // and the direction vector from start node to end node
         TrafficVector directionVector = new TrafficVector(startNode.getCenterPoint(), endNode.getCenterPoint());
-        this.startPoint = directionVector.translatePoint(startNode.getCenterPoint(),
-                startRadius - Constants.ROAD_MARKING_OFFSET);
-        this.endPoint = directionVector.translatePoint(endNode.getCenterPoint(),
-                -(endRadius - Constants.ROAD_MARKING_OFFSET));
+        this.startPoint = directionVector.translatePoint(startNode.getCenterPoint(), startDistance);
+        this.endPoint = directionVector.translatePoint(endNode.getCenterPoint(), -endDistance);
 
         this.id = IdGenerator.roadId();
         this.rightWay = new Way(lightStateRightWay, laneCountPerWay, true, startPoint, endPoint, id);
@@ -42,26 +40,27 @@ public class Road implements IVehicleTransition {
     }
 
     public Road(TrafficNode startNode, TrafficNode endNode) {
+        this(startNode, endNode, Constants.DEFAULT_LANE_COUNT);
+    }
+
+    public Road(TrafficNode startNode, TrafficNode endNode, int laneCountPerWay) {
         this.startNode = startNode;
         this.endNode = endNode;
 
-        // Calculate the radius needed for the default lane count
-        double startRadius = startNode.computeRadiusForLaneCount(Constants.DEFAULT_LANE_COUNT);
-        double endRadius = endNode.computeRadiusForLaneCount(Constants.DEFAULT_LANE_COUNT);
+        // Calculate distance from center where this road should start
+        double startDistance = startNode.computeRoadStartDistance(laneCountPerWay);
+        double endDistance = endNode.computeRoadStartDistance(laneCountPerWay);
 
         // Calculate road start and end point by the center point of start and end node,
         // and the direction vector from start node to end node
         TrafficVector directionVector = new TrafficVector(startNode.getCenterPoint(), endNode.getCenterPoint());
-        this.startPoint = directionVector.translatePoint(startNode.getCenterPoint(),
-                startRadius - Constants.ROAD_MARKING_OFFSET);
-        this.endPoint = directionVector.translatePoint(endNode.getCenterPoint(),
-                -(endRadius - Constants.ROAD_MARKING_OFFSET));
+        this.startPoint = directionVector.translatePoint(startNode.getCenterPoint(), startDistance);
+        this.endPoint = directionVector.translatePoint(endNode.getCenterPoint(), -endDistance);
         this.id = IdGenerator.roadId();
 
-        // Default setting for Road constructor with default lane count and traffic
-        // light state
-        this.rightWay = new Way(LightState.GREEN, Constants.DEFAULT_LANE_COUNT, true, startPoint, endPoint, id);
-        this.leftWay = new Way(LightState.GREEN, Constants.DEFAULT_LANE_COUNT, false, startPoint, endPoint, id);
+        // Default traffic light state: GREEN for both ways
+        this.rightWay = new Way(LightState.GREEN, laneCountPerWay, true, startPoint, endPoint, id);
+        this.leftWay = new Way(LightState.GREEN, laneCountPerWay, false, startPoint, endPoint, id);
     }
 
     // Check if this road conflicts with another road (i.e., they intersect)

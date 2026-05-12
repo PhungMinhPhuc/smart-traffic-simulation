@@ -31,13 +31,17 @@ public class TrafficMap {
     }
 
     public void addConnection(TrafficNode startNode, TrafficNode endNode) {
+        addConnection(startNode, endNode, Constants.DEFAULT_LANE_COUNT);
+    }
+
+    public void addConnection(TrafficNode startNode, TrafficNode endNode, int laneCountPerWay) {
         // Check node existence
         if (!nodeList.contains(startNode) || !nodeList.contains(endNode)) {
             System.out.println("One or both nodes do not exist in the map");
             return;
         }
       
-		Road newRoad = new Road(startNode, endNode); // Use the constructor with default lane count and traffic light state
+		Road newRoad = new Road(startNode, endNode, laneCountPerWay);
 		
 		// Check collision with existing roads
 		for(Road existingRoad : getRoadList()) {

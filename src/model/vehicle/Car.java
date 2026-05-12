@@ -1,6 +1,6 @@
 package model.vehicle;
 
-import model.vehicle.behavior.DriverBehavior;
+// import model.vehicle.behavior.DriverBehavior;
 import model.utility.TrafficPoint;
 import model.utility.TrafficVector;
 import config.Constants;

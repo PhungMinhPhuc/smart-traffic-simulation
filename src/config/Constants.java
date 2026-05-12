@@ -9,7 +9,7 @@ public final class Constants {
     // LANE CONFIG
     public static final double LANE_WIDTH = 15.0;
     public static final Color LANE_COLOR = Color.GRAY;
-    public static final int DEFAULT_LANE_COUNT = 5;
+    public static final int DEFAULT_LANE_COUNT = 3;
 
     // LANE MARKING CONFIG
     public static final double LANE_MARKING_WIDTH = 1.0;
@@ -18,11 +18,10 @@ public final class Constants {
     // ROAD MARKING CONFIG
     public static final double ROAD_MARKING_WIDTH = 1.0;
     public static final Color ROAD_MARKING_COLOR = Color.WHITE;
-    public static final double ROAD_MARKING_OFFSET = 20.0;
+    public static final double ROAD_MARKING_OFFSET = 30.0;
 
     // JUNCTION CONFIG
-    public static final double JUNCTION_MIN_RADIUS = 40.0; // Minimum radius when no roads connected
-    public static final double JUNCTION_PADDING = 10.0; // Extra padding around road width inside junction
+    public static final double JUNCTION_MIN_RADIUS = 60.0; // Minimum radius when no roads connected
     public static final Color JUNCTION_COLOR = Color.GRAY;
     public static final Color JUNCTION_CENTER_POINT_COLOR = Color.WHITE;
 

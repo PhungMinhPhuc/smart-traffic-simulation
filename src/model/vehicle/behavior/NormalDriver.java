@@ -1,7 +1,6 @@
 package model.vehicle.behavior;
 
 import model.vehicle.Vehicle;
-import model.road.Lane;
 import model.traffic.LightState;
 
 public class NormalDriver implements DriverBehavior {
@@ -46,7 +45,8 @@ public class NormalDriver implements DriverBehavior {
 
     // Logic: Stop exactly at a red light stop line.
     private double calculateBraking(Vehicle self, double distance) {
-        if (distance < ALREADY_STOPPED) return 0; // Already stopped
+        if (distance < ALREADY_STOPPED)
+            return 0; // Already stopped
         // V^2 = 2as => a = V^2 / 2s
         double requiredBraking = -(Math.pow(self.getSpeed(), 2) / (2 * distance));
         return Math.max(requiredBraking, BRAKING_STRENGTH);
@@ -58,16 +58,19 @@ public class NormalDriver implements DriverBehavior {
         return calculateBraking(self, distanceToLight);
     }
 
-    // Yield to Emergency Vehicles. Logic: Slow down significantly or change lane to allow the ambulance to pass.
+    // Yield to Emergency Vehicles. Logic: Slow down significantly or change lane to
+    // allow the ambulance to pass.
     @Override
     public void onEmergency(Vehicle self, Vehicle emergencyVehicle) {
 
     }
 
-    // Overtaking. Logic: If a car is slow in front, check if the neighbor lane is better
+    // Overtaking. Logic: If a car is slow in front, check if the neighbor lane is
+    // better
     @Override
     public boolean shouldChangeLane(Vehicle self, Vehicle ahead) {
-        if (ahead == null) return false;
+        if (ahead == null)
+            return false;
 
         double distance = self.getPosition().distanceTo(ahead.getPosition());
         if (distance < SAFE_DISTANCE && ahead.getSpeed() < self.getMaxSpeed() * 0.7) {

@@ -32,9 +32,7 @@ public abstract class TrafficNode implements IVehicleTransition {
 
     /**
      * Recalculates the junction radius based on the widest connected road.
-     * Radius = max(MIN_RADIUS, maxRoadHalfWidth + PADDING)
-     * where roadHalfWidth = LANE_WIDTH * laneCountPerWay (one way's width).
-     * Full road width = 2 * roadHalfWidth, so we need radius >= roadHalfWidth + padding.
+     * Radius = max(MIN_RADIUS, maxHalfWidth + ROAD_MARKING_OFFSET)
      */
     public void updateRadius() {
         double maxHalfWidth = 0;
@@ -45,15 +43,19 @@ public abstract class TrafficNode implements IVehicleTransition {
                 maxHalfWidth = halfWidth;
             }
         }
-        this.radius = Math.max(Constants.JUNCTION_MIN_RADIUS, maxHalfWidth + Constants.JUNCTION_PADDING);
+        this.radius = Math.max(Constants.JUNCTION_MIN_RADIUS,
+                maxHalfWidth + Constants.ROAD_MARKING_OFFSET);
     }
 
     /**
-     * Calculates what the radius would need to be for a given lane count.
+     * Computes the distance from center where a road with the given lane count should start.
+     * Uses sqrt(R² - W²) so wider roads start closer to center.
+     * R = max(currentRadius, halfWidth + ROAD_MARKING_OFFSET) to handle new wider roads.
      */
-    public double computeRadiusForLaneCount(int laneCountPerWay) {
+    public double computeRoadStartDistance(int laneCountPerWay) {
         double halfWidth = Constants.LANE_WIDTH * laneCountPerWay;
-        return Math.max(Constants.JUNCTION_MIN_RADIUS, halfWidth + Constants.JUNCTION_PADDING);
+        double neededRadius = Math.max(this.radius, halfWidth + Constants.ROAD_MARKING_OFFSET);
+        return Math.sqrt(neededRadius * neededRadius - halfWidth * halfWidth);
     }
 
     /**
