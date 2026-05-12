@@ -10,6 +10,8 @@ public final class Constants {
     public static final double LANE_WIDTH = 15.0;
     public static final Color LANE_COLOR = Color.GRAY;
     public static final int DEFAULT_LANE_COUNT = 3;
+    public static final int MAX_LANE_COUNT = 10;
+    public static final int MIN_LANE_COUNT = 1;
 
     // LANE MARKING CONFIG
     public static final double LANE_MARKING_WIDTH = 1.0;
@@ -60,4 +62,9 @@ public final class Constants {
 
     // GUI CONFIG
     public static final double MIN_DISTANCE_TO_END_POINT = 5.0;
+
+    // ZOOM CONFIG
+    public static final double MIN_ZOOM = 0.1;
+    public static final double MAX_ZOOM = 10000.0;
+    public static final double ZOOM_STEP = 0.1;
 }
