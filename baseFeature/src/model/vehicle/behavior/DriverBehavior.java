@@ -1,62 +1,76 @@
 package model.vehicle.behavior;
 
 import model.vehicle.Vehicle;
-import model.map.Lane;
 
 public abstract class DriverBehavior {
+    protected double speedRatio;     
+    protected double safeTimeGap;    
+    protected double accNormal;      
+    protected double accStrong;      
+    protected double brakeNormal;   
+    protected double brakeStrong;    
+    protected double sightDistance; 
+    protected double overtakeThreshold;
 
-    protected double safeTimeGap;
-    protected double minDistance;
-    protected double accelerationValue;
-    protected double brakingValue;
-    protected double stopLineDistance;
+    public void decide(Vehicle self, Vehicle ahead, double distToLight, boolean isRed) {
+        double freeWayAcc = handleFreeWay(self, ahead);
+        double followAcc = handleFollowVehicle(self, ahead);
+        double lightAcc = handleRedLight(self, distToLight, isRed);
+        double finalAcc = Math.min(freeWayAcc, Math.min(followAcc, lightAcc));
+        handleLaneChange(self, ahead);
+        self.applyAcceleration(finalAcc);
+    }
+
+    protected double calculateBrakeToStop(double currentSpeed, double distance) {
+        if (distance <= 0.5) return 0;
+        double targetAcc = -(currentSpeed * currentSpeed) / (2 * distance);
+        return Math.max(brakeStrong, targetAcc);
+    }
     
-    protected abstract void handleFreeWay (Vehicle self);
-    protected abstract void handleFollowVehicle (Vehicle self, Vehicle ahead);
-    protected abstract void handleRedLight (Vehicle self, double distance);
-    protected abstract void handleEmergency (Vehicle self);
-    public abstract String getBehaviorName();
-
-    public void decide(Vehicle self, Vehicle ahead, double dist, boolean isRed) {
-          if (self.isEmergency()) handleEmergency(self);
-          else if (isRed && dist < stopLineDistance) handleRedLight(self, dist);  
-          else if (ahead != null) handleFollowVehicle(self, ahead);
-          else handleFreeWay(self);
+    protected void attemptLaneChange(Vehicle self) {
+        if (self.getCurrentLane().getNeighborLane(-1) != null) self.changeLane(-1);
+        else if (self.getCurrentLane().getNeighborLane(1) != null) self.changeLane(1);
     }
 
-    protected double safeDistance(Vehicle self) {
-        return self.getSpeed() * safeTimeGap + minDistance;
+    protected double handleFreeWay(Vehicle self, Vehicle ahead) {
+    	if (ahead == null) return Double.MAX_VALUE;
+        double targetSpeed = self.getMaxSpeed() * this.speedRatio;
+        if (self.getSpeed() < targetSpeed) return this.accNormal;
+        else if (self.getSpeed() > targetSpeed) return this.brakeNormal;
+        return 0.0;
     }
+    
+    protected double handleFollowVehicle(Vehicle self, Vehicle ahead) {
+    	if (ahead == null) return Double.MAX_VALUE;
+    	
+        double dist = self.getPosition().distanceTo(ahead.getPosition());
+        double safetyGap = self.getSpeed() * this.safeTimeGap;
 
-    protected double distance(Vehicle a, Vehicle b) {
-        return a.getPosition().distanceTo(b.getPosition());
+        if (dist < safetyGap)
+            return (self.getSpeed() - ahead.getSpeed()) > 0 ? 
+            		this.brakeStrong : this.brakeNormal;
+        return this.accNormal;
     }
-
-    protected double brakingToStop(Vehicle self, double distance) {
-        if (distance <= 1) return 0;
-
-        double v = self.getSpeed();
-        double a = -(v * v) / (2 * distance);
-
-        return Math.max(a, brakingValue);
+    
+    protected double handleRedLight(Vehicle self, double distance, boolean isRed) {
+        if (!isRed || distance > sightDistance) return Double.MAX_VALUE;
+        return this.calculateBrakeToStop(self.getSpeed(), distance);
     }
-
-    protected boolean shouldChangeLane(Vehicle self, int offset) {
-        if (self.getCurrentLane() == null) return false;
-
-        Lane neighbor = self.getCurrentLane().getNeighborLane(offset);
-        if (neighbor == null) return false; // Không có làn bên cạnh thì không rẽ
-
-        // Kiểm tra xem trên làn bên cạnh có xe phía trước không
-        Vehicle aheadInNeighbor = neighbor.getVehicleAhead(self);
-        if (aheadInNeighbor != null) {
-            // Nếu khoảng cách đến xe đó nhỏ hơn khoảng cách an toàn -> không rẽ
-            if (distance(self, aheadInNeighbor) < safeDistance(self)) {
-                return false;
+    
+    protected void handleLaneChange(Vehicle self, Vehicle ahead) {
+    	if (ahead != null) {
+            double dist = self.getPosition().distanceTo(ahead.getPosition());
+            double targetSpeed = self.getMaxSpeed() * this.speedRatio;
+            
+            if (dist < targetSpeed * this.safeTimeGap && ahead.getSpeed() < targetSpeed * this.overtakeThreshold) {
+                attemptLaneChange(self);
             }
         }
-
-        // Không vướng xe nào quá gần thì rẽ được
-        return true;
     }
+    
+    protected void handleEmergency(Vehicle self) {
+    	attemptLaneChange(self);
+    }
+    
+    public abstract String getBehaviorName();
 }

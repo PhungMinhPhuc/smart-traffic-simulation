@@ -3,63 +3,27 @@ package model.vehicle.behavior;
 import model.vehicle.Vehicle;
 
 public class AggressiveDriver extends DriverBehavior {
-
     public AggressiveDriver() {
-        this.safeTimeGap = 1.0;
-        this.minDistance = 3.0;
-        this.accelerationValue = 2.5;
-        this.brakingValue = -3.5;
-        this.stopLineDistance = 25.0;
+        this.speedRatio = 1.0;      
+        this.safeTimeGap = 1;    
+        this.accNormal = 2.0;       
+        this.accStrong = 4.0;       
+        this.brakeNormal = -2.0;    
+        this.brakeStrong = -4.0;   
+        this.sightDistance = 200.0;
+        this.overtakeThreshold = 0.9;
     }
 
     @Override
-    protected void handleFreeWay(Vehicle self) {
-        self.applyAcceleration(accelerationValue);
+    protected double handleRedLight(Vehicle self, double distance, boolean isRed) {
+        return Double.MAX_VALUE;
     }
 
     @Override
-    protected void handleFollowVehicle(Vehicle self, Vehicle ahead) {
-        double dist = distance(self, ahead);
-        double safe = safeDistance(self);
-
-        if (dist < safe) {
-            // Luôn tìm cách vượt
-            if (shouldChangeLane(self, -1)) {
-                self.changeLane(-1);
-                return;
-            } else if (shouldChangeLane(self, 1)) {
-                self.changeLane(1);
-                return;
-            }
-            // không vượt được thì phanh
-            self.applyAcceleration(brakingValue);
-        } 
-        else {
-            self.applyAcceleration(accelerationValue);
-        }
+    public void handleEmergency(Vehicle self) {
+    	
     }
-
-    @Override
-    protected void handleRedLight(Vehicle self, double distance) {
-        if (distance > 10) {
-            self.applyAcceleration(brakingValue); // sát vạch đèn đỏ mới phanh
-        } 
-        else {
-            self.setSpeed(0);
-            self.applyAcceleration(0);
-        }
-    }
-
-    @Override
-    protected void handleEmergency(Vehicle self) {
-        // tránh xe cứu thương
-        if (shouldChangeLane(self, 1)) {
-            self.changeLane(1);
-        } else if (shouldChangeLane(self, -1)) {
-            self.changeLane(-1);
-        }
-    }
-
+    
     @Override
     public String getBehaviorName() {
         return "Aggressive";
