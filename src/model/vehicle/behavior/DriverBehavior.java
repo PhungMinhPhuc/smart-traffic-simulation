@@ -13,7 +13,7 @@ public abstract class DriverBehavior {
     protected double overtakeThreshold;
 
     public void decide(Vehicle self, Vehicle ahead, double distToLight, boolean isRed) {
-        double freeWayAcc = handleFreeWay(self);
+        double freeWayAcc = handleFreeWay(self, ahead);
         double followAcc = handleFollowVehicle(self, ahead);
         double lightAcc = handleRedLight(self, distToLight, isRed);
         double finalAcc = Math.min(freeWayAcc, Math.min(followAcc, lightAcc));
@@ -32,7 +32,8 @@ public abstract class DriverBehavior {
         else if (self.getCurrentLane().getNeighborLane(1) != null) self.changeLane(1);
     }
 
-    protected double handleFreeWay(Vehicle self) {
+    protected double handleFreeWay(Vehicle self, Vehicle ahead) {
+    	if (ahead == null) return Double.MAX_VALUE;
         double targetSpeed = self.getMaxSpeed() * this.speedRatio;
         if (self.getSpeed() < targetSpeed) return this.accNormal;
         else if (self.getSpeed() > targetSpeed) return this.brakeNormal;
