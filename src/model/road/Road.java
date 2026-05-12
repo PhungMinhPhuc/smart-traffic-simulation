@@ -24,11 +24,17 @@ public class Road implements IVehicleTransition {
         this.startNode = startNode;
         this.endNode = endNode;
 
+        // Calculate the radius needed for this road's lane count
+        double startRadius = startNode.computeRadiusForLaneCount(laneCountPerWay);
+        double endRadius = endNode.computeRadiusForLaneCount(laneCountPerWay);
+
         // Calculate road start and end point by the center point of start and end node,
         // and the direction vector from start node to end node
         TrafficVector directionVector = new TrafficVector(startNode.getCenterPoint(), endNode.getCenterPoint());
-        this.startPoint = directionVector.translatePoint(startNode.getCenterPoint(), Constants.JUNCTION_RADIUS);
-        this.endPoint = directionVector.translatePoint(endNode.getCenterPoint(), -Constants.JUNCTION_RADIUS);
+        this.startPoint = directionVector.translatePoint(startNode.getCenterPoint(),
+                startRadius - Constants.ROAD_MARKING_OFFSET);
+        this.endPoint = directionVector.translatePoint(endNode.getCenterPoint(),
+                -(endRadius - Constants.ROAD_MARKING_OFFSET));
 
         this.id = IdGenerator.roadId();
         this.rightWay = new Way(lightStateRightWay, laneCountPerWay, true, startPoint, endPoint, id);
@@ -39,11 +45,17 @@ public class Road implements IVehicleTransition {
         this.startNode = startNode;
         this.endNode = endNode;
 
+        // Calculate the radius needed for the default lane count
+        double startRadius = startNode.computeRadiusForLaneCount(Constants.DEFAULT_LANE_COUNT);
+        double endRadius = endNode.computeRadiusForLaneCount(Constants.DEFAULT_LANE_COUNT);
+
         // Calculate road start and end point by the center point of start and end node,
         // and the direction vector from start node to end node
         TrafficVector directionVector = new TrafficVector(startNode.getCenterPoint(), endNode.getCenterPoint());
-        this.startPoint = directionVector.translatePoint(startNode.getCenterPoint(), Constants.JUNCTION_RADIUS);
-        this.endPoint = directionVector.translatePoint(endNode.getCenterPoint(), -Constants.JUNCTION_RADIUS);
+        this.startPoint = directionVector.translatePoint(startNode.getCenterPoint(),
+                startRadius - Constants.ROAD_MARKING_OFFSET);
+        this.endPoint = directionVector.translatePoint(endNode.getCenterPoint(),
+                -(endRadius - Constants.ROAD_MARKING_OFFSET));
         this.id = IdGenerator.roadId();
 
         // Default setting for Road constructor with default lane count and traffic

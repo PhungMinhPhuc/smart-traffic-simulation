@@ -9,16 +9,22 @@ public final class Constants {
     // LANE CONFIG
     public static final double LANE_WIDTH = 15.0;
     public static final Color LANE_COLOR = Color.GRAY;
-    public static final int DEFAULT_LANE_COUNT = 2;
+    public static final int DEFAULT_LANE_COUNT = 5;
 
     // LANE MARKING CONFIG
     public static final double LANE_MARKING_WIDTH = 1.0;
     public static final Color LANE_MARKING_COLOR = Color.WHITE;
 
     // ROAD MARKING CONFIG
+    public static final double ROAD_MARKING_WIDTH = 1.0;
+    public static final Color ROAD_MARKING_COLOR = Color.WHITE;
+    public static final double ROAD_MARKING_OFFSET = 20.0;
 
     // JUNCTION CONFIG
-    public static final double JUNCTION_RADIUS = 70.0;
+    public static final double JUNCTION_MIN_RADIUS = 40.0; // Minimum radius when no roads connected
+    public static final double JUNCTION_PADDING = 10.0; // Extra padding around road width inside junction
+    public static final Color JUNCTION_COLOR = Color.GRAY;
+    public static final Color JUNCTION_CENTER_POINT_COLOR = Color.WHITE;
 
     // STOP LINE CONFIG
     public static final double STOP_LINE_WIDTH = 2.0;
@@ -41,8 +47,13 @@ public final class Constants {
     public static final double RED_DURATION = 30.0;
 
     // VEHICLE CONFIG
-    public static final double MAX_SPEED = 60.0;
-    public static final double ACCELERATION = 2.0;
+
+    // CAR CONFIG
+    public static final double CAR_WIDTH = 30.0;
+    public static final double CAR_LENGTH = 15.0;
+    public static final String CAR_SOUND = "CarSound.wav";
+    public static final Color CAR_COLOR = Color.BLUE;
+    public static final double CAR_MAX_SPEED = 100.0;
 
     // SIMULATION CONFIG
     public static final int TICK_RATE_MS = 1000;

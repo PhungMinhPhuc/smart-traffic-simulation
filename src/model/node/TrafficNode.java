@@ -20,12 +20,40 @@ public abstract class TrafficNode implements IVehicleTransition {
     protected List<Road> roadList;
     protected List<Path> pathList;
     protected int pathCounter = 0;
+    protected double radius;
 
     public TrafficNode(TrafficPoint point) {
         this.id = IdGenerator.nodeId();
         this.centerPoint = (TrafficPoint) point.clone();
         this.roadList = new ArrayList<>();
         this.pathList = new ArrayList<>();
+        this.radius = Constants.JUNCTION_MIN_RADIUS;
+    }
+
+    /**
+     * Recalculates the junction radius based on the widest connected road.
+     * Radius = max(MIN_RADIUS, maxRoadHalfWidth + PADDING)
+     * where roadHalfWidth = LANE_WIDTH * laneCountPerWay (one way's width).
+     * Full road width = 2 * roadHalfWidth, so we need radius >= roadHalfWidth + padding.
+     */
+    public void updateRadius() {
+        double maxHalfWidth = 0;
+        for (Road road : roadList) {
+            int laneCount = road.getRightWay().getLaneList().size();
+            double halfWidth = Constants.LANE_WIDTH * laneCount;
+            if (halfWidth > maxHalfWidth) {
+                maxHalfWidth = halfWidth;
+            }
+        }
+        this.radius = Math.max(Constants.JUNCTION_MIN_RADIUS, maxHalfWidth + Constants.JUNCTION_PADDING);
+    }
+
+    /**
+     * Calculates what the radius would need to be for a given lane count.
+     */
+    public double computeRadiusForLaneCount(int laneCountPerWay) {
+        double halfWidth = Constants.LANE_WIDTH * laneCountPerWay;
+        return Math.max(Constants.JUNCTION_MIN_RADIUS, halfWidth + Constants.JUNCTION_PADDING);
     }
 
     /**
@@ -86,6 +114,7 @@ public abstract class TrafficNode implements IVehicleTransition {
         }
 
         roadList.add(newRoad);
+        updateRadius(); // Recalculate radius based on widest road
         buildAllConflictPoints();
     }
 
@@ -136,7 +165,7 @@ public abstract class TrafficNode implements IVehicleTransition {
         // Check if the point is within a certain distance from the center point, if it
         // is, then it is considered as containing the point
         double distance = centerPoint.distanceTo(point);
-        return distance <= Constants.JUNCTION_RADIUS;
+        return distance <= radius;
     }
 
     // Find the lane that starts at a given point
@@ -202,6 +231,10 @@ public abstract class TrafficNode implements IVehicleTransition {
 
     public void setCenterPoint(TrafficPoint centerPoint) {
         this.centerPoint = centerPoint.clone();
+    }
+
+    public double getRadius() {
+        return radius;
     }
 
     public List<Path> getPathList() {

@@ -5,7 +5,6 @@ import model.node.Path;
 import model.road.Lane;
 import model.utility.TrafficPoint;
 import model.utility.TrafficVector;
-// import model.map.Vector2D;
 import model.vehicle.behavior.DriverBehavior;
 import java.util.Queue;
 import java.util.LinkedList;

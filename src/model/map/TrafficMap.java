@@ -22,7 +22,7 @@ public class TrafficMap {
     public void addNode(TrafficNode newNode) {
         if (!nodeList.contains(newNode)) {
             for (TrafficNode node : nodeList) {
-                if (TrafficGeometry.intersectsCircle(newNode.getCenterPoint(), Constants.JUNCTION_RADIUS, node.getCenterPoint(), Constants.JUNCTION_RADIUS)) {
+                if (TrafficGeometry.intersectsCircle(newNode.getCenterPoint(), Constants.JUNCTION_MIN_RADIUS, node.getCenterPoint(), node.getRadius())) {
                     return;
                 }
             }

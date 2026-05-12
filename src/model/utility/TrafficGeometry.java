@@ -16,7 +16,7 @@ public final class TrafficGeometry {
 
         double denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
         if (Math.abs(denominator) < Constants.EPS) {
-            return null; // parallel or overlapping
+            return null; // Parallel or overlapping
         }
 
         double det1 = x1 * y2 - y1 * x2;
@@ -48,45 +48,34 @@ public final class TrafficGeometry {
     public static boolean intersectsRectangles(
             TrafficPoint aStart, TrafficPoint aEnd, double aHalfWidth,
             TrafficPoint bStart, TrafficPoint bEnd, double bHalfWidth) {
-        // Build the 4 corners of each rotated rectangle from its center line.
         TrafficPoint[] a = buildCorners(aStart, aEnd, aHalfWidth);
         TrafficPoint[] b = buildCorners(bStart, bEnd, bHalfWidth);
 
-        // SAT axes: the 2 edge directions of each rectangle are enough.
-        TrafficVector[] axes = new TrafficVector[] {
-                new TrafficVector(a[0], a[1]),
-                new TrafficVector(a[1], a[2]),
-                new TrafficVector(b[0], b[1]),
-                new TrafficVector(b[1], b[2])
+        int[][] edges = new int[][] {
+                { 0, 1 },
+                { 1, 2 },
+                { 2, 3 },
+                { 3, 0 }
         };
 
-        for (TrafficVector axis : axes) {
-            double axisLen = axis.length();
-            if (axisLen == 0) {
-                continue; // Ignore degenerate axes.
-            }
-
-            // Normalize the axis so projection values are comparable.
-            double ax = axis.getX() / axisLen;
-            double ay = axis.getY() / axisLen;
-
-            double[] projA = project(a, ax, ay);
-            double[] projB = project(b, ax, ay);
-
-            // If projections do not overlap on any axis, the rectangles do not intersect.
-            if (projA[1] < projB[0] || projB[1] < projA[0]) {
-                return false;
+        for (int[] edgeA : edges) {
+            for (int[] edgeB : edges) {
+                if (intersectsLines(
+                        a[edgeA[0]], a[edgeA[1]],
+                        b[edgeB[0]], b[edgeB[1]]) != null) {
+                    return true;
+                }
             }
         }
 
-        // No separating axis found, so the rectangles intersect.
-        return true;
+        return isPointInsideRectangle(a[0], b)
+                || isPointInsideRectangle(b[0], a);
     }
 
     private static TrafficPoint[] buildCorners(TrafficPoint start, TrafficPoint end, double halfWidth) {
         TrafficVector dir = new TrafficVector(start, end);
         if (dir.length() == 0) {
-            throw new IllegalArgumentException("start and end cannot be the same point");
+            throw new IllegalArgumentException("Start and end cannot be the same point");
         }
 
         // Unit direction along the center line of the rectangle.
@@ -94,30 +83,41 @@ public final class TrafficGeometry {
 
         // Perpendicular vector used to offset the rectangle width.
         TrafficVector normal = new TrafficVector(-unit.getY(), unit.getX()).scale(halfWidth);
+        TrafficVector opposite = new TrafficVector(-normal.getX(), -normal.getY());
 
         // Return the 4 corners in clockwise order.
         return new TrafficPoint[] {
                 start.moveByVector(normal),
                 end.moveByVector(normal),
-                end.moveByVector(normal.scale(-1)),
-                start.moveByVector(normal.scale(-1))
+                end.moveByVector(opposite),
+                start.moveByVector(opposite)
         };
     }
 
-    private static double[] project(TrafficPoint[] rect, double ax, double ay) {
-        // Project all rectangle corners onto one axis and return [min, max].
-        double min = rect[0].getX() * ax + rect[0].getY() * ay;
-        double max = min;
+    private static boolean isPointInsideRectangle(TrafficPoint point, TrafficPoint[] rect) {
+        double sign = 0.0;
 
-        for (int i = 1; i < rect.length; i++) {
-            double p = rect[i].getX() * ax + rect[i].getY() * ay;
-            if (p < min)
-                min = p;
-            if (p > max)
-                max = p;
+        for (int i = 0; i < rect.length; i++) {
+            TrafficPoint a = rect[i];
+            TrafficPoint b = rect[(i + 1) % rect.length];
+            double cross = cross(a, b, point);
+            if (Math.abs(cross) < Constants.EPS) {
+                continue;
+            }
+
+            if (sign == 0.0) {
+                sign = cross;
+            } else if (sign * cross < 0.0) {
+                return false;
+            }
         }
 
-        return new double[] { min, max };
+        return true;
+    }
+
+    private static double cross(TrafficPoint a, TrafficPoint b, TrafficPoint c) {
+        return (b.getX() - a.getX()) * (c.getY() - a.getY())
+                - (b.getY() - a.getY()) * (c.getX() - a.getX());
     }
 
     public static boolean intersectsCircle(TrafficPoint aCenter, double aRadius, TrafficPoint bCenter, double bRadius) {
