@@ -40,7 +40,7 @@ public final class Constants {
 
     // TRAFFIC LIGHT CONFIG
     public static final double HOUSING_WIDTH = 18;
-    public static final double HOUSING_HEIGHT = 60;
+    public static final double HOUSING_HEIGHT = 70;
     public static final double LIGHT_RADIUS = 7;
     public static final double SPACING = 15;
 
