@@ -20,15 +20,18 @@ public abstract class Vehicle {
     protected TrafficVector direction;
     protected int pendingLaneChange = 0;
 
-    public Vehicle(double maxSpeed, double length, double width, String sound) {
-        this.id = IdGenerator.vehicleId(type);
-        this.maxSpeed = maxSpeed;
-        this.length = length;	
-        this.width = width;
-        this.sound = sound;
-        this.speed = 0;
-        this.acceleration = 0;
-    }
+    public Vehicle(String type, double maxSpeed, double length, double width, String sound, 
+            TrafficPoint position, TrafficVector direction, DriverBehavior behavior) {
+    	 this.id = IdGenerator.vehicleId(type); 
+    	 this.type = type;
+    	 this.maxSpeed = maxSpeed;	
+    	 this.length = length;
+    	 this.width = width;
+    	 this.sound = sound;
+    	 this.position = position;
+    	 this.direction = direction;
+    	 this.behavior = behavior;
+}
 
     public void update(double distToVehicleAhead, double speedVehicleAhead, double distToLight, 
     		boolean isRed, boolean canChangeToRight, boolean canChangeToLeft, double deltaTime) {

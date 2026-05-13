@@ -11,13 +11,9 @@ public class Truck extends Vehicle {
     private static final double DEFAULT_MAX_SPEED = 60.0;
 
     public Truck(TrafficPoint position, TrafficVector direction, DriverBehavior behavior) {
- 	   super(DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND);
- 	   this.type = "Truck";
- 	   this.isEmergency = false;
- 	   this.position = position;
- 	   this.direction = direction;
- 	   this.behavior = behavior;
-    }
+	   super("Car", DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND,
+			   position, direction, behavior);
+   }
 
     public Truck(TrafficPoint position, TrafficVector direction) {
  	   this(position, direction, new model.vehicle.behavior.CautiousDriver());
