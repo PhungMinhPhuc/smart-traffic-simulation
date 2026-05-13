@@ -5,6 +5,7 @@ import model.node.*;
 import model.road.*;
 import model.utility.*;
 import model.vehicle.*;
+import model.vehicle.behavior.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,7 +109,7 @@ public class TrafficMap {
 		// Add a default vehicle to the first lane of the way
 		Lane lane = way.getLaneList().get(0);
 		Vehicle vehicle = new Car(lane.getStartPoint().clone(),
-				new TrafficVector(lane.getStartPoint(), lane.getEndPoint()));
+				new TrafficVector(lane.getStartPoint(), lane.getEndPoint()), new NormalDriver());
 		lane.addVehicle(vehicle);
 	}
 

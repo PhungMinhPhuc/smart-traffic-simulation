@@ -129,7 +129,11 @@ public abstract class TrafficNode implements IVehicleTransition {
                     newEntryWay.getLaneList().get(0).getEndPoint());
             double angleDegrees = Math.toDegrees(direction.getAngle());
 
-            trafficLightList.add(new model.traffic.TrafficLight(stopLinePoint, 1, angleDegrees));
+            TrafficLight newLight = new TrafficLight(stopLinePoint, 1, angleDegrees);
+            for (Lane lane : newEntryWay.getLaneList()) {
+                newLight.addControlledLane(lane);
+            }
+            trafficLightList.add(newLight);
         }
 
         roadList.add(newRoad);

@@ -52,7 +52,7 @@ public class AggressiveDriver implements DriverBehavior {
     private double calculateHardBraking(Vehicle self, double distance) {
         if (distance < ALREADY_STOPPED) return 0;
         double required = -(Math.pow(self.getSpeed(), 2) / (2 * distance));
-        return Math.max(required, -5.0); 
+        return Math.max(required, -25.0); 
     }
 
     // Even aggressive drivers must yield to ambulances
