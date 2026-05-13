@@ -18,6 +18,8 @@ public class Road implements IVehicleTransition {
     private TrafficNode startNode;
     private TrafficNode endNode;
     private String id;
+    private TrafficLight trafficLightRightWay;
+    private TrafficLight trafficLightLeftWay;
 
     public Road(TrafficNode startNode, TrafficNode endNode, int laneCountPerWay, LightState lightStateRightWay,
             LightState lightStateLeftWay) {
@@ -69,9 +71,10 @@ public class Road implements IVehicleTransition {
         TrafficPoint q1 = this.endPoint;
         TrafficPoint p2 = otherRoad.getStartPoint();
         TrafficPoint q2 = otherRoad.getEndPoint();
-        double halfWidthRoad = Constants.LANE_WIDTH * Constants.DEFAULT_LANE_COUNT;
+        double halfWidthThisRoad = Constants.LANE_WIDTH * this.getRightWay().getLaneList().size();
+        double halfWidthOtherRoad = Constants.LANE_WIDTH * otherRoad.getRightWay().getLaneList().size();
 
-        return TrafficGeometry.intersectsRectangles(p1, q1, halfWidthRoad, p2, q2, halfWidthRoad);
+        return TrafficGeometry.intersectsRectangles(p1, q1, halfWidthThisRoad, p2, q2, halfWidthOtherRoad);
     }
 
     private void checkLaneVehicles(Way way, TrafficNode targetNode) {
@@ -100,6 +103,11 @@ public class Road implements IVehicleTransition {
     }
 
     @Override
+    public void controlTrafficLight() {
+
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -107,6 +115,11 @@ public class Road implements IVehicleTransition {
             return false;
         Road other = (Road) obj;
         return id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 
     public TrafficNode getStartNode() {
