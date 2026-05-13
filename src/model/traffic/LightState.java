@@ -1,5 +1,19 @@
 package model.traffic;
 
+import javafx.scene.paint.Color;
+
 public enum LightState {
-    RED, YELLOW, GREEN;
+    RED(Color.RED),
+    YELLOW(Color.YELLOW),
+    GREEN(Color.GREEN);
+
+    private final Color color;
+
+    LightState(Color color) {
+        this.color = color;
+    }
+
+    public Color getColor() {
+        return color;
+    }
 }

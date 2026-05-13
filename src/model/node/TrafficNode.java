@@ -9,6 +9,7 @@ import model.utility.TrafficVector;
 import model.transition.IVehicleTransition;
 import model.vehicle.Vehicle;
 import config.Constants;
+import model.traffic.TrafficLight;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ public abstract class TrafficNode implements IVehicleTransition {
     protected TrafficPoint centerPoint;
     protected List<Road> roadList;
     protected List<Path> pathList;
+    protected List<TrafficLight> trafficLightList;
     protected int pathCounter = 0;
     protected double radius;
 
@@ -27,6 +29,7 @@ public abstract class TrafficNode implements IVehicleTransition {
         this.centerPoint = (TrafficPoint) point.clone();
         this.roadList = new ArrayList<>();
         this.pathList = new ArrayList<>();
+        this.trafficLightList = new ArrayList<>();
         this.radius = Constants.JUNCTION_MIN_RADIUS;
     }
 
@@ -117,6 +120,18 @@ public abstract class TrafficNode implements IVehicleTransition {
             createPaths(getEntryWay(road), newExitWay);
         }
 
+        // Create and add traffic light for the new road's entry way
+        // Position it at the road's start/endpoint (interface with the junction)
+        if (!newEntryWay.getLaneList().isEmpty()) {
+            TrafficPoint stopLinePoint = newRoad.getStartNode().equals(this) ? newRoad.getStartPoint()
+                    : newRoad.getEndPoint();
+            TrafficVector direction = new TrafficVector(newEntryWay.getLaneList().get(0).getStartPoint(),
+                    newEntryWay.getLaneList().get(0).getEndPoint());
+            double angleDegrees = Math.toDegrees(direction.getAngle());
+
+            trafficLightList.add(new model.traffic.TrafficLight(stopLinePoint, 1, angleDegrees));
+        }
+
         roadList.add(newRoad);
         updateRadius(); // Recalculate radius based on widest road
         buildAllConflictPoints();
@@ -142,6 +157,13 @@ public abstract class TrafficNode implements IVehicleTransition {
                 .anyMatch(lane -> path.getStartPoint().equals(lane.getEndPoint()))
                 || exitWay.getLaneList().stream()
                         .anyMatch(lane -> path.getEndPoint().equals(lane.getStartPoint())));
+
+        // Remove the traffic light associated with the entry way's stop line
+        if (!entryWay.getLaneList().isEmpty()) {
+            TrafficPoint stopLinePoint = roadToRemove.getStartNode().equals(this) ? roadToRemove.getStartPoint()
+                    : roadToRemove.getEndPoint();
+            trafficLightList.removeIf(light -> light.getPosition().equals(stopLinePoint));
+        }
 
         roadList.remove(roadToRemove);
         buildAllConflictPoints();
@@ -240,6 +262,10 @@ public abstract class TrafficNode implements IVehicleTransition {
 
     public double getRadius() {
         return radius;
+    }
+
+    public List<model.traffic.TrafficLight> getTrafficLightList() {
+        return trafficLightList;
     }
 
     public List<Path> getPathList() {

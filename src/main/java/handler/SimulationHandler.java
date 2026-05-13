@@ -15,13 +15,16 @@ public class SimulationHandler {
 
     private TrafficMap trafficMap;
     private VehicleRenderer vehicleRenderer;
+    private render.TrafficLightRenderer trafficLightRenderer;
     private Pane vehicleLayer;
     private Label instructionsLabel;
 
-    public void initialize(TrafficMap trafficMap, VehicleRenderer vehicleRenderer, Pane vehicleLayer,
+    public void initialize(TrafficMap trafficMap, VehicleRenderer vehicleRenderer, 
+            render.TrafficLightRenderer trafficLightRenderer, Pane vehicleLayer,
             Label instructionsLabel) {
         this.trafficMap = trafficMap;
         this.vehicleRenderer = vehicleRenderer;
+        this.trafficLightRenderer = trafficLightRenderer;
         this.vehicleLayer = vehicleLayer;
         this.instructionsLabel = instructionsLabel;
 
@@ -59,8 +62,13 @@ public class SimulationHandler {
 
     public void renderVehicles() {
         vehicleLayer.getChildren().clear();
+        // Render Vehicles
         for (Vehicle veh : trafficMap.getVehicleList()) {
             vehicleLayer.getChildren().add(vehicleRenderer.render(veh));
+        }
+        // Render Traffic Lights
+        for (model.traffic.TrafficLight light : trafficMap.getTrafficLightList()) {
+            vehicleLayer.getChildren().add(trafficLightRenderer.render(light));
         }
     }
 

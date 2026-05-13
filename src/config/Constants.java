@@ -38,6 +38,12 @@ public final class Constants {
     // GEOMETRY / MATH
     public static final double EPS = 1e-9;
 
+    // TRAFFIC LIGHT CONFIG
+    public static final double HOUSING_WIDTH = 18;
+    public static final double HOUSING_HEIGHT = 60;
+    public static final double LIGHT_RADIUS = 7;
+    public static final double SPACING = 15;
+
     // TRAFFIC LIGHT TIMING
     public static final int GREEN_TIME = 30;
     public static final int YELLOW_TIME = 3;

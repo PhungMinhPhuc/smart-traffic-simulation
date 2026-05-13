@@ -65,6 +65,7 @@ public class MainSceneController {
 	// Map and map renderer
 	private final TrafficMapRenderer trafficMapRenderer = new TrafficMapRenderer();
 	private final VehicleRenderer vehicleRenderer = new VehicleRenderer();
+	private final render.TrafficLightRenderer trafficLightRenderer = new render.TrafficLightRenderer();
 	private final TrafficMap trafficMap = new TrafficMap();
 
 	// Handlers
@@ -85,7 +86,7 @@ public class MainSceneController {
 		mapEditorHandler.initialize(mapLayer, trafficMapWrapper, trafficMap, trafficMapRenderer,
 				laneCountSpinner, instructionsLabel, addTrafficNodeButton,
 				addRoadButton, removeTrafficNodeButton);
-		simulationHandler.initialize(trafficMap, vehicleRenderer, vehicleLayer, instructionsLabel);
+		simulationHandler.initialize(trafficMap, vehicleRenderer, trafficLightRenderer, vehicleLayer, instructionsLabel);
 
 		// config scrollPane and Panes
 		trafficMapWrapper.setPannable(true);
