@@ -69,9 +69,10 @@ public class Road implements IVehicleTransition {
         TrafficPoint q1 = this.endPoint;
         TrafficPoint p2 = otherRoad.getStartPoint();
         TrafficPoint q2 = otherRoad.getEndPoint();
-        double halfWidthRoad = Constants.LANE_WIDTH * Constants.DEFAULT_LANE_COUNT;
+        double halfWidthThisRoad = Constants.LANE_WIDTH * this.getRightWay().getLaneList().size();
+        double halfWidthOtherRoad = Constants.LANE_WIDTH * otherRoad.getRightWay().getLaneList().size();
 
-        return TrafficGeometry.intersectsRectangles(p1, q1, halfWidthRoad, p2, q2, halfWidthRoad);
+        return TrafficGeometry.intersectsRectangles(p1, q1, halfWidthThisRoad, p2, q2, halfWidthOtherRoad);
     }
 
     private void checkLaneVehicles(Way way, TrafficNode targetNode) {
