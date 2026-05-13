@@ -1,7 +1,6 @@
 package model.vehicle;
 
 import model.vehicle.behavior.DriverBehavior;
-import model.map.*;
 import model.utility.TrafficPoint;
 import model.utility.TrafficVector;
 

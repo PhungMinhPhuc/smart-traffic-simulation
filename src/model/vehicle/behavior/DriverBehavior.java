@@ -3,34 +3,38 @@ package model.vehicle.behavior;
 import model.vehicle.Vehicle;
 
 public abstract class DriverBehavior {
-    protected double speedRatio;     
-    protected double safeTimeGap;    
-    protected double accNormal;      
-    protected double accStrong;      
-    protected double brakeNormal;   
-    protected double brakeStrong;    
-    protected double sightDistance; 
-    protected double overtakeThreshold;
+	protected double speedRatio;       // Tỉ lệ tốc độ mong muốn so với maxSpeed
+    protected double safeTimeGap;      // Khoảng cách an toàn tính bằng giây
+    protected double accStrong;		   // Gia tốc tăng tốc gấp
+    protected double accNormal;        // Gia tốc tăng tốc bình thường
+    protected double brakeNormal;      // Gia tốc phanh bình thường
+    protected double brakeStrong;      // Gia tốc phanh gấp
+    protected double sightDistance;    // Tầm nhìn xa để phản ứng
+    protected double overtakeThreshold; // Ngưỡng tốc độ xe trước để quyết định vượt
 
-    public void decide(Vehicle self, double distToVehicleAhead, double speedVehicleAhead, double distToLight, 
-    		boolean isRed, boolean canChangeToRight, boolean canChangeToLeft) {
-        double freeWayAcc = handleFreeWay(self, distToVehicleAhead);
-        double followAcc = handleFollowVehicle(self, distToVehicleAhead);
-        double lightAcc = handleRedLight(self, distToLight, isRed);
+    public void decide(Vehicle self, double distAhead, double speedAhead, double distLight, 
+    		boolean isRed, boolean canRight, boolean canLeft) {
+        double freeWayAcc = handleFreeWay(self, distAhead);
+        double followAcc = handleFollowVehicle(self, distAhead, speedAhead);
+        double lightAcc = handleRedLight(self, distLight, isRed);
         double finalAcc = Math.min(freeWayAcc, Math.min(followAcc, lightAcc));
         self.applyAcceleration(finalAcc);
+        
+        int offset = 0;
+        if (handleLaneChange(self, distAhead, speedAhead)) {
+            if (canLeft) offset = -1;
+            else if (canRight) offset = 1;
+        }
+        
+        self.setPendingLaneChange(offset); 
     }
+    
+
     
     protected double calculateBrakeToStop(double currentSpeed, double distance) {
         if (distance <= 0.5) return 0;
         double targetAcc = -(currentSpeed * currentSpeed) / (2 * distance);
         return Math.max(brakeStrong, targetAcc);
-    }
-    
-    protected int attemptLaneChange(boolean canChangeToRight, boolean canChangeToLeft) {
-        if (canChangeToRight) return 1;
-        else if (canChangeToLeft) return -1;
-        else return 0;
     }
 
     protected double handleFreeWay(Vehicle self, double distToVehicleAhead) {
@@ -41,13 +45,12 @@ public abstract class DriverBehavior {
         return 0.0;
     }
     
-    protected double handleFollowVehicle(Vehicle self, double distToVehicleAhead) {
-    	if (distToVehicleAhead < 0) return Double.MAX_VALUE;
+    protected double handleFollowVehicle(Vehicle self, double distAhead, double speedAhead) {
+    	if (distAhead < 0) return Double.MAX_VALUE;
     	
         double safetyGap = self.getSpeed() * this.safeTimeGap;
 
-        if (distToVehicleAhead < safetyGap / 2) return this.brakeStrong;
-        else if (distToVehicleAhead < safetyGap) return this.brakeNormal;
+        if (distAhead < safetyGap) return self.getSpeed() > speedAhead ? brakeNormal : brakeStrong;
         else return this.accNormal;
         
     }
@@ -57,18 +60,19 @@ public abstract class DriverBehavior {
         return this.calculateBrakeToStop(self.getSpeed(), distance);
     }
     
-    protected int handleLaneChange(Vehicle self, double distTovehicleAhead) {
+    protected boolean handleLaneChange(Vehicle self, double distTovehicleAhead, double speedAhead) {
     	if (distTovehicleAhead > 0) {
             double targetSpeed = self.getMaxSpeed() * this.speedRatio;
             
-            if (distTovehicleAhead < targetSpeed * this.safeTimeGap && ahead.getSpeed() < targetSpeed * this.overtakeThreshold) {
-                return attemptLaneChange;
-            }
+            if (distTovehicleAhead < targetSpeed * this.safeTimeGap 
+            		&& speedAhead < targetSpeed * this.overtakeThreshold)
+            	return true;
+            return false;
         }
+    	return false;
     }
     
     protected void handleEmergency(Vehicle self) {
-    	attemptLaneChange(self);
     }
     
     public abstract String getBehaviorName();

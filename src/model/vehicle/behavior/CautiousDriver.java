@@ -14,7 +14,9 @@ public class CautiousDriver extends DriverBehavior {
     }
 
     @Override
-    protected void handleLaneChange(Vehicle self, Vehicle ahead) {}
+    protected boolean handleLaneChange(Vehicle self, double DistAhead, double speedAhead) {
+    	return false;
+    }
 
     @Override
     public String getBehaviorName() {
