@@ -1,7 +1,8 @@
 package model.vehicle;
 
 import model.vehicle.behavior.DriverBehavior;
-import model.map.*;
+import model.utility.TrafficPoint;
+import model.utility.TrafficVector;
 
 public class Bus extends Vehicle {
     private static final String DEFAULT_SOUND = "BusSound.wav";
@@ -9,15 +10,17 @@ public class Bus extends Vehicle {
     private static final double DEFAULT_LENGTH = 70.0;
     private static final double DEFAULT_MAX_SPEED = 70.0;
 
-    public Bus(Point position, Lane currentLane, DriverBehavior behavior) {
-        super("Bus", DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND, behavior);
-        this.isEmergency = false;
-        this.position = position;
-        this.currentLane = currentLane;
+    public Bus(TrafficPoint position, TrafficVector direction, DriverBehavior behavior) {
+ 	   super(DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND);
+ 	   this.type = "Car";
+ 	   this.isEmergency = false;
+ 	   this.position = position;
+ 	   this.direction = direction;
+ 	   this.behavior = behavior;
     }
 
-    public Bus(Point position, Lane currentLane) {
-        this(position, currentLane, new model.vehicle.behavior.NormalDriver());
+    public Bus(TrafficPoint position, TrafficVector direction) {
+ 	   this(position, direction, new model.vehicle.behavior.NormalDriver());
     }
 
     public String toString() {
