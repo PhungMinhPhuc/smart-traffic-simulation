@@ -1,26 +1,25 @@
 package model.vehicle;
 
-// import model.vehicle.behavior.DriverBehavior;
-import model.utility.TrafficPoint;
-import model.utility.TrafficVector;
-import config.Constants;
+import model.vehicle.behavior.DriverBehavior;
+import model.map.*;
 
 public class Car extends Vehicle {
+    private static final String DEFAULT_SOUND = "CarSound.wav";
+    private static final double DEFAULT_WIDTH = 20.0;
+    private static final double DEFAULT_LENGTH = 40.0;
+    private static final double DEFAULT_MAX_SPEED = 100.0;
+    
+   public Car(Point position, Lane currentLane, DriverBehavior behavior) {
+	   super("Car", DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND, behavior);
+	   this.isEmergency = false;
+	   this.position = position;
+	   this.currentLane = currentLane;
+   }
 
-    public Car() {
-        super("Car", Constants.CAR_MAX_SPEED, Constants.CAR_LENGTH, Constants.CAR_WIDTH, Constants.CAR_SOUND);
-        this.isEmergency = false;
-    }
-
-    public Car(TrafficPoint position, TrafficVector direction) {
-        super("Car", Constants.CAR_MAX_SPEED, Constants.CAR_LENGTH, Constants.CAR_WIDTH, Constants.CAR_SOUND);
-        this.position = position;
-        this.direction = direction.clone();
-        this.speed = 1000.0;
-        this.isEmergency = false;
-    }
-
-    @Override
+   public Car(Point position, Lane currentLane) {
+	   this(position, currentLane, new model.vehicle.behavior.NormalDriver());
+   }
+   
     public String toString() {
         return "Car [" + behavior.getBehaviorName() + "]";
     }
