@@ -12,9 +12,9 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		
 		try {
-			Parent root = FXMLLoader.load(getClass().getResource("/MainScene.fxml"));
+			Parent root = FXMLLoader.load(getClass().getResource("/main/resources/MainScene.fxml"));
 			Scene scene = new Scene(root);
-			scene.getStylesheets().add(getClass().getResource("/MainSceneStyle.css").toExternalForm());
+			scene.getStylesheets().add(getClass().getResource("/main/resources/MainSceneStyle.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.setMaximized(true);
 			primaryStage.show();
