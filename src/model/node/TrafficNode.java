@@ -317,7 +317,6 @@ public abstract class TrafficNode implements IVehicleTransition {
                         vehicle.setPosition(path.getEndPoint().clone());
                         // Set vehicle direction to match the lane's direction
                         vehicle.setDirection(new TrafficVector(nextLane.getStartPoint(), nextLane.getEndPoint()));
-                        vehicle.setCurrentLane(nextLane);
                         nextLane.addVehicle(vehicle);
                     }
                     vehicleIterator.remove();

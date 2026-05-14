@@ -45,15 +45,17 @@ public final class Constants {
     public static final double SPACING = 15;
 
     // TRAFFIC LIGHT TIMING
-    public static final int GREEN_TIME = 30;
+    public static final int GREEN_TIME = 10;
     public static final int YELLOW_TIME = 3;
-    public static final int RED_TIME = 30;
+    public static final int RED_TIME = 10;
 
-    public static final double GREEN_DURATION = 30.0; // Seconds
+    public static final double GREEN_DURATION = 10.0; // Seconds
     public static final double YELLOW_DURATION = 3.0;
-    public static final double RED_DURATION = 30.0;
+    public static final double RED_DURATION = 10.0;
 
     // VEHICLE CONFIG
+    public static final double SAFE_DISTANCE = 100.0;
+    public static final double MUST_STOP_DISTANCE = 40.0;
 
     // CAR CONFIG
     public static final double CAR_WIDTH = 30.0;

@@ -23,8 +23,7 @@ public class Lane {
     public void addVehicle(Vehicle vehicle) {
         if (!vehicleList.contains(vehicle)) {
             vehicleList.add(vehicle);
-            vehicle.setCurrentLane(this);
-            vehicle.setDirection(startPoint, endPoint);
+            vehicle.setDirection(new model.utility.TrafficVector(startPoint, endPoint));
             vehicle.setPosition(startPoint.clone());
         }
     }
