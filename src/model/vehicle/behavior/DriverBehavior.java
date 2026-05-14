@@ -16,7 +16,7 @@ public abstract class DriverBehavior {
     		boolean isRed, boolean canRight, boolean canLeft) {
         double freeWayAcc = handleFreeWay(self, distAhead);
         double followAcc = handleFollowVehicle(self, distAhead, speedAhead);
-        double lightAcc = handleRedLight(self, distLight, isRed);
+        double lightAcc = handleRedLight(self,distAhead, distLight, isRed);
         double finalAcc = Math.min(freeWayAcc, Math.min(followAcc, lightAcc));
         self.applyAcceleration(finalAcc);
         
@@ -28,17 +28,16 @@ public abstract class DriverBehavior {
         
         self.setPendingLaneChange(offset); 
     }
-    
-
-    
+   
     protected double calculateBrakeToStop(double currentSpeed, double distance) {
         if (distance <= 0.5) return 0;
         double targetAcc = -(currentSpeed * currentSpeed) / (2 * distance);
         return Math.max(brakeStrong, targetAcc);
     }
 
-    protected double handleFreeWay(Vehicle self, double distToVehicleAhead) {
-    	if (distToVehicleAhead >= 0) return Double.MAX_VALUE;
+    protected double handleFreeWay(Vehicle self, double distAhead) {
+    	if (distAhead >= 0) return Double.MAX_VALUE;
+    	else if (distAhead <= 3) self.setSpeed(0.0);
         double targetSpeed = self.getMaxSpeed() * this.speedRatio;
         if (self.getSpeed() < targetSpeed) return this.accNormal;
         else if (self.getSpeed() > targetSpeed) return this.brakeNormal;
@@ -55,16 +54,17 @@ public abstract class DriverBehavior {
         
     }
     
-    protected double handleRedLight(Vehicle self, double distance, boolean isRed) {
+    protected double handleRedLight(Vehicle self, double distAhead, double distLight, boolean isRed) {
+    	double distance = distAhead > distLight ? distAhead : distLight;
         if (!isRed || distance > sightDistance) return Double.MAX_VALUE;
         return this.calculateBrakeToStop(self.getSpeed(), distance);
     }
     
-    protected boolean handleLaneChange(Vehicle self, double distTovehicleAhead, double speedAhead) {
-    	if (distTovehicleAhead > 0) {
+    protected boolean handleLaneChange(Vehicle self, double distAhead, double speedAhead) {
+    	if (distAhead > 0) {
             double targetSpeed = self.getMaxSpeed() * this.speedRatio;
             
-            if (distTovehicleAhead < targetSpeed * this.safeTimeGap 
+            if (distAhead < targetSpeed * this.safeTimeGap 
             		&& speedAhead < targetSpeed * this.overtakeThreshold)
             	return true;
             return false;

@@ -24,7 +24,7 @@ public class AggressiveDriver extends DriverBehavior {
     }
     
     @Override
-    protected double handleRedLight(Vehicle self, double distance, boolean isRed) {
+    protected double handleRedLight(Vehicle self, double distAhead, double distLight, boolean isRed) {
         return Double.MAX_VALUE;
     }
 
