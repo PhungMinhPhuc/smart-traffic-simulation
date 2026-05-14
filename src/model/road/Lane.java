@@ -1,6 +1,7 @@
 package model.road;
 
 import model.utility.TrafficPoint;
+import model.utility.TrafficVector;
 import model.vehicle.Vehicle;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +24,7 @@ public class Lane {
     public void addVehicle(Vehicle vehicle) {
         if (!vehicleList.contains(vehicle)) {
             vehicleList.add(vehicle);
-            vehicle.setCurrentLane(this);
-            vehicle.setDirection(startPoint, endPoint);
+            vehicle.setDirection(new TrafficVector(startPoint, endPoint));
             vehicle.setPosition(startPoint.clone());
         }
     }

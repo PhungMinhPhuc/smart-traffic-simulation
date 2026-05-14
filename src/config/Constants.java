@@ -54,6 +54,8 @@ public final class Constants {
     public static final double RED_DURATION = 30.0;
 
     // VEHICLE CONFIG
+    public static final double SAFE_DISTANCE = 100.0;
+    public static final double MUST_STOP_DISTANCE = 40.0;
 
     // CAR CONFIG
     public static final double CAR_WIDTH = 30.0;

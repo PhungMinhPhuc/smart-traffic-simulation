@@ -83,7 +83,6 @@ public class Road implements IVehicleTransition {
                     Path chosenPath = ((Junction) targetNode).getRandomPathFromPoint(lane.getEndPoint());
 
                     if (chosenPath != null) {
-                        vehicle.setCurrentLane(null); // Clear lane context — vehicle is now on a path
                         vehicle.setPosition(chosenPath.getStartPoint().clone());
                         vehicle.setDirection(new TrafficVector(chosenPath.getStartPoint(), chosenPath.getEndPoint()));
                         chosenPath.addVehicle(vehicle);

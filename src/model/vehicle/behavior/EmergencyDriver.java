@@ -1,60 +1,28 @@
 package model.vehicle.behavior;
 
 import model.vehicle.Vehicle;
-import model.traffic.LightState;
 
-public class EmergencyDriver implements DriverBehavior {
-    private final double MIN_SAFE_DISTANCE = 15.0;
-    private final double SAFE_DISTANCE = 60.0;
-    private final double EMERGENCY_ACCELERATION = 2.5; 
-    private final double EMERGENCY_BRAKING = -5.0; // Acceleration when braking
+public class EmergencyDriver extends DriverBehavior{
+	 public EmergencyDriver() {
+		super(1, 20.0, -40.0); //double maxSpeedRatio, double speedUpAcceleration, double brakeAccelearation
+	}
 
-    @Override
-    public double decideAcceleration(Vehicle self, Vehicle ahead) {
-        double currentSpeed = self.getSpeed();
-
-        // Ignore Traffic Lights
-
-        // Handling Obstacles (Vehicles ahead)
-        if (ahead != null) {
-            double distance = self.getPosition().distanceTo(ahead.getPosition());
-            
-            if (distance < MIN_SAFE_DISTANCE) {
-                return EMERGENCY_BRAKING;
-            }
-            else if (distance < SAFE_DISTANCE) {
-                // If someone is in front, slow down slightly but keep pressure and wait for them to yield (move aside)
-                return (ahead.getSpeed() - currentSpeed) * 0.5;
-            }
-        }
-
-        // Maximum Pursuit: Try to reach max speed quickly
-        if (currentSpeed < self.getMaxSpeed()) {
-            return EMERGENCY_ACCELERATION;
-        }
-
-        return 0;
-    }
-
-    // Priority vehicles pass through red lights.
-    @Override
-    public double onRedLight(Vehicle self, LightState state, double distanceToLight) {
-        return 0.5; // Small positive acceleration to keep moving
-    }
-
-    // Emergency vehicles don't yield to others; they are the priority.
-    @Override
-    public void onEmergency(Vehicle self, Vehicle otherEmergency) {
-    }
-
-    // Aggressive Lane Changing. Logic: If a lane is blocked, an ambulance should change lanes immediately
-    @Override
-    public boolean shouldChangeLane(Vehicle self, Vehicle ahead) {
-        return (ahead != null);
-    }
-
-    @Override
-    public String getBehaviorName() {
-        return "Emergency";
-    }
+	 @Override
+	 protected double handleFreeLane(Vehicle self, double distAhead) {
+	    	if (distAhead >= 0) return Double.MAX_VALUE;
+	        double targetSpeed = self.getMaxSpeed() * this.maxSpeedRatio;
+	        if (self.getSpeed() < targetSpeed) return this.speedUpAcceleration;
+	        else if (self.getSpeed() > targetSpeed) return this.brakeAccelearation;
+	        return 0.0;
+	    }
+	 
+	 @Override
+	    protected double handleRedLight(Vehicle self, double distLight, boolean isRed) {
+	        return Double.MAX_VALUE;
+	    }
+	 
+	 @Override
+	 public String getBehaviorName(){
+		 return "Emergency";
+	 }
 }

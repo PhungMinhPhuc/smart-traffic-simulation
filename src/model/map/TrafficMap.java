@@ -5,8 +5,7 @@ import model.node.*;
 import model.road.*;
 import model.utility.*;
 import model.vehicle.*;
-import model.vehicle.behavior.*;
-import model.traffic.TrafficLight;
+import model.traffic.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,19 +93,39 @@ public class TrafficMap {
 		// Add a default vehicle to the first lane of the way
 		Lane lane = way.getLaneList().get(0);
 		Vehicle vehicle = new Car(lane.getStartPoint().clone(),
-				new TrafficVector(lane.getStartPoint(), lane.getEndPoint()), new NormalDriver());
+				new TrafficVector(lane.getStartPoint(), lane.getEndPoint()));
 		lane.addVehicle(vehicle);
 	}
 
 	// Update the position of all vehicles in the map, this method will be called in
 	// each time step of the simulation
 	public void updateVehicles(double timeInterval) {
-		for (Vehicle vehicle : getVehicleList()) {
-			vehicle.update(timeInterval);
-		}
-
+		// Update Junction logic
 		for (TrafficNode node : nodeList) {
 			node.update(timeInterval);
+		}
+		// Update Vehicles on Roads
+		for (Road road : roadList) {
+			updateWay(road.getRightWay(), timeInterval);
+			updateWay(road.getLeftWay(), timeInterval);
+		}
+
+		// Update Vehicles on Junction Paths
+		for (TrafficNode node : nodeList) {
+			for (Path path : node.getPathList()) {
+				List<Vehicle> pathVehicles = path.getVehicleList();
+				for (int i = 0; i < pathVehicles.size(); i++) {
+					Vehicle v = pathVehicles.get(i);
+					Vehicle ahead = (i == 0) ? null : pathVehicles.get(i - 1);
+
+					double distAhead = (ahead == null) ? -1 : v.getPosition().distanceTo(ahead.getPosition());
+					double speedAhead = (ahead == null) ? 0 : ahead.getSpeed();
+
+					// On a path inside a junction, we assume no red lights (already cleared)
+					// and no lane changes.
+					v.update(distAhead, speedAhead, 1000.0, false, false, false, false, timeInterval);
+				}
+			}
 		}
 
 		// Transition vehicles between roads and paths
@@ -116,6 +135,30 @@ public class TrafficMap {
 
 		for (TrafficNode node : nodeList) {
 			node.transitionVehicles();
+		}
+	}
+
+	private void updateWay(Way way, double dt) {
+		List<Lane> lanes = way.getLaneList();
+		boolean isRed = (way.getTrafficLight() != null && way.getTrafficLight().getCurrentState() == LightState.RED);
+
+		for (int l = 0; l < lanes.size(); l++) {
+			Lane lane = lanes.get(l);
+			List<Vehicle> vehicles = lane.getVehicleList();
+
+			for (int i = 0; i < vehicles.size(); i++) {
+				Vehicle v = vehicles.get(i);
+				Vehicle ahead = (i == 0) ? null : vehicles.get(i - 1);
+
+				double distAhead = (ahead == null) ? -1 : v.getPosition().distanceTo(ahead.getPosition());
+				double speedAhead = (ahead == null) ? 0 : ahead.getSpeed();
+				double distLight = v.getPosition().distanceTo(lane.getEndPoint());
+
+				boolean canLeft = (l > 0);
+				boolean canRight = (l < lanes.size() - 1);
+
+				v.update(distAhead, speedAhead, distLight, isRed, canRight, canLeft, false, dt);
+			}
 		}
 	}
 
@@ -163,8 +206,10 @@ public class TrafficMap {
 	public ArrayList<TrafficLight> getTrafficLightList() {
 		ArrayList<TrafficLight> trafficLightList = new ArrayList<>();
 		for (Road road : roadList) {
-			trafficLightList.add(road.getRightWay().getTrafficLight());
-			trafficLightList.add(road.getLeftWay().getTrafficLight());
+			if (road.getRightWay().getTrafficLight() != null)
+				trafficLightList.add(road.getRightWay().getTrafficLight());
+			if (road.getLeftWay().getTrafficLight() != null)
+				trafficLightList.add(road.getLeftWay().getTrafficLight());
 		}
 		return trafficLightList;
 	}
