@@ -37,7 +37,6 @@ public abstract class DriverBehavior {
 
     protected double handleFreeWay(Vehicle self, double distAhead) {
     	if (distAhead >= 0) return Double.MAX_VALUE;
-    	else if (distAhead <= 3) self.setSpeed(0.0);
         double targetSpeed = self.getMaxSpeed() * this.speedRatio;
         if (self.getSpeed() < targetSpeed) return this.accNormal;
         else if (self.getSpeed() > targetSpeed) return this.brakeNormal;
@@ -46,6 +45,7 @@ public abstract class DriverBehavior {
     
     protected double handleFollowVehicle(Vehicle self, double distAhead, double speedAhead) {
     	if (distAhead < 0) return Double.MAX_VALUE;
+    	else if (distAhead <= 3) self.setSpeed(0.0);
     	
         double safetyGap = self.getSpeed() * this.safeTimeGap;
 
@@ -55,7 +55,7 @@ public abstract class DriverBehavior {
     }
     
     protected double handleRedLight(Vehicle self, double distAhead, double distLight, boolean isRed) {
-    	double distance = distAhead > distLight ? distAhead : distLight;
+    	double distance = distAhead < distLight ? distAhead : distLight;
         if (!isRed || distance > sightDistance) return Double.MAX_VALUE;
         return this.calculateBrakeToStop(self.getSpeed(), distance);
     }

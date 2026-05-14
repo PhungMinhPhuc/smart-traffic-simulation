@@ -49,12 +49,14 @@ public abstract class Vehicle {
     }
     
     private void applyPhysics(double deltaTime) {
+    	//calculate speed 
         speed += acceleration * deltaTime;
         if (speed > maxSpeed * behavior.getSpeedRatio()) speed = maxSpeed * behavior.getSpeedRatio();
         else if (speed < 0) speed = 0;
-     
+        //move
+    	position = direction.translatePoint(position, deltaTime * speed);
     }
-
+    
 	public String getId() {
 		return id;
 	}
