@@ -1,27 +1,34 @@
 package model.vehicle.behavior;
 
 import model.vehicle.Vehicle;
+import config.Constants;
 
 public abstract class DriverBehavior {
-	protected double speedRatio;       // Tỉ lệ tốc độ mong muốn so với maxSpeed
-    protected double safeTimeGap;      // Khoảng cách an toàn tính bằng giây
-    protected double accStrong;		   // Gia tốc tăng tốc gấp
-    protected double accNormal;        // Gia tốc tăng tốc bình thường
-    protected double brakeNormal;      // Gia tốc phanh bình thường
-    protected double brakeStrong;      // Gia tốc phanh gấp
-    protected double sightDistance;    // Tầm nhìn xa để phản ứng
-    protected double overtakeThreshold; // Ngưỡng tốc độ xe trước để quyết định vượt
-
+	protected double maxSpeedRatio;       		// Tỉ lệ tốc độ mong muốn so với maxSpeed
+    protected double speedUpAcceleration;        // Gia tốc tăng tốc bình thường
+    protected double brakeAccelearation;      	// Gia tốc phanh bình thường
+    
+    public DriverBehavior(double speedRatio, double speedUpAcceleration, double brakeAccelearation){
+    	this.maxSpeedRatio = speedRatio;
+    	this.speedUpAcceleration = speedUpAcceleration;
+    	this.brakeAccelearation = brakeAccelearation;
+    }
+    
     public void decide(Vehicle self, double distAhead, double speedAhead, double distLight, 
-    		boolean isRed, boolean canRight, boolean canLeft) {
-        double freeWayAcc = handleFreeWay(self, distAhead);
-        double followAcc = handleFollowVehicle(self, distAhead, speedAhead);
-        double lightAcc = handleRedLight(self,distAhead, distLight, isRed);
-        double finalAcc = Math.min(freeWayAcc, Math.min(followAcc, lightAcc));
-        self.applyAcceleration(finalAcc);
+    		boolean isRed, boolean canRight, boolean canLeft, boolean onEmergency) {
+        double freeWayAcceleration = handleFreeLane(self, distAhead);
+        double aheadAcceleration = handleAheadVehicle(self, distAhead, speedAhead);
+        double lightAcceleration = handleRedLight(self, distLight, isRed);
+        double finalAccleration = Math.min(freeWayAcceleration, Math.min(aheadAcceleration, lightAcceleration));
+        self.applyAcceleration(finalAccleration);
         
         int offset = 0;
-        if (handleLaneChange(self, distAhead, speedAhead)) {
+        
+        if (onEmergency) {
+        	if (canLeft) offset = -1;
+            else if (canRight) offset = 1;
+        }
+        else if (handleLaneChange(self, distAhead, speedAhead)) {
             if (canLeft) offset = -1;
             else if (canRight) offset = 1;
         }
@@ -30,55 +37,52 @@ public abstract class DriverBehavior {
     }
    
     protected double calculateBrakeToStop(double currentSpeed, double distance) {
-        if (distance <= 0.5) return 0;
+        if (distance <= Constants.MUST_STOP_DISTANCE) return 0;
         double targetAcc = -(currentSpeed * currentSpeed) / (2 * distance);
-        return Math.max(brakeStrong, targetAcc);
+        return Math.max(brakeAccelearation, targetAcc);
     }
 
-    protected double handleFreeWay(Vehicle self, double distAhead) {
+    protected double handleFreeLane(Vehicle self, double distAhead) {
     	if (distAhead >= 0) return Double.MAX_VALUE;
-        double targetSpeed = self.getMaxSpeed() * this.speedRatio;
-        if (self.getSpeed() < targetSpeed) return this.accNormal;
-        else if (self.getSpeed() > targetSpeed) return this.brakeNormal;
+        double targetSpeed = self.getMaxSpeed() * this.maxSpeedRatio;
+        if (self.getSpeed() < targetSpeed) return speedUpAcceleration;
+        else if (self.getSpeed() > targetSpeed) return brakeAccelearation;
         return 0.0;
     }
     
-    protected double handleFollowVehicle(Vehicle self, double distAhead, double speedAhead) {
+    protected double handleAheadVehicle(Vehicle self, double distAhead, double speedAhead) {
     	if (distAhead < 0) return Double.MAX_VALUE;
-    	else if (distAhead <= 3) self.setSpeed(0.0);
-    	
-        double safetyGap = self.getSpeed() * this.safeTimeGap;
+    	else if (distAhead <= Constants.MUST_STOP_DISTANCE) self.setSpeed(0.0);
 
-        if (distAhead < safetyGap) return self.getSpeed() > speedAhead ? brakeNormal : brakeStrong;
-        else return this.accNormal;
+        if (distAhead < Constants.SAFE_DISTANCE) return brakeAccelearation;
+        else return speedUpAcceleration;
         
     }
     
-    protected double handleRedLight(Vehicle self, double distAhead, double distLight, boolean isRed) {
-    	double distance = distAhead < distLight ? distAhead : distLight;
-        if (!isRed || distance > sightDistance) return Double.MAX_VALUE;
-        return this.calculateBrakeToStop(self.getSpeed(), distance);
+    protected double handleRedLight(Vehicle self, double distLight, boolean isRed) {
+        if (!isRed || distLight > Constants.SAFE_DISTANCE) return Double.MAX_VALUE;
+        else if (distLight <= Constants.MUST_STOP_DISTANCE) self.setSpeed(0.0);
+        return this.calculateBrakeToStop(self.getSpeed(), distLight);
     }
     
     protected boolean handleLaneChange(Vehicle self, double distAhead, double speedAhead) {
     	if (distAhead > 0) {
-            double targetSpeed = self.getMaxSpeed() * this.speedRatio;
-            
-            if (distAhead < targetSpeed * this.safeTimeGap 
-            		&& speedAhead < targetSpeed * this.overtakeThreshold)
+            if (distAhead < Constants.SAFE_DISTANCE
+            		&& speedAhead < self.getSpeed())
             	return true;
             return false;
         }
     	return false;
     }
     
-    protected void handleEmergency(Vehicle self) {
+    protected boolean handleEmergency(boolean onEmergency) {
+    	return onEmergency;
     }
     
     public abstract String getBehaviorName();
 
 	public double getSpeedRatio() {
-		return speedRatio;
+		return maxSpeedRatio;
 	}
     
     

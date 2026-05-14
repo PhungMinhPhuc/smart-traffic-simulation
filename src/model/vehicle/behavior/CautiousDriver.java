@@ -4,13 +4,9 @@ import model.vehicle.Vehicle;
 
 public class CautiousDriver extends DriverBehavior {
     public CautiousDriver() {
-        this.speedRatio = 0.6;      
-        this.safeTimeGap = 3.0;    
-        this.accNormal = 0.8;       
-        this.accStrong = 1.5;       
-        this.brakeNormal = -1.2;    
-        this.brakeStrong = -2.5;    
-        this.sightDistance = 200.0; 
+        this.maxSpeedRatio = 0.6;      
+        this.speedUpAcceleration = 0.8;            
+        this.brakeAccelearation = -1.2;     
     }
 
     @Override

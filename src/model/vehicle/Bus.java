@@ -11,7 +11,7 @@ public class Bus extends Vehicle {
     private static final double DEFAULT_MAX_SPEED = 70.0;
 
     public Bus(TrafficPoint position, TrafficVector direction, DriverBehavior behavior) {
-	   super("Car", DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND,
+	   super("Bus", DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND,
 			   position, direction, behavior);
    }
 

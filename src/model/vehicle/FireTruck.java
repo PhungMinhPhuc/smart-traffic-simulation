@@ -11,7 +11,7 @@ public class FireTruck extends Vehicle {
     private static final double DEFAULT_MAX_SPEED = 110.0;
 
     public FireTruck(TrafficPoint position, TrafficVector direction, DriverBehavior behavior) {
-	   super("Car", DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND,
+	   super("FireTruck", DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND,
 			   position, direction, behavior);
    }
 

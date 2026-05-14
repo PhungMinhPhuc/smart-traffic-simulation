@@ -3,34 +3,27 @@ package model.vehicle.behavior;
 import model.vehicle.Vehicle;
 
 public class AggressiveDriver extends DriverBehavior {
-    public AggressiveDriver() {
-        this.speedRatio = 1.0;      
-        this.safeTimeGap = 1;    
-        this.accNormal = 2.0;       
-        this.accStrong = 4.0;   
-        this.brakeNormal = -2.0;    
-        this.brakeStrong = -4.0;   
-        this.sightDistance = 200.0;
-        this.overtakeThreshold = 0.9;
-    }
+	public AggressiveDriver() {
+		super(1, 40.0, -40.0); //double speedRatio, double speedUpAcceleration, double brakeAccelearation
+	}
 
     @Override
-    protected double handleFreeWay(Vehicle self, double distToVehicleAhead) {
+    protected double handleFreeLane(Vehicle self, double distToVehicleAhead) {
     	if (distToVehicleAhead >= 0) return Double.MAX_VALUE;
-        double targetSpeed = self.getMaxSpeed() * this.speedRatio;
-        if (self.getSpeed() < targetSpeed) return this.accStrong;
-        else if (self.getSpeed() > targetSpeed) return this.brakeNormal;
+        double targetSpeed = self.getMaxSpeed() * this.maxSpeedRatio;
+        if (self.getSpeed() < targetSpeed) return this.speedUpAcceleration;
+        else if (self.getSpeed() > targetSpeed) return this.brakeAccelearation;
         return 0.0;
     }
     
     @Override
-    protected double handleRedLight(Vehicle self, double distAhead, double distLight, boolean isRed) {
+    protected double handleRedLight(Vehicle self, double distLight, boolean isRed) {
         return Double.MAX_VALUE;
     }
 
     @Override
-    public void handleEmergency(Vehicle self) {
-    	
+    public boolean handleEmergency(boolean onEmergency) {
+    	return false;
     }
     
     @Override

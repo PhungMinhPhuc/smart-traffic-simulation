@@ -34,8 +34,8 @@ public abstract class Vehicle {
 }
 
     public void update(double distToVehicleAhead, double speedVehicleAhead, double distToLight, 
-    		boolean isRed, boolean canChangeToRight, boolean canChangeToLeft, double deltaTime) {
-        behavior.decide(this, distToVehicleAhead, speedVehicleAhead, distToLight, isRed, canChangeToRight, canChangeToLeft);
+    		boolean isRed, boolean canChangeToRight, boolean canChangeToLeft, boolean onEmergency, double deltaTime) {
+        behavior.decide(this, distToVehicleAhead, speedVehicleAhead, distToLight, isRed, canChangeToRight, canChangeToLeft, onEmergency);
         
         applyPhysics(deltaTime);
     }

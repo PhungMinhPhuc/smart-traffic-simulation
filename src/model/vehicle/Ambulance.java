@@ -11,7 +11,7 @@ public class Ambulance extends Vehicle {
     private static final double DEFAULT_MAX_SPEED = 120.0;
 
     public Ambulance(TrafficPoint position, TrafficVector direction, DriverBehavior behavior) {
-	   super("Car", DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND,
+	   super("Ambulance", DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND,
 			   position, direction, behavior);
    }
 
