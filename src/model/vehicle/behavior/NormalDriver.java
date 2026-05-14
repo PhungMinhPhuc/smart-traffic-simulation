@@ -1,8 +1,10 @@
 package model.vehicle.behavior;
 
+import config.Constants;
+
 public class NormalDriver extends DriverBehavior {
     public NormalDriver() {
-        super(0.8, 80.0, -80.0); // double maxSpeedRatio, double speedUpAcceleration, double brakeAccelearation
+        super(Constants.NORMAL_SPEED_RATIO, Constants.NORMAL_ACCELERATION, Constants.NORMAL_BRAKING);
     }
 
     @Override

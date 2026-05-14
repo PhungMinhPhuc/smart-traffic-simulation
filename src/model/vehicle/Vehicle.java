@@ -6,57 +6,77 @@ import model.utility.TrafficVector;
 import model.vehicle.behavior.DriverBehavior;
 
 public abstract class Vehicle {
-    protected String id;
-    protected String type;
-    protected TrafficPoint position;
-    protected double speed;
-    protected double acceleration;
-    protected double maxSpeed;
-    protected double length;
-    protected double width;
-    protected String sound;
-    protected DriverBehavior behavior;
-    protected boolean isEmergency;
-    protected TrafficVector direction;
-    protected int pendingLaneChange = 0;
+	protected String id;
+	protected String type;
+	protected TrafficPoint position;
+	protected double speed;
+	protected double acceleration;
+	protected double maxSpeed;
+	protected double length;
+	protected double width;
+	protected String sound;
+	protected DriverBehavior behavior;
+	protected boolean isEmergency;
+	protected TrafficVector direction;
+	protected int laneChangeDirection = 0; // -1: move left, 0: stay, 1: move right
 
-    public Vehicle(String type, double maxSpeed, double length, double width, String sound, 
-            TrafficPoint position, TrafficVector direction, DriverBehavior behavior) {
-    	 this.id = IdGenerator.vehicleId(type); 
-    	 this.type = type;
-    	 this.maxSpeed = maxSpeed;	
-    	 this.length = length;
-    	 this.width = width;
-    	 this.sound = sound;
-    	 this.position = position;
-    	 this.direction = direction;
-    	 this.behavior = behavior;
-}
+	public Vehicle(String type, double maxSpeed, double length, double width, String sound,
+			TrafficPoint position, TrafficVector direction, DriverBehavior behavior) {
+		this.id = IdGenerator.vehicleId(type);
+		this.type = type;
+		this.maxSpeed = maxSpeed;
+		this.length = length;
+		this.width = width;
+		this.sound = sound;
+		this.position = position;
+		this.direction = direction;
+		this.behavior = behavior;
+	}
 
-    public void update(double distToVehicleAhead, double speedVehicleAhead, double distToLight, 
-    		boolean isRed, boolean canChangeToRight, boolean canChangeToLeft, boolean onEmergency, double deltaTime) {
-        behavior.decide(this, distToVehicleAhead, speedVehicleAhead, distToLight, isRed, canChangeToRight, canChangeToLeft, onEmergency);
+	// This method updates the vehicle by first asking the driver to 'decide' a plan 
+    // and then moving the vehicle physically using 'applyPhysics'
+	public void update(double distanceToVehicleAhead, 
+                       double speedOfVehicleAhead, 
+                       double distanceToLight,
+			           boolean isRed, 
+                       boolean canRight, 
+                       boolean canLeft, 
+                       boolean onEmergency, 
+                       double deltaTime) {
         
-        applyPhysics(deltaTime);
-    }
-    
-    public void applyAcceleration(double a) {
-    	this.acceleration = a;
-    }
-    
-    public void clearPendingLaneChange() {
-        this.pendingLaneChange = 0;
-    }
-    
-    private void applyPhysics(double deltaTime) {
-    	//calculate speed 
-        speed += acceleration * deltaTime;
-        if (speed > maxSpeed * behavior.getSpeedRatio()) speed = maxSpeed * behavior.getSpeedRatio();
-        else if (speed < 0) speed = 0;
-        //move
-    	position = direction.translatePoint(position, deltaTime * speed);
-    }
-    
+		behavior.decide(this, 
+                        distanceToVehicleAhead, 
+                        speedOfVehicleAhead, 
+                        distanceToLight, 
+                        isRed, 
+                        canRight,
+				        canLeft, 
+                        onEmergency);
+
+		applyPhysics(deltaTime);
+	}
+
+	public void applyAcceleration(double acceleration) {
+		this.acceleration = acceleration;
+	}
+
+	public void resetLaneChangeDirection() {
+		this.laneChangeDirection = 0;
+	}
+
+	private void applyPhysics(double deltaTime) {
+		speed += acceleration * deltaTime;
+        
+		double currentMaxSpeed = maxSpeed * behavior.getSpeedRatio();
+		if (speed > currentMaxSpeed) {
+			speed = currentMaxSpeed;
+		} else if (speed < 0) {
+			speed = 0;
+		}
+        
+		position = direction.translatePoint(position, deltaTime * speed);
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -129,11 +149,11 @@ public abstract class Vehicle {
 		this.direction = direction;
 	}
 
-	public int getPendingLaneChange() {
-		return pendingLaneChange;
+	public int getLaneChangeDirection() {
+		return laneChangeDirection;
 	}
 
-	public void setPendingLaneChange(int pendingLaneChange) {
-		this.pendingLaneChange = pendingLaneChange;
+	public void setLaneChangeDirection(int laneChangeDirection) {
+		this.laneChangeDirection = laneChangeDirection;
 	}
 }

@@ -3,20 +3,16 @@ package model.vehicle;
 import model.vehicle.behavior.DriverBehavior;
 import model.utility.TrafficPoint;
 import model.utility.TrafficVector;
+import config.Constants;
 
 public class FireTruck extends Vehicle {
-    private static final String DEFAULT_SOUND = "FireTruckSiren.wav";
-    private static final double DEFAULT_WIDTH = 30.0; 
-    private static final double DEFAULT_LENGTH = 85.0; 
-    private static final double DEFAULT_MAX_SPEED = 110.0;
-
     public FireTruck(TrafficPoint position, TrafficVector direction, DriverBehavior behavior) {
-	   super("FireTruck", DEFAULT_MAX_SPEED, DEFAULT_LENGTH, DEFAULT_WIDTH, DEFAULT_SOUND,
+	   super("FireTruck", Constants.FIRE_TRUCK_MAX_SPEED, Constants.FIRE_TRUCK_LENGTH, Constants.FIRE_TRUCK_WIDTH, Constants.FIRE_TRUCK_SOUND,
 			   position, direction, behavior);
    }
 
     public FireTruck(TrafficPoint position, TrafficVector direction) {
- 	   this(position, direction, new model.vehicle.behavior.EmergencyDriver());
+  	   this(position, direction, new model.vehicle.behavior.EmergencyDriver());
     }
 
     public String toString() {
