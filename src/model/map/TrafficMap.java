@@ -6,6 +6,7 @@ import model.road.*;
 import model.utility.*;
 import model.vehicle.*;
 import model.vehicle.behavior.*;
+import model.traffic.TrafficLight;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,27 +14,11 @@ import java.util.List;
 public class TrafficMap {
 	private List<TrafficNode> nodeList;
 	private List<Road> roadList;
-	private List<model.traffic.TrafficLight> trafficLightList;
 
 	public TrafficMap() {
 		this.nodeList = new ArrayList<>();
 		this.roadList = new ArrayList<>();
-		this.trafficLightList = new ArrayList<>();
 		System.out.println("Map created");
-	}
-
-	public void addTrafficLight(model.traffic.TrafficLight light) {
-		if (!trafficLightList.contains(light)) {
-			trafficLightList.add(light);
-		}
-	}
-
-	public List<model.traffic.TrafficLight> getTrafficLightList() {
-		List<model.traffic.TrafficLight> allLights = new ArrayList<>(trafficLightList);
-		for (TrafficNode node : nodeList) {
-			allLights.addAll(node.getTrafficLightList());
-		}
-		return allLights;
 	}
 
 	public void addNode(TrafficNode newNode) {
@@ -120,14 +105,8 @@ public class TrafficMap {
 			vehicle.update(timeInterval);
 		}
 
-		for (model.traffic.TrafficLight light : trafficLightList) {
-			light.update(timeInterval);
-		}
-
 		for (TrafficNode node : nodeList) {
-			for (model.traffic.TrafficLight light : node.getTrafficLightList()) {
-				light.update(timeInterval);
-			}
+			node.update(timeInterval);
 		}
 
 		// Transition vehicles between roads and paths
@@ -179,5 +158,14 @@ public class TrafficMap {
 			}
 		}
 		return null; // no node found at the point
+	}
+
+	public ArrayList<TrafficLight> getTrafficLightList() {
+		ArrayList<TrafficLight> trafficLightList = new ArrayList<>();
+		for (Road road : roadList) {
+			trafficLightList.add(road.getRightWay().getTrafficLight());
+			trafficLightList.add(road.getLeftWay().getTrafficLight());
+		}
+		return trafficLightList;
 	}
 }

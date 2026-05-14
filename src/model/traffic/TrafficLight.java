@@ -4,7 +4,6 @@ import config.Constants;
 import model.utility.TrafficPoint;
 import model.road.Lane;
 import java.util.ArrayList;
-import java.util.List;
 
 public class TrafficLight {
     private LightState currentState;
@@ -12,7 +11,6 @@ public class TrafficLight {
     private int displayMode; // 0: No timer, 1: Full timer, 2: Only show < 10s
     private TrafficPoint position;
     private double rotation; // In degrees
-    private List<Lane> controlledLanes;
 
     public TrafficLight(TrafficPoint position, int displayMode, double rotation) {
         this.position = position;
@@ -20,15 +18,14 @@ public class TrafficLight {
         this.internalTimer = Constants.RED_DURATION;
         this.displayMode = displayMode;
         this.rotation = rotation;
-        this.controlledLanes = new ArrayList<>();
     }
 
-    public void update(double deltaTime) {
+    public void update(double deltaTime, ArrayList<Lane> controlledLanes) {
         internalTimer -= deltaTime;
         if (internalTimer <= 0) {
             changeColor();
         }
-        syncLanes();
+        syncLanes(controlledLanes);
     }
 
     // Logic: Red -> Green -> Yellow -> Red
@@ -43,17 +40,15 @@ public class TrafficLight {
             setState(LightState.RED);
             internalTimer = Constants.RED_DURATION;
         }
-        syncLanes();
     }
 
-    public void addControlledLane(Lane lane) {
-        if (!controlledLanes.contains(lane)) {
-            controlledLanes.add(lane);
-            syncLanes();
-        }
+    public void setLightState(LightState state, double duration, ArrayList<Lane> controlledLanes) {
+        this.currentState = state;
+        this.internalTimer = duration;
+        syncLanes(controlledLanes);
     }
 
-    private void syncLanes() {
+    public void syncLanes(ArrayList<Lane> controlledLanes) {
         if (controlledLanes == null)
             return;
         boolean shouldStop = (currentState == LightState.RED || currentState == LightState.YELLOW);
@@ -71,7 +66,7 @@ public class TrafficLight {
         return String.valueOf((int) Math.ceil(internalTimer));
     }
 
-    public model.utility.TrafficPoint getPosition() {
+    public TrafficPoint getPosition() {
         return position;
     }
 

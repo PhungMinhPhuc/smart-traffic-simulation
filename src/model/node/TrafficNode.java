@@ -10,6 +10,7 @@ import model.transition.IVehicleTransition;
 import model.vehicle.Vehicle;
 import config.Constants;
 import model.traffic.TrafficLight;
+import model.traffic.LightState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,8 @@ public abstract class TrafficNode implements IVehicleTransition {
     protected TrafficPoint centerPoint;
     protected List<Road> roadList;
     protected List<Path> pathList;
-    protected List<TrafficLight> trafficLightList;
+    protected double phaseTimer = 0;
+    protected int currentPhaseIndex = 0;
     protected int pathCounter = 0;
     protected double radius;
 
@@ -29,7 +31,6 @@ public abstract class TrafficNode implements IVehicleTransition {
         this.centerPoint = (TrafficPoint) point.clone();
         this.roadList = new ArrayList<>();
         this.pathList = new ArrayList<>();
-        this.trafficLightList = new ArrayList<>();
         this.radius = Constants.JUNCTION_MIN_RADIUS;
     }
 
@@ -120,25 +121,13 @@ public abstract class TrafficNode implements IVehicleTransition {
             createPaths(getEntryWay(road), newExitWay);
         }
 
-        // Create and add traffic light for the new road's entry way
-        // Position it at the road's start/endpoint (interface with the junction)
-        if (!newEntryWay.getLaneList().isEmpty()) {
-            TrafficPoint stopLinePoint = newRoad.getStartNode().equals(this) ? newRoad.getStartPoint()
-                    : newRoad.getEndPoint();
-            TrafficVector direction = new TrafficVector(newEntryWay.getLaneList().get(0).getStartPoint(),
-                    newEntryWay.getLaneList().get(0).getEndPoint());
-            double angleDegrees = Math.toDegrees(direction.getAngle());
-
-            TrafficLight newLight = new TrafficLight(stopLinePoint, 1, angleDegrees);
-            for (Lane lane : newEntryWay.getLaneList()) {
-                newLight.addControlledLane(lane);
-            }
-            trafficLightList.add(newLight);
-        }
-
         roadList.add(newRoad);
         updateRadius(); // Recalculate radius based on widest road
         buildAllConflictPoints();
+
+        // Reset traffic light cycle when a new road is added
+        this.currentPhaseIndex = 0;
+        this.phaseTimer = 0;
     }
 
     /**
@@ -162,16 +151,13 @@ public abstract class TrafficNode implements IVehicleTransition {
                 || exitWay.getLaneList().stream()
                         .anyMatch(lane -> path.getEndPoint().equals(lane.getStartPoint())));
 
-        // Remove the traffic light associated with the entry way's stop line
-        if (!entryWay.getLaneList().isEmpty()) {
-            TrafficPoint stopLinePoint = roadToRemove.getStartNode().equals(this) ? roadToRemove.getStartPoint()
-                    : roadToRemove.getEndPoint();
-            trafficLightList.removeIf(light -> light.getPosition().equals(stopLinePoint));
-        }
-
         roadList.remove(roadToRemove);
         buildAllConflictPoints();
         updateRadius(); // Recalculate radius based on widest road
+
+        // Reset traffic light cycle when a road is removed
+        this.currentPhaseIndex = 0;
+        this.phaseTimer = 0;
     }
 
     public void buildAllConflictPoints() {
@@ -214,6 +200,106 @@ public abstract class TrafficNode implements IVehicleTransition {
                     return lane;
                 }
             }
+        }
+        return null;
+    }
+
+    public void update(double deltaTime) {
+        List<Road> roads = getRoadList();
+        if (roads.isEmpty())
+            return;
+
+        // Group entry lights into phases based on their angles
+        // Phase grouping: Roads with similar angles (difference ~180 deg) go together
+        List<List<TrafficLight>> phases = new ArrayList<>();
+        List<Road> processedRoads = new ArrayList<>();
+
+        for (Road road : roads) {
+            if (processedRoads.contains(road))
+                continue;
+
+            List<TrafficLight> currentPhaseLights = new ArrayList<>();
+            Way entry = getEntryWay(road);
+            if (entry.getTrafficLight() != null) {
+                currentPhaseLights.add(entry.getTrafficLight());
+            }
+            processedRoads.add(road);
+
+            // Find "opposite" roads (roughly 180 degrees apart)
+            TrafficVector v1 = new TrafficVector(entry.getLaneList().get(0).getStartPoint(),
+                    entry.getLaneList().get(0).getEndPoint());
+            double angle1 = Math.toDegrees(v1.getAngle());
+
+            for (Road other : roads) {
+                if (processedRoads.contains(other))
+                    continue;
+                Way otherEntry = getEntryWay(other);
+                if (otherEntry.getTrafficLight() == null)
+                    continue;
+
+                TrafficVector v2 = new TrafficVector(otherEntry.getLaneList().get(0).getStartPoint(),
+                        otherEntry.getLaneList().get(0).getEndPoint());
+                double angle2 = Math.toDegrees(v2.getAngle());
+
+                double diff = Math.abs(angle1 - angle2);
+                if (Math.abs(diff - 180) < 45 || Math.abs(diff + 180) < 45 || Math.abs(diff - 540) < 45) {
+                    currentPhaseLights.add(otherEntry.getTrafficLight());
+                    processedRoads.add(other);
+                }
+            }
+            if (!currentPhaseLights.isEmpty()) {
+                phases.add(currentPhaseLights);
+            }
+        }
+
+        if (phases.isEmpty())
+            return;
+
+        phaseTimer += deltaTime;
+
+        // Reset if roads were added/removed
+        if (currentPhaseIndex >= phases.size()) {
+            currentPhaseIndex = 0;
+            phaseTimer = 0;
+        }
+
+        double greenDuration = Constants.GREEN_DURATION;
+        double yellowDuration = Constants.YELLOW_DURATION;
+        double phaseDuration = greenDuration + yellowDuration;
+
+        for (int p = 0; p < phases.size(); p++) {
+            List<TrafficLight> phaseLights = phases.get(p);
+            if (p == currentPhaseIndex) {
+                if (phaseTimer < greenDuration) {
+                    for (TrafficLight l : phaseLights)
+                        l.setLightState(LightState.GREEN, greenDuration - phaseTimer, getLanesForLight(l));
+                } else if (phaseTimer < phaseDuration) {
+                    for (TrafficLight l : phaseLights)
+                        l.setLightState(LightState.YELLOW, phaseDuration - phaseTimer, getLanesForLight(l));
+                } else {
+                    for (TrafficLight l : phaseLights) {
+                        l.setLightState(LightState.RED, Constants.RED_DURATION, getLanesForLight(l));
+                    }
+                    currentPhaseIndex = (currentPhaseIndex + 1) % phases.size();
+                    phaseTimer = 0;
+                    // Immediately trigger next phase
+                    for (TrafficLight l : phases.get(currentPhaseIndex))
+                        l.setLightState(LightState.GREEN, greenDuration, getLanesForLight(l));
+                }
+            } else {
+                int phasesToWait = (p - currentPhaseIndex + phases.size()) % phases.size();
+                double timeUntilGreen = (phaseDuration - phaseTimer) + (phasesToWait - 1) * phaseDuration;
+                for (TrafficLight l : phaseLights)
+                    l.setLightState(LightState.RED, timeUntilGreen, getLanesForLight(l));
+            }
+        }
+    }
+
+    private ArrayList<Lane> getLanesForLight(TrafficLight light) {
+        for (Road road : roadList) {
+            Way entry = getEntryWay(road);
+            if (entry.getTrafficLight() == light)
+                return entry.getLaneList();
         }
         return null;
     }
@@ -269,7 +355,14 @@ public abstract class TrafficNode implements IVehicleTransition {
     }
 
     public List<model.traffic.TrafficLight> getTrafficLightList() {
-        return trafficLightList;
+        List<TrafficLight> lights = new ArrayList<>();
+        for (Road road : roadList) {
+            Way entry = getEntryWay(road);
+            if (entry.getTrafficLight() != null) {
+                lights.add(entry.getTrafficLight());
+            }
+        }
+        return lights;
     }
 
     public List<Path> getPathList() {

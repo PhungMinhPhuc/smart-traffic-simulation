@@ -3,17 +3,17 @@ package model.road;
 import java.util.ArrayList;
 import config.Constants;
 import model.traffic.LightState;
+import model.traffic.TrafficLight;
 import model.utility.TrafficPoint;
 import model.utility.TrafficVector;
 
 public class Way {
     private ArrayList<Lane> laneList = new ArrayList<Lane>();
-    private LightState stateTrafficLight;
+    private TrafficLight trafficLight;
     private String roadId;
 
     public Way(LightState lightState, int laneCount, boolean isRightWay, TrafficPoint roadStartPoint,
             TrafficPoint roadEndPoint, String roadId) {
-        this.stateTrafficLight = lightState;
         this.roadId = roadId;
         // Create lanes base on the lane count and the position of the road
         TrafficVector vectorRoad = new TrafficVector(roadStartPoint, roadEndPoint);
@@ -44,14 +44,29 @@ public class Way {
                 laneList.add(new Lane(i, laneStartPoint, laneEndPoint));
             }
         }
+
+        // Initialize TrafficLight at the end of the first lane (the stop line)
+        if (!laneList.isEmpty()) {
+            Lane firstLane = laneList.get(0);
+            TrafficVector direction = new TrafficVector(firstLane.getStartPoint(), firstLane.getEndPoint());
+            double angleDegrees = Math.toDegrees(direction.getAngle());
+            this.trafficLight = new TrafficLight(firstLane.getEndPoint(), 1, angleDegrees);
+            this.trafficLight.setState(lightState);
+        }
     }
 
-    public void setStateTrafficLight(LightState stateTrafficLight) {
-        this.stateTrafficLight = stateTrafficLight;
+    public void update(double deltaTime) {
+        if (trafficLight != null) {
+            trafficLight.update(deltaTime, laneList);
+        }
     }
 
-    public LightState getStateTrafficLight() {
-        return stateTrafficLight;
+    public TrafficLight getTrafficLight() {
+        return trafficLight;
+    }
+
+    public void setTrafficLight(TrafficLight trafficLight) {
+        this.trafficLight = trafficLight;
     }
 
     public ArrayList<Lane> getLaneList() {
