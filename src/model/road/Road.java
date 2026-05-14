@@ -18,6 +18,7 @@ public class Road implements IVehicleTransition {
     private TrafficNode startNode;
     private TrafficNode endNode;
     private String id;
+    private LaneChangeTransition laneChangeHandler;
 
     public Road(TrafficNode startNode, TrafficNode endNode, int laneCountPerWay, LightState lightStateRightWay,
             LightState lightStateLeftWay) {
@@ -37,6 +38,7 @@ public class Road implements IVehicleTransition {
         this.id = IdGenerator.roadId();
         this.rightWay = new Way(lightStateRightWay, laneCountPerWay, true, startPoint, endPoint, id);
         this.leftWay = new Way(lightStateLeftWay, laneCountPerWay, false, startPoint, endPoint, id);
+        this.laneChangeHandler = new LaneChangeTransition();
     }
 
     public Road(TrafficNode startNode, TrafficNode endNode) {
@@ -61,6 +63,7 @@ public class Road implements IVehicleTransition {
         // Default traffic light state: GREEN for both ways
         this.rightWay = new Way(LightState.GREEN, laneCountPerWay, true, startPoint, endPoint, id);
         this.leftWay = new Way(LightState.GREEN, laneCountPerWay, false, startPoint, endPoint, id);
+        this.laneChangeHandler = new LaneChangeTransition();
     }
 
     // Check if this road conflicts with another road (i.e., they intersect)
@@ -75,10 +78,17 @@ public class Road implements IVehicleTransition {
         return TrafficGeometry.intersectsRectangles(p1, q1, halfWidthThisRoad, p2, q2, halfWidthOtherRoad);
     }
 
+    public void updateLaneChanges(double deltaTime) {
+        laneChangeHandler.updateTransitions(deltaTime);
+    }
+
     private void checkLaneVehicles(Way way, TrafficNode targetNode) {
         for (Lane lane : way.getLaneList()) {
             for (Iterator<Vehicle> vehicleIterator = lane.getVehicleList().iterator(); vehicleIterator.hasNext();) {
                 Vehicle vehicle = vehicleIterator.next();
+                
+                if (laneChangeHandler.isVehicleChangingLane(vehicle)) continue;
+
                 if (vehicle.getPosition().distanceTo(lane.getEndPoint()) < Constants.MIN_DISTANCE_TO_END_POINT) {
                     Path chosenPath = ((Junction) targetNode).getRandomPathFromPoint(lane.getEndPoint());
 
@@ -95,6 +105,9 @@ public class Road implements IVehicleTransition {
 
     @Override
     public void transitionVehicles() {
+        laneChangeHandler.processLaneChangeRequests(rightWay);
+        laneChangeHandler.processLaneChangeRequests(leftWay);
+
         checkLaneVehicles(rightWay, this.getStartNode());
         checkLaneVehicles(leftWay, this.getEndNode());
     }
@@ -151,5 +164,8 @@ public class Road implements IVehicleTransition {
 
     public Way getLeftWay() {
         return leftWay;
+    }
+    public LaneChangeTransition getLaneChangeHandler() {
+        return laneChangeHandler;
     }
 }

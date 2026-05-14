@@ -4,6 +4,7 @@ import model.utility.TrafficPoint;
 import model.utility.TrafficVector;
 import model.vehicle.Vehicle;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class Lane {
@@ -25,7 +26,8 @@ public class Lane {
         if (!vehicleList.contains(vehicle)) {
             vehicleList.add(vehicle);
             vehicle.setDirection(new TrafficVector(startPoint, endPoint));
-            vehicle.setPosition(startPoint.clone());
+            // Always keep the vehicles ordered by distance to the endPoint (the first one is the leader)
+            vehicleList.sort(Comparator.comparingDouble(v -> v.getPosition().distanceTo(endPoint))); 
         }
     }
 

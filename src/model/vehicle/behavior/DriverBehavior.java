@@ -20,11 +20,15 @@ public abstract class DriverBehavior {
     // lane to choose
     public void decide(Vehicle self, double distanceToVehicleAhead, double speedOfVehicleAhead,
             double distanceToLight, boolean isRed, boolean canRight, boolean canLeft,
-            boolean onEmergency) {
+            double distLeft, double distRight, boolean onEmergency, boolean isChangingLane) {
 
         // Calculate acceleration needed for different situations
         double cruiseAcc = calculateAccelerationForFreeLane(self, distanceToVehicleAhead);
-        double aheadAcc = calculateAccelerationForVehicleAhead(self, distanceToVehicleAhead, speedOfVehicleAhead);
+        
+        // "Complete change lane before check vehicle ahead"
+        // If we are currently changing lanes, we ignore the car ahead to ensure we finish the move
+        double aheadAcc = isChangingLane ? Double.MAX_VALUE : calculateAccelerationForVehicleAhead(self, distanceToVehicleAhead, speedOfVehicleAhead);
+        
         double lightAcc = calculateAccelerationForRedLight(self, distanceToLight, isRed);
 
         // Use the most restrictive acceleration (minimum value) for safety
@@ -40,11 +44,26 @@ public abstract class DriverBehavior {
             } else if (canRight) {
                 laneChangeDirection = 1; // Yield to right
             }
-        } else if (checkIfLaneChangeIsNeeded(self, distanceToVehicleAhead, speedOfVehicleAhead)) {
+        } else if (checkIfLaneChangeIsNeeded(self, distanceToVehicleAhead, speedOfVehicleAhead, distanceToLight, isRed)) {
+            // "Scan" which lane is better.
+            double currentDist = (distanceToVehicleAhead == -1) ? Double.MAX_VALUE : distanceToVehicleAhead;
+            double bestDist = currentDist;
+            
+            // Only change if the adjacent lane is significantly better (e.g. at least 30 pixels more space)
+            double improvementThreshold = 30.0;
+            
             if (canLeft) {
-                laneChangeDirection = -1; // Overtake via left
-            } else if (canRight) {
-                laneChangeDirection = 1; // Overtake via right
+                double scoreLeft = (distLeft == -1) ? Double.MAX_VALUE : distLeft;
+                if (scoreLeft > bestDist + improvementThreshold) {
+                    laneChangeDirection = -1;
+                    bestDist = scoreLeft;
+                }
+            }
+            if (canRight) {
+                double scoreRight = (distRight == -1) ? Double.MAX_VALUE : distRight;
+                if (scoreRight > bestDist + improvementThreshold) {
+                    laneChangeDirection = 1;
+                }
             }
         }
 
@@ -116,10 +135,20 @@ public abstract class DriverBehavior {
     }
 
     protected boolean checkIfLaneChangeIsNeeded(Vehicle self, double distanceToVehicleAhead,
-            double speedOfVehicleAhead) {
+            double speedOfVehicleAhead, double distanceToLight, boolean isRed) {
+        
+        // Don't change lanes if stopped or stopping for a red light
+        if (self.getSpeed() < 5.0) {
+            return false;
+        }
+
+        if (isRed && distanceToLight < 120.0) {
+            return false;
+        }
+
         if (distanceToVehicleAhead > 0) {
             // Change lane if blocked and neighbor lane is faster
-            if (distanceToVehicleAhead < Constants.SAFE_DISTANCE && speedOfVehicleAhead < self.getSpeed()) {
+            if (distanceToVehicleAhead < Constants.SAFE_DISTANCE * 0.75 && speedOfVehicleAhead < self.getMaxSpeed() * this.getSpeedRatio()) {
                 return true;
             }
         }

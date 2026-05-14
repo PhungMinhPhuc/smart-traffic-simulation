@@ -41,7 +41,10 @@ public abstract class Vehicle {
 			           boolean isRed, 
                        boolean canRight, 
                        boolean canLeft, 
+                       double distLeft,
+                       double distRight,
                        boolean onEmergency, 
+                       boolean isChangingLane,
                        double deltaTime) {
         
 		behavior.decide(this, 
@@ -51,7 +54,10 @@ public abstract class Vehicle {
                         isRed, 
                         canRight,
 				        canLeft, 
-                        onEmergency);
+                        distLeft,
+                        distRight,
+                        onEmergency,
+                        isChangingLane);
 
 		applyPhysics(deltaTime);
 	}

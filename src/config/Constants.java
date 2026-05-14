@@ -12,6 +12,7 @@ public final class Constants {
     public static final int DEFAULT_LANE_COUNT = 3;
     public static final int MAX_LANE_COUNT = 10;
     public static final int MIN_LANE_COUNT = 1;
+    public static final double LANE_CHANGE_DISTANCE = 60.0; // Real-life like distance for a lane change
 
     // LANE MARKING CONFIG
     public static final double LANE_MARKING_WIDTH = 1.0;

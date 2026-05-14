@@ -6,6 +6,7 @@ import model.road.*;
 import model.utility.*;
 import model.vehicle.*;
 import model.traffic.*;
+import model.transition.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,8 +91,9 @@ public class TrafficMap {
 		}
 		
 		for (Road road : roadList) {
-			updateWay(road.getRightWay(), timeInterval);
-			updateWay(road.getLeftWay(), timeInterval);
+			updateWay(road.getRightWay(), road.getLaneChangeHandler(), timeInterval);
+			updateWay(road.getLeftWay(), road.getLaneChangeHandler(), timeInterval);
+			road.updateLaneChanges(timeInterval);
 		}
 
 		for (TrafficNode node : nodeList) {
@@ -104,7 +106,7 @@ public class TrafficMap {
 					double distanceToVehicleAhead = (vehicleAhead == null) ? -1 : currentVehicle.getPosition().distanceTo(vehicleAhead.getPosition());
 					double speedOfVehicleAhead = (vehicleAhead == null) ? 0 : vehicleAhead.getSpeed();
 					
-					currentVehicle.update(distanceToVehicleAhead, speedOfVehicleAhead, 1000.0, false, true, true, false, timeInterval);
+					currentVehicle.update(distanceToVehicleAhead, speedOfVehicleAhead, 1000.0, false, false, false, -1, -1, false, false, timeInterval);
 				}
 			}
 		}
@@ -118,7 +120,7 @@ public class TrafficMap {
 		}
 	}
 
-	private void updateWay(Way way, double deltaTime) {
+	private void updateWay(Way way, LaneChangeTransition handler, double deltaTime) {
 		List<Lane> lanes = way.getLaneList();
 		boolean isRed = (way.getTrafficLight() != null && way.getTrafficLight().getCurrentState() == LightState.RED);
 
@@ -136,10 +138,32 @@ public class TrafficMap {
 
 				boolean canLeft = (l > 0);
 				boolean canRight = (l < lanes.size() - 1);
+				
+				double distLeft = canLeft ? getDistanceToVehicleAheadInLane(currentVehicle, lanes.get(l - 1)) : -1;
+				double distRight = canRight ? getDistanceToVehicleAheadInLane(currentVehicle, lanes.get(l + 1)) : -1;
 
-				currentVehicle.update(distanceToVehicleAhead, speedOfVehicleAhead, distanceToLight, isRed, canRight, canLeft, false, deltaTime);
+				boolean isChangingLane = (handler != null && handler.isVehicleChangingLane(currentVehicle));
+
+				currentVehicle.update(distanceToVehicleAhead, speedOfVehicleAhead, distanceToLight, isRed, canRight, canLeft, distLeft, distRight, false, isChangingLane, deltaTime);
 			}
 		}
+	}
+
+	private double getDistanceToVehicleAheadInLane(Vehicle currentVehicle, Lane lane) {
+		double minDistance = Double.MAX_VALUE;
+		boolean found = false;
+		
+		for (Vehicle v : lane.getVehicleList()) {
+			// Check if v is ahead of currentVehicle by comparing distances to the end of the road
+			if (v.getPosition().distanceTo(lane.getEndPoint()) < currentVehicle.getPosition().distanceTo(lane.getEndPoint())) {
+				double dist = currentVehicle.getPosition().distanceTo(v.getPosition());
+				if (dist < minDistance) {
+					minDistance = dist;
+					found = true;
+				}
+			}
+		}
+		return found ? minDistance : -1;
 	}
 
 	public List<TrafficNode> getTrafficNodeList() {

@@ -9,7 +9,7 @@ public class CautiousDriver extends DriverBehavior {
     }
 
     @Override
-    protected boolean checkIfLaneChangeIsNeeded(Vehicle self, double distanceToVehicleAhead, double speedOfVehicleAhead) {
+    protected boolean checkIfLaneChangeIsNeeded(Vehicle self, double distanceToVehicleAhead, double speedOfVehicleAhead, double distanceToLight, boolean isRed) {
         // Cautious drivers never change lanes to overtake
         return false;
     }
