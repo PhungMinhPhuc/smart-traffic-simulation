@@ -136,8 +136,8 @@ public class TrafficMap {
 				double speedAhead = (ahead == null) ? 0 : ahead.getSpeed();
 				double distLight = v.getPosition().distanceTo(lane.getEndPoint());
 				
-				boolean canLeft = (l > 0);
-				boolean canRight = (l < lanes.size() - 1);
+				boolean canLeft = way.canVehicleChangeLane(v, lane, -1); // Check if can change to left lane
+				boolean canRight = way.canVehicleChangeLane(v, lane, 1); // Check if can change to right lane
 				
 				v.update(distAhead, speedAhead, distLight, isRed, canRight, canLeft, false, dt);
 			}

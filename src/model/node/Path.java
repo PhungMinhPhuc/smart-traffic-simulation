@@ -5,6 +5,7 @@ import model.vehicle.Vehicle;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.Comparator;
 import config.Constants;
 
 public class Path {
@@ -89,6 +90,8 @@ public class Path {
         if (!vehicleList.contains(vehicle)) {
             vehicle.setPosition(startPoint.clone());
             vehicleList.add(vehicle);
+            //always keep the vehicles ordered by distance to the endPoint (the first one is the closest to the endPoint)
+            vehicleList.sort(Comparator.comparingDouble(v -> v.getPosition().distanceTo(endPoint)));
         }
     }
 

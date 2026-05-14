@@ -6,6 +6,7 @@ import model.traffic.LightState;
 import model.traffic.TrafficLight;
 import model.utility.TrafficPoint;
 import model.utility.TrafficVector;
+import model.vehicle.Vehicle;
 
 public class Way {
     private ArrayList<Lane> laneList = new ArrayList<Lane>();
@@ -60,7 +61,25 @@ public class Way {
             trafficLight.update(deltaTime, laneList);
         }
     }
-
+    
+    //decider method to check if a vehicle can change lane based on the target lane's vehicles and the target position after lane change
+    public boolean canVehicleChangeLane(Vehicle vehicle, Lane currentLane, int laneIndexOffset) {
+    	TrafficVector laneDirection = new TrafficVector(currentLane.getStartPoint(), currentLane.getEndPoint()).normalize();
+	 	TrafficVector perpendicularVector = laneDirection.rotateVector(Math.toRadians(90));
+	 	TrafficPoint targetPosition = perpendicularVector.translatePoint(vehicle.getPosition(), Constants.LANE_WIDTH * laneIndexOffset);
+	 	int targetLaneIndex = currentLane.getIndex() + laneIndexOffset;
+	 	if(targetLaneIndex < 0 || targetLaneIndex >= laneList.size()) {
+	 		return false; // Cannot change lane as it goes out of bounds
+	 	}
+	 	for(Vehicle other : laneList.get(targetLaneIndex).getVehicleList()) {
+	 		double dist = targetPosition.distanceTo(other.getPosition());
+	 		if(dist < other.getLength() / 2.0 + vehicle.getLength() / 2.0 + Constants.SAFE_DISTANCE) {
+	 			return false; // Cannot change lane due to intersection with another vehicle
+	 		}
+	 	}
+	 	return true; // Can change lane
+	}
+ 
     public TrafficLight getTrafficLight() {
         return trafficLight;
     }

@@ -19,6 +19,25 @@ public class Road implements IVehicleTransition {
     private TrafficNode endNode;
     private String id;
 
+    /**
+     * helper class for sequentially lane change process
+     * avoiding multiple lane changes for the same vehicle in one transition step, 
+     * which can cause issues like skipping lanes or oscillating between lanes
+     */
+    private static class LaneChangeRequest {
+        final Way way;
+        final Lane fromLane;
+        final Vehicle vehicle;
+        final int offset;
+
+        LaneChangeRequest(Way way, Lane fromLane, Vehicle vehicle, int offset) {
+            this.way = way;
+            this.fromLane = fromLane;
+            this.vehicle = vehicle;
+            this.offset = offset;
+        }
+    }
+
     public Road(TrafficNode startNode, TrafficNode endNode, int laneCountPerWay, LightState lightStateRightWay,
             LightState lightStateLeftWay) {
         this.startNode = startNode;
@@ -92,11 +111,56 @@ public class Road implements IVehicleTransition {
             }
         }
     }
+    
+    //remove vehicle from current lane and add to target lane, 
+    //then update vehicle's position by translating it perpendicular to the lane direction
+    private void changeLaneVehicle(Way currentWay,Lane currentLane,Vehicle vehicle,int laneIndexOffset) {
+    	//laneIndexOffset: -1 for changing to left lane, +1 for changing to right lane
+    	TrafficVector laneDirection = new TrafficVector(currentLane.getStartPoint(), currentLane.getEndPoint()).normalize();
+    	TrafficVector perpendicularVector = laneDirection.rotateVector(Math.toRadians(90));
+    	
+    	int newLaneIndex = currentLane.getIndex() + laneIndexOffset;
+    	if(newLaneIndex >= 0 && newLaneIndex < currentWay.getLaneList().size()) {
+    		Lane targetLane = currentWay.getLaneList().get(newLaneIndex);
+    		currentLane.removeVehicle(vehicle);
+			targetLane.addVehicle(vehicle);
+	    	vehicle.setPosition(perpendicularVector.translatePoint(vehicle.getPosition(),Constants.LANE_WIDTH * laneIndexOffset));
+		}
+    }
+    
+    //process lane change requests sequentially 
+    private void checkLaneChange(Way way) {
+    	//collect lane change requests from all vehicles first to avoid modifying the lane's vehicle list while iterating
+        List<LaneChangeRequest> requests = new ArrayList<>();
+        for (Lane lane : way.getLaneList()) {
+            for (Vehicle vehicle : lane.getVehicleList()) {
+                int offset = vehicle.getPendingLaneChange();
+                if (offset != 0) {
+                    requests.add(new LaneChangeRequest(way, lane, vehicle, offset));
+                }
+                vehicle.clearPendingLaneChange();
+            }
+        }
+        //stores vehicles that have already changed lane in this transition
+        Set<Vehicle> moved = new HashSet<>();
+        //process lane change requests sequentially, if a vehicle has already changed lane in this step, skip any further lane change request for that vehicle to prevent multiple lane changes in one step
+        for (LaneChangeRequest req : requests) {
+            if (moved.contains(req.vehicle)) {
+                continue;
+            }
+            if (req.way.canVehicleChangeLane(req.vehicle, req.fromLane, req.offset)) {
+                changeLaneVehicle(req.way, req.fromLane, req.vehicle, req.offset);
+                moved.add(req.vehicle);
+            }
+        }
+    }
 
     @Override
     public void transitionVehicles() {
         checkLaneVehicles(rightWay, this.getStartNode());
         checkLaneVehicles(leftWay, this.getEndNode());
+        checkLaneChange(rightWay);
+        checkLaneChange(leftWay);
     }
 
     @Override
