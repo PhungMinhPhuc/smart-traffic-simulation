@@ -4,7 +4,7 @@ import model.vehicle.Vehicle;
 
 public class AggressiveDriver extends DriverBehavior {
 	public AggressiveDriver() {
-		super(1, 40.0, -40.0); //double speedRatio, double speedUpAcceleration, double brakeAccelearation
+		super(1, 40.0, -40.0); //double maxSpeedRatio, double speedUpAcceleration, double brakeAccelearation
 	}
 
     @Override

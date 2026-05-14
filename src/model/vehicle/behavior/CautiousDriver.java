@@ -3,11 +3,10 @@ package model.vehicle.behavior;
 import model.vehicle.Vehicle;
 
 public class CautiousDriver extends DriverBehavior {
-    public CautiousDriver() {
-        this.maxSpeedRatio = 0.6;      
-        this.speedUpAcceleration = 0.8;            
-        this.brakeAccelearation = -1.2;     
-    }
+	
+	 public CautiousDriver() {
+			super(0.6, 8.0, -12.0); //double maxSpeedRatio, double speedUpAcceleration, double brakeAccelearation
+		}
 
     @Override
     protected boolean handleLaneChange(Vehicle self, double DistAhead, double speedAhead) {

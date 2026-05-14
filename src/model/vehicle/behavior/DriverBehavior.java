@@ -52,7 +52,10 @@ public abstract class DriverBehavior {
     
     protected double handleAheadVehicle(Vehicle self, double distAhead, double speedAhead) {
     	if (distAhead < 0) return Double.MAX_VALUE;
-    	else if (distAhead <= Constants.MUST_STOP_DISTANCE) self.setSpeed(0.0);
+    	else if (distAhead <= Constants.MUST_STOP_DISTANCE) {
+    		self.setSpeed(0.0);
+    		self.applyAcceleration(0.0);
+    	}
 
         if (distAhead < Constants.SAFE_DISTANCE) return brakeAccelearation;
         else return speedUpAcceleration;
@@ -61,7 +64,10 @@ public abstract class DriverBehavior {
     
     protected double handleRedLight(Vehicle self, double distLight, boolean isRed) {
         if (!isRed || distLight > Constants.SAFE_DISTANCE) return Double.MAX_VALUE;
-        else if (distLight <= Constants.MUST_STOP_DISTANCE) self.setSpeed(0.0);
+        else if (distLight <= Constants.MUST_STOP_DISTANCE) {
+        	self.setSpeed(0.0);
+        	self.applyAcceleration(0.0);
+        }
         return this.calculateBrakeToStop(self.getSpeed(), distLight);
     }
     

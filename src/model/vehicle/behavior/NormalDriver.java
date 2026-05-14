@@ -1,15 +1,9 @@
 package model.vehicle.behavior;
 
 public class NormalDriver extends DriverBehavior {
-    public NormalDriver() {
-        this.maxSpeedRatio = 0.8;
-        this.safeTimeGap = 2.0;
-        this.accStrong = 2.0;
-        this.accNormal = 1.0;
-        this.brakeNormal = -1.0;
-        this.brakeStrong = -2.0;
-        this.overtakeThreshold = 0.7;
-    }
+	 public NormalDriver() {
+			super(0.8, 20.0, -20.0); //double maxSpeedRatio, double speedUpAcceleration, double brakeAccelearation
+		}
    
     @Override
     public String getBehaviorName() {
