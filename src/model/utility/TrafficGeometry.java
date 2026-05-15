@@ -123,4 +123,16 @@ public final class TrafficGeometry {
     public static boolean intersectsCircle(TrafficPoint aCenter, double aRadius, TrafficPoint bCenter, double bRadius) {
         return aCenter.distanceTo(bCenter) <= aRadius + bRadius;
     }
+
+    public static double getDistanceToSegment(TrafficPoint p, TrafficPoint a, TrafficPoint b) {
+        double l2 = a.distanceTo(b) * a.distanceTo(b);
+        if (l2 == 0.0) return p.distanceTo(a);
+        
+        // Project p onto the line ab
+        double t = ((p.getX() - a.getX()) * (b.getX() - a.getX()) + (p.getY() - a.getY()) * (b.getY() - a.getY())) / l2;
+        t = Math.max(0, Math.min(1, t)); // Clamp t to the segment
+        
+        TrafficPoint projection = new TrafficPoint(a.getX() + t * (b.getX() - a.getX()), a.getY() + t * (b.getY() - a.getY()));
+        return p.distanceTo(projection);
+    }
 }

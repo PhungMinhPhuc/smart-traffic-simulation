@@ -52,6 +52,9 @@ public class MapEditorHandler {
         this.addTrafficNodeButton = addNodeBtn;
         this.addRoadButton = addRoadBtn;
         this.removeTrafficNodeButton = removeNodeBtn;
+        
+        // Ensure mapLayer is clickable everywhere
+        this.mapLayer.setStyle("-fx-background-color: rgba(0,0,0,0);");
     }
 
     private void displayInstruction(String instruction) {

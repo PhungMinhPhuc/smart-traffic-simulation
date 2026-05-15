@@ -57,6 +57,10 @@ public class TrafficVector {
         return new TrafficPoint(point.getX() + resizedDirection.x, point.getY() + resizedDirection.y);
     }
 
+    public double dotProduct(TrafficVector other) {
+        return this.x * other.x + this.y * other.y;
+    }
+
     @Override
     public TrafficVector clone() {
         return new TrafficVector(this.x, this.y);

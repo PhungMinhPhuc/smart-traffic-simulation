@@ -10,6 +10,7 @@ import model.traffic.*;
 import model.transition.*;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class TrafficMap {
@@ -80,10 +81,12 @@ public class TrafficMap {
 			System.out.println("No lane available on the way to add vehicle");
 			return;
 		}
-		
+
 		Lane lane = way.getLaneList().get(0);
-		// Vehicle vehicle = new Car(lane.getStartPoint().clone(), new TrafficVector(lane.getStartPoint(), lane.getEndPoint()));
-		Vehicle vehicle = VehicleGenerator.getRandomVehicle(lane.getStartPoint().clone(), new TrafficVector(lane.getStartPoint(), lane.getEndPoint()));
+		// Vehicle vehicle = new Car(lane.getStartPoint().clone(), new
+		// TrafficVector(lane.getStartPoint(), lane.getEndPoint()));
+		Vehicle vehicle = VehicleGenerator.getRandomVehicle(lane.getStartPoint().clone(),
+				new TrafficVector(lane.getStartPoint(), lane.getEndPoint()));
 		lane.addVehicle(vehicle);
 	}
 
@@ -91,7 +94,7 @@ public class TrafficMap {
 		for (TrafficNode node : nodeList) {
 			node.update(timeInterval);
 		}
-		
+
 		for (Road road : roadList) {
 			updateWay(road.getRightWay(), road.getLaneChangeHandler(), timeInterval);
 			updateWay(road.getLeftWay(), road.getLaneChangeHandler(), timeInterval);
@@ -101,14 +104,25 @@ public class TrafficMap {
 		for (TrafficNode node : nodeList) {
 			for (Path path : node.getPathList()) {
 				List<Vehicle> pathVehicles = path.getVehicleList();
+				// Ensure order: closest to end is first
+				pathVehicles.sort(Comparator.comparingDouble(v -> v.getPosition().distanceTo(path.getEndPoint())));
+
 				for (int i = 0; i < pathVehicles.size(); i++) {
 					Vehicle currentVehicle = pathVehicles.get(i);
-					Vehicle vehicleAhead = (i == 0) ? null : pathVehicles.get(i - 1);
-
-					double distanceToVehicleAhead = (vehicleAhead == null) ? -1 : currentVehicle.getPosition().distanceTo(vehicleAhead.getPosition());
-					double speedOfVehicleAhead = (vehicleAhead == null) ? 0 : vehicleAhead.getSpeed();
 					
-					currentVehicle.update(distanceToVehicleAhead, speedOfVehicleAhead, 1000.0, false, false, false, -1, -1, false, false, timeInterval);
+					double distanceToAhead = -1;
+					if (node instanceof Junction) {
+						distanceToAhead = ((Junction) node).getEffectiveDistanceAhead(currentVehicle, path);
+					}
+					
+					double speedOfAhead = 0;
+					
+					// If there's a vehicle ahead on the SAME path, use its speed
+					if (i > 0) {
+						speedOfAhead = pathVehicles.get(i - 1).getSpeed();
+					}
+
+					currentVehicle.update(distanceToAhead, speedOfAhead, 1000.0, false, false, false, -1, -1, false, false, timeInterval);
 				}
 			}
 		}
@@ -120,6 +134,48 @@ public class TrafficMap {
 		for (TrafficNode node : nodeList) {
 			node.transitionVehicles();
 		}
+
+		pruneInvalidVehicles();
+	}
+
+	private void pruneInvalidVehicles() {
+		for (Road road : roadList) {
+			pruneWay(road.getRightWay());
+			pruneWay(road.getLeftWay());
+		}
+		for (TrafficNode node : nodeList) {
+			for (Path path : node.getPathList()) {
+				path.getVehicleList().removeIf(v -> isVehicleInvalid(v, path.getStartPoint(), path.getEndPoint()));
+			}
+		}
+	}
+
+	private void pruneWay(Way way) {
+		for (Lane lane : way.getLaneList()) {
+			lane.getVehicleList().removeIf(v -> isVehicleInvalid(v, lane.getStartPoint(), lane.getEndPoint()));
+		}
+	}
+
+	private boolean isVehicleInvalid(Vehicle v, TrafficPoint start, TrafficPoint end) {
+		// 1. Check if vehicle has drifted too far from its assigned segment.
+		// We allow a buffer larger than MIN_DISTANCE_TO_END_POINT to accommodate 
+		// "pre-transitioned" vehicles positioned slightly before the start of the segment.
+		double distToSegment = TrafficGeometry.getDistanceToSegment(v.getPosition(), start, end);
+		double buffer = Constants.MIN_DISTANCE_TO_END_POINT + 15.0; // Total buffer for adherence
+		
+		if (distToSegment > buffer) { 
+			return true;
+		}
+
+		// 2. Check if vehicle is significantly past the end point of its segment
+		// (missed transition)
+		double segmentLength = start.distanceTo(end);
+		double distFromStart = v.getPosition().distanceTo(start);
+		if (distFromStart > segmentLength + 40.0) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private void updateWay(Way way, LaneChangeTransition handler, double deltaTime) {
@@ -134,19 +190,21 @@ public class TrafficMap {
 				Vehicle currentVehicle = vehicles.get(i);
 				Vehicle vehicleAhead = (i == 0) ? null : vehicles.get(i - 1);
 
-				double distanceToVehicleAhead = (vehicleAhead == null) ? -1 : currentVehicle.getPosition().distanceTo(vehicleAhead.getPosition());
+				double distanceToVehicleAhead = (vehicleAhead == null) ? -1
+						: currentVehicle.getPosition().distanceTo(vehicleAhead.getPosition());
 				double speedOfVehicleAhead = (vehicleAhead == null) ? 0 : vehicleAhead.getSpeed();
 				double distanceToLight = currentVehicle.getPosition().distanceTo(lane.getEndPoint());
 
 				boolean canLeft = (l > 0);
 				boolean canRight = (l < lanes.size() - 1);
-				
+
 				double distLeft = canLeft ? getDistanceToVehicleAheadInLane(currentVehicle, lanes.get(l - 1)) : -1;
 				double distRight = canRight ? getDistanceToVehicleAheadInLane(currentVehicle, lanes.get(l + 1)) : -1;
 
 				boolean isChangingLane = (handler != null && handler.isVehicleChangingLane(currentVehicle));
 
-				currentVehicle.update(distanceToVehicleAhead, speedOfVehicleAhead, distanceToLight, isRed, canRight, canLeft, distLeft, distRight, false, isChangingLane, deltaTime);
+				currentVehicle.update(distanceToVehicleAhead, speedOfVehicleAhead, distanceToLight, isRed, canRight,
+						canLeft, distLeft, distRight, false, isChangingLane, deltaTime);
 			}
 		}
 	}
@@ -154,10 +212,12 @@ public class TrafficMap {
 	private double getDistanceToVehicleAheadInLane(Vehicle currentVehicle, Lane lane) {
 		double minDistance = Double.MAX_VALUE;
 		boolean found = false;
-		
+
 		for (Vehicle v : lane.getVehicleList()) {
-			// Check if v is ahead of currentVehicle by comparing distances to the end of the road
-			if (v.getPosition().distanceTo(lane.getEndPoint()) < currentVehicle.getPosition().distanceTo(lane.getEndPoint())) {
+			// Check if v is ahead of currentVehicle by comparing distances to the end of
+			// the road
+			if (v.getPosition().distanceTo(lane.getEndPoint()) < currentVehicle.getPosition()
+					.distanceTo(lane.getEndPoint())) {
 				double dist = currentVehicle.getPosition().distanceTo(v.getPosition());
 				if (dist < minDistance) {
 					minDistance = dist;

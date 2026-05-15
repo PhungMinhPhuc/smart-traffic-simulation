@@ -311,12 +311,22 @@ public abstract class TrafficNode implements IVehicleTransition {
             java.util.Iterator<Vehicle> vehicleIterator = path.getVehicleList().iterator();
             while (vehicleIterator.hasNext()) {
                 Vehicle vehicle = vehicleIterator.next();
-                if (vehicle.getPosition().distanceTo(path.getEndPoint()) < Constants.MIN_DISTANCE_TO_END_POINT) {
-                    Lane nextLane = getLaneAtPoint(path.getEndPoint());
+                TrafficPoint endPoint = path.getEndPoint();
+                TrafficVector toEnd = new TrafficVector(vehicle.getPosition(), endPoint);
+                double distToEnd = vehicle.getPosition().distanceTo(endPoint);
+
+                if (distToEnd < Constants.MIN_DISTANCE_TO_END_POINT || toEnd.dotProduct(vehicle.getDirection()) < 0) {
+                    Lane nextLane = getLaneAtPoint(endPoint);
                     if (nextLane != null) {
-                        vehicle.setPosition(path.getEndPoint().clone());
-                        // Set vehicle direction to match the lane's direction
-                        vehicle.setDirection(new TrafficVector(nextLane.getStartPoint(), nextLane.getEndPoint()));
+                        // Perfect continuity transition
+                        double signedDist = (toEnd.dotProduct(vehicle.getDirection()) < 0) ? distToEnd : -distToEnd;
+                        
+                        TrafficPoint nextStart = nextLane.getStartPoint();
+                        TrafficVector nextDir = new TrafficVector(nextStart, nextLane.getEndPoint());
+                        TrafficPoint nextPos = nextDir.translatePoint(nextStart, signedDist);
+
+                        vehicle.setPosition(nextPos);
+                        vehicle.setDirection(nextDir);
                         nextLane.addVehicle(vehicle);
                     }
                     vehicleIterator.remove();

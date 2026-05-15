@@ -89,12 +89,26 @@ public class Road implements IVehicleTransition {
                 
                 if (laneChangeHandler.isVehicleChangingLane(vehicle)) continue;
 
-                if (vehicle.getPosition().distanceTo(lane.getEndPoint()) < Constants.MIN_DISTANCE_TO_END_POINT) {
-                    Path chosenPath = ((Junction) targetNode).getRandomPathFromPoint(lane.getEndPoint());
+                TrafficPoint endPoint = lane.getEndPoint();
+                TrafficVector toEnd = new TrafficVector(vehicle.getPosition(), endPoint);
+                double distToEnd = vehicle.getPosition().distanceTo(endPoint);
+
+                // Transition if very close OR if we already passed the end point
+                if (distToEnd < Constants.MIN_DISTANCE_TO_END_POINT || toEnd.dotProduct(vehicle.getDirection()) < 0) {
+                    Path chosenPath = ((Junction) targetNode).getRandomPathFromPoint(endPoint);
 
                     if (chosenPath != null) {
-                        vehicle.setPosition(chosenPath.getStartPoint().clone());
-                        vehicle.setDirection(new TrafficVector(chosenPath.getStartPoint(), chosenPath.getEndPoint()));
+                        // Perfect continuity transition:
+                        // If we haven't reached the end yet, signedDist is negative.
+                        // If we passed it, signedDist is positive (overshoot).
+                        double signedDist = (toEnd.dotProduct(vehicle.getDirection()) < 0) ? distToEnd : -distToEnd;
+                        
+                        TrafficPoint nextStart = chosenPath.getStartPoint();
+                        TrafficVector nextDir = new TrafficVector(nextStart, chosenPath.getEndPoint());
+                        TrafficPoint nextPos = nextDir.translatePoint(nextStart, signedDist);
+                        
+                        vehicle.setPosition(nextPos);
+                        vehicle.setDirection(nextDir);
                         chosenPath.addVehicle(vehicle);
                     }
                     vehicleIterator.remove();
@@ -165,6 +179,7 @@ public class Road implements IVehicleTransition {
     public Way getLeftWay() {
         return leftWay;
     }
+
     public LaneChangeTransition getLaneChangeHandler() {
         return laneChangeHandler;
     }

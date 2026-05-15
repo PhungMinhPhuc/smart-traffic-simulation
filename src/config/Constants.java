@@ -52,7 +52,7 @@ public final class Constants {
     public static final double RED_DURATION = 20.0;
 
     // VEHICLE CONFIG
-    public static final double SAFE_DISTANCE = 100.0;
+    public static final double SAFE_DISTANCE = 40.0;
     public static final double MUST_STOP_DISTANCE = 40.0;
 
     public static final double NORMAL_SPEED_RATIO = 0.8;
@@ -142,7 +142,7 @@ public final class Constants {
     public static final double NANOS_PER_SECOND = 1e9; // 1 sec = 1e9 nano sec
 
     // GUI CONFIG
-    public static final double MIN_DISTANCE_TO_END_POINT = 5.0;
+    public static final double MIN_DISTANCE_TO_END_POINT = 1.0;
 
     // ZOOM CONFIG
     public static final double MIN_ZOOM = 0.1;

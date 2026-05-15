@@ -110,6 +110,7 @@ public class MainSceneController {
 		// config scrollPane and Panes
 		trafficMapWrapper.setPannable(true);
 		vehicleLayer.setMouseTransparent(true);
+		lightLayer.setMouseTransparent(true);
 
 		// Center the scroll position after layout
 		javafx.application.Platform.runLater(() -> {
