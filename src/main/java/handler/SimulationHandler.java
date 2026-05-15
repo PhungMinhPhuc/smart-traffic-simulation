@@ -2,11 +2,18 @@ package main.java.handler;
 
 import config.Constants;
 import javafx.animation.AnimationTimer;
+import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import model.map.TrafficMap;
 import model.vehicle.Vehicle;
+import model.traffic.TrafficLight;
 import render.VehicleRenderer;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class SimulationHandler {
     private AnimationTimer vehicleTimer;
@@ -18,6 +25,8 @@ public class SimulationHandler {
     private render.TrafficLightRenderer trafficLightRenderer;
     private Pane vehicleLayer;
     private Label instructionsLabel;
+    private final Map<Vehicle, Group> vehicleNodeMap = new HashMap<>();
+    private final Map<TrafficLight, Group> trafficLightNodeMap = new HashMap<>();
 
     public void initialize(TrafficMap trafficMap, VehicleRenderer vehicleRenderer, 
             render.TrafficLightRenderer trafficLightRenderer, Pane vehicleLayer,
@@ -54,22 +63,56 @@ public class SimulationHandler {
                 }
 
                 trafficMap.updateVehicles(deltaTime);
-                renderVehicles();
+                syncSceneNodes();
             }
         };
         vehicleTimer.start();
     }
 
-    public void renderVehicles() {
-        vehicleLayer.getChildren().clear();
-        // Render Vehicles
+    public void syncSceneNodes() {
+        Set<Vehicle> activeVehicles = new HashSet<>();
         for (Vehicle veh : trafficMap.getVehicleList()) {
-            vehicleLayer.getChildren().add(vehicleRenderer.render(veh));
+            activeVehicles.add(veh);
+
+            Group node = vehicleNodeMap.get(veh);
+            if (node == null) {
+                node = vehicleRenderer.createNode(veh);
+                vehicleNodeMap.put(veh, node);
+                vehicleLayer.getChildren().add(node);
+            } else {
+                vehicleRenderer.updateNode(node, veh);
+            }
         }
-        // Render Traffic Lights
-        for (model.traffic.TrafficLight light : trafficMap.getTrafficLightList()) {
-            vehicleLayer.getChildren().add(trafficLightRenderer.render(light));
+
+        vehicleNodeMap.entrySet().removeIf(entry -> {
+            if (!activeVehicles.contains(entry.getKey())) {
+                vehicleLayer.getChildren().remove(entry.getValue());
+                return true;
+            }
+            return false;
+        });
+
+        Set<TrafficLight> activeLights = new HashSet<>();
+        for (TrafficLight light : trafficMap.getTrafficLightList()) {
+            activeLights.add(light);
+
+            Group node = trafficLightNodeMap.get(light);
+            if (node == null) {
+                node = trafficLightRenderer.createNode(light);
+                trafficLightNodeMap.put(light, node);
+                vehicleLayer.getChildren().add(node);
+            } else {
+                trafficLightRenderer.updateNode(node, light);
+            }
         }
+
+        trafficLightNodeMap.entrySet().removeIf(entry -> {
+            if (!activeLights.contains(entry.getKey())) {
+                vehicleLayer.getChildren().remove(entry.getValue());
+                return true;
+            }
+            return false;
+        });
     }
 
     public void pauseSimulation() {
