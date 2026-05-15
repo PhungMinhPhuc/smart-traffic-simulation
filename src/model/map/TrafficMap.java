@@ -83,7 +83,7 @@ public class TrafficMap {
 		
 		Lane lane = way.getLaneList().get(0);
 		// Vehicle vehicle = new Car(lane.getStartPoint().clone(), new TrafficVector(lane.getStartPoint(), lane.getEndPoint()));
-		Vehicle vehicle = new VehicleGenerator().getRandomVehicle(lane.getStartPoint().clone(), new TrafficVector(lane.getStartPoint(), lane.getEndPoint()));
+		Vehicle vehicle = VehicleGenerator.getRandomVehicle(lane.getStartPoint().clone(), new TrafficVector(lane.getStartPoint(), lane.getEndPoint()));
 		lane.addVehicle(vehicle);
 	}
 
