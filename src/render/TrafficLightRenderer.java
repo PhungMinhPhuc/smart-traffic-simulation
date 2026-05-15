@@ -19,14 +19,16 @@ public class TrafficLightRenderer implements IRender<TrafficLight> {
 
     @Override
     public Parent render(TrafficLight light) {
-        return render(light, light.getPosition().getX(), light.getPosition().getY());
+        return createNode(light);
     }
 
-    public Group render(TrafficLight light, double x, double y) {
+    public Group createNode(TrafficLight light) {
         Group group = new Group();
 
         double w = Constants.HOUSING_WIDTH;
         double h = Constants.HOUSING_HEIGHT;
+        double x = light.getPosition().getX();
+        double y = light.getPosition().getY();
 
         // Background housing: starts at x and extends backwards by w
         Rectangle housing = new Rectangle(x - w, y, w, h);
@@ -34,58 +36,81 @@ public class TrafficLightRenderer implements IRender<TrafficLight> {
 
         // Lights: centered horizontally in the housing
         double centerX = x - w / 2;
-        Circle redLight = createLight(centerX, y + 1 * h / 4 - Constants.SPACING / 2, Color.RED,
-                light.getCurrentState() == LightState.RED);
-        Circle yellowLight = createLight(centerX, y + 2 * h / 4 - Constants.SPACING / 2, Color.YELLOW,
-                light.getCurrentState() == LightState.YELLOW);
-        Circle greenLight = createLight(centerX, y + 3 * h / 4 - Constants.SPACING / 2, Color.GREEN,
-                light.getCurrentState() == LightState.GREEN);
-
-        group.getChildren().addAll(housing, redLight, yellowLight, greenLight);
+        Circle redLight = new Circle(centerX, y + 1 * h / 4 - Constants.SPACING / 2, Constants.LIGHT_RADIUS);
+        Circle yellowLight = new Circle(centerX, y + 2 * h / 4 - Constants.SPACING / 2, Constants.LIGHT_RADIUS);
+        Circle greenLight = new Circle(centerX, y + 3 * h / 4 - Constants.SPACING / 2, Constants.LIGHT_RADIUS);
 
         // Timer text
-        String timerTextValue = light.getDisplayText();
-        if (!timerTextValue.isEmpty()) {
-            Text timerText = new Text(timerTextValue);
-            try {
-                // Load font from the classpath root (src/main/resources)
-                InputStream is = getClass().getResourceAsStream("/assets/fonts/Seven Segment.ttf");
-                if (is != null) {
-                    Font segmentFont = Font.loadFont(is, 13f);
-                    timerText.setFont(segmentFont);
-                } else {
-                    System.err.println("Font file not found: /assets/fonts/Seven Segment.ttf");
-                    timerText.setFont(new Font(13));
-                }
-            } catch (Exception e) {
+        Text timerText = new Text();
+        try {
+            // Load font from the classpath root (src/main/resources)
+            InputStream is = getClass().getResourceAsStream("/assets/fonts/Seven Segment.ttf");
+            if (is != null) {
+                Font segmentFont = Font.loadFont(is, 13f);
+                timerText.setFont(segmentFont);
+            } else {
                 timerText.setFont(new Font(13));
-                e.printStackTrace();
             }
-            timerText.setFill(light.getCurrentState().getColor());
-
-            // Center horizontally within the wrapping width
-            timerText.setWrappingWidth(w);
-            timerText.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
-
-            // Set vertical origin to center for better positioning
-            timerText.setTextOrigin(VPos.CENTER);
-
-            // Position centered in the housing
-            timerText.setX(x - w);
-            timerText.setY(y + 4 * h / 4 - Constants.SPACING / 2);
-            timerText.setRotate(90);
-
-            group.getChildren().add(timerText);
+        } catch (Exception e) {
+            timerText.setFont(new Font(13));
         }
+
+        // Center horizontally within the wrapping width
+        timerText.setWrappingWidth(w);
+        timerText.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+
+        // Set vertical origin to center for better positioning
+        timerText.setTextOrigin(VPos.CENTER);
+
+        // Position centered in the housing
+        timerText.setX(x - w);
+        timerText.setY(y + 4 * h / 4 - Constants.SPACING / 2);
+        timerText.setRotate(90);
+
+        group.getChildren().addAll(housing, redLight, yellowLight, greenLight, timerText);
 
         // Apply rotation around the stop point (x, y)
         group.getTransforms().add(new Rotate(light.getRotation(), x, y));
 
+        updateNode(group, light);
         return group;
     }
 
-    private Circle createLight(double x, double y, Color color, boolean isActive) {
-        Circle circle = new Circle(x, y, Constants.LIGHT_RADIUS);
+    public void updateNode(Group group, TrafficLight light) {
+        Rectangle housing = (Rectangle) group.getChildren().get(0);
+        Circle redLight = (Circle) group.getChildren().get(1);
+        Circle yellowLight = (Circle) group.getChildren().get(2);
+        Circle greenLight = (Circle) group.getChildren().get(3);
+        Text timerText = (Text) group.getChildren().get(4);
+
+        double w = Constants.HOUSING_WIDTH;
+        double h = Constants.HOUSING_HEIGHT;
+        double x = light.getPosition().getX();
+        double y = light.getPosition().getY();
+
+        housing.setX(x - w);
+        housing.setY(y);
+
+        double centerX = x - w / 2;
+        redLight.setCenterX(centerX);
+        redLight.setCenterY(y + 1 * h / 4 - Constants.SPACING / 2);
+        yellowLight.setCenterX(centerX);
+        yellowLight.setCenterY(y + 2 * h / 4 - Constants.SPACING / 2);
+        greenLight.setCenterX(centerX);
+        greenLight.setCenterY(y + 3 * h / 4 - Constants.SPACING / 2);
+
+        // Update lights with active state and glow effect
+        updateLight(redLight, Color.RED, light.getCurrentState() == LightState.RED);
+        updateLight(yellowLight, Color.YELLOW, light.getCurrentState() == LightState.YELLOW);
+        updateLight(greenLight, Color.GREEN, light.getCurrentState() == LightState.GREEN);
+
+        String timerTextValue = light.getDisplayText();
+        timerText.setText(timerTextValue);
+        timerText.setVisible(!timerTextValue.isEmpty());
+        timerText.setFill(light.getCurrentState().getColor());
+    }
+
+    private void updateLight(Circle circle, Color color, boolean isActive) {
         if (isActive) {
             circle.setFill(color);
             // Add a glow effect or just make it bright
@@ -96,6 +121,5 @@ public class TrafficLightRenderer implements IRender<TrafficLight> {
             circle.setFill(color.deriveColor(0, 1, 0.3, 1));
             circle.setStroke(Color.TRANSPARENT);
         }
-        return circle;
     }
 }
