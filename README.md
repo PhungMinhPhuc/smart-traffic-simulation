@@ -1,73 +1,55 @@
 # Smart Traffic Simulation
-This is an OOP Project for 2025.2 course, implementing a smart city traffic simulation system.
 
-Ví dụ: Dưới đây là cách triển khai thực tế cho nhóm **Vehicle** (3 người):
+A sophisticated, multi-agent urban traffic simulation engine built with JavaFX. This project provides a robust framework for modeling complex traffic interactions, driver behaviors, and urban infrastructure management.
 
-### 1. Quy trình tạo nhánh "Cha - Con"
+![Simulation Screenshot]()
 
-1.  **Bước 1 (Nhóm trưởng):** Từ nhánh `develop`, tạo một nhánh "Cha" chung cho cả nhóm gọi là `vehicle/integration`. Đây sẽ là "thủ phủ" của nhóm Vehicle.
-2.  **Bước 2 (3 Thành viên):** Cả 3 người sẽ **không** tạo nhánh từ `develop`, mà tạo nhánh từ `vehicle/integration`.
+> [!NOTE]
+> The current implementation features a "Dual-Switch" architecture for vehicle rendering. Users can toggle between **Rectangle Mode** (schematic view with ID labels) and **Image Mode** (sprite-based view) using separate dedicated ToggleButtons to ensure clear visual choice.
 
-### 2. Cấu trúc cây thư mục nhánh
+## Core Capabilities
 
-```text
-develop (Nhánh chung toàn dự án)
-   |
-   └── vehicle/integration (Nhánh chung của nhóm Vehicle - Nhánh "Cha")
-          |
-          ├── vehicle/A/base-logic (Nhánh "Con" của người A)
-          ├── vehicle/B/behavior   (Nhánh "Con" của người B)
-          └── vehicle/C/renderer   (Nhánh "Con" của người C)
-```
+### Advanced Traffic Engineering
+*   **Conflict Resolution Engine**: Implements a hierarchical priority system to resolve intersection conflicts, preventing deadlocks and optimizing throughput.
+*   **Coordinate Continuity**: A signed-distance physics system ensures seamless vehicle movement across segment boundaries without visual stutters.
+*   **Dynamic Signal Coordination**: Real-time traffic light synchronization integrated with path-finding logic.
 
-### 3. Lý do
+### Behavioral Simulation
+*   **Heterogeneous Driver AI**: Drivers exhibit distinct behaviors (Normal, Aggressive, Emergency) that adapt to local traffic conditions.
+*   **Priority-Based Yielding**: Emergency vehicles (Ambulances, FireTrucks) receive absolute priority, with other vehicles performing reactive yielding.
+*   **Smooth Motion Control**: Realistic braking and acceleration curves based on leader-follower distance and signal states.
 
-*   **Tự do thử nghiệm:** 3 người nhóm Vehicle có thể thoải mái gộp code qua lại, sửa lỗi cho nhau trên nhánh `integration` mà không sợ làm hỏng code của nhóm Map.
-*   **Gộp code sạch sẽ:** Khi nhóm Vehicle đã làm xong xuôi, xe chạy mượt, các bạn chỉ cần gửi **1 cái Pull Request duy nhất** từ `vehicle/integration` vào `develop`. Nhóm Map nhìn vào sẽ thấy rất gọn gàng.
-*   **Giải quyết xung đột sớm:** Nếu người A và người B sửa chung một file, họ sẽ phát hiện và sửa lỗi ngay khi gộp vào nhánh `integration` của nhóm, thay vì đợi đến lúc gộp vào nhánh chung của cả lớp mới phát hiện ra.
+### Map Infrastructure
+*   **Real-time Editor**: Dynamic modification of nodes and roads within the running simulation.
+*   **Traffic Regulation**: Granular control over vehicle generation rates and global spawn toggles.
+*   **State Management**: Support for complete map resets and default template restoration.
 
----
+## Technical Architecture
 
-### 4. Các lệnh Git thực tế để làm việc này:
+> [!TIP]
+> The simulation utilizes a decoupled Handler-Renderer architecture, allowing for independent updates to physics logic and visual representation without affecting performance.
 
-**Cho Nhóm trưởng (Tạo nhánh cha):**
-```bash
-git checkout develop              # Sang nhánh develop
-git pull origin develop           # Cập nhật code mới nhất
-git checkout -b vehicle/integration # Tạo nhánh cha cho nhóm
-git push origin vehicle/integration # Đẩy nhánh cha lên GitHub
-```
+*   **Logic Core**: Java 25 based event-loop simulation.
+*   **UI Layer**: JavaFX with CSS-styled components and hardware-accelerated rendering.
+*   **Data Management**: Maven-based dependency and lifecycle management.
 
-**Cho Thành viên A (Tạo nhánh con từ nhánh cha):**
-```bash
-git clone git@github.com:PhungMinhPhuc/smart-traffic-simulation.git # Clone dự án về máy
-cd smart-traffic-simulation
-git fetch origin                           # Lấy thông tin các nhánh mới về
-git checkout vehicle/integration           # Sang nhánh cha của nhóm
-git checkout -b vehicle/A/base-logic       # Tạo nhánh con từ nhánh cha (A = your name)
-```
+## Installation
 
----
+### Prerequisites
+*   Java Development Kit (JDK) 25 or higher
+*   Apache Maven
 
-### 5. Quy trình gộp code hàng ngày:
-
-1.  **Người A** làm xong tính năng -> Gửi Pull Request vào `vehicle/integration`.
-2.  **Người B và C** vào kiểm tra code của người A trên GitHub, nếu thấy OK thì bấm **Merge**.
-3.  Sau khi gộp xong, **Người B và C** nên cập nhật code mới từ nhánh cha về nhánh con của mình để tránh bị lạc hậu:
+### Running the Project
+1.  Clone the repository.
+2.  Execute the following command in the project root:
     ```bash
-    git checkout vehicle/integration
-    git pull origin vehicle/integration
-    git checkout vehicle/B/behavior
-    git merge vehicle/integration
+    mvn javafx:run
     ```
-
-### 6. Khi nào thì gộp vào `develop`?
-Khi cả 3 người A, B, C đã hoàn thành và nhánh `vehicle/integration` đã có một bộ khung hoàn chỉnh (Xe đã hiện hình, đã biết chạy, đã có AI), lúc đó nhóm trưởng mới gửi Pull Request từ `vehicle/integration` vào `develop` để kết hợp với nhóm Map.
 
 ## Authors
 - Phuc, Phung Minh
 - Truong, Tran Xuan
+- Van, Nguyen Duc
 - Phi, Duong Tuan
 - Nghia, Le Trong
-- Van, Nguyen Duc
 - Trung, Tran Van
