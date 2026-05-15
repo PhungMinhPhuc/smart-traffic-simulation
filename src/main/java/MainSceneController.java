@@ -118,11 +118,20 @@ public class MainSceneController {
 	}
 
 	private void createDefaultMap() {
-		TrafficNode node1 = new Junction(new TrafficPoint(25000, 24700));
-		TrafficNode node2 = new Junction(new TrafficPoint(25000, 25300));
+		TrafficNode node1 = new Junction(new TrafficPoint(25000, 24500));
+		TrafficNode node2 = new Junction(new TrafficPoint(25000, 25000));
+		TrafficNode node3 = new Junction(new TrafficPoint(25000, 25500));
+		TrafficNode node4 = new Junction(new TrafficPoint(25500, 25000));
+		TrafficNode node5 = new Junction(new TrafficPoint(24500, 25000));
 		trafficMap.addNode(node1);
 		trafficMap.addNode(node2);
-		trafficMap.addConnection(node1, node2, 3);
+		trafficMap.addNode(node3);
+		trafficMap.addNode(node4);
+		trafficMap.addNode(node5);
+		trafficMap.addConnection(node2, node1, 3);
+		trafficMap.addConnection(node2, node3, 3);
+		trafficMap.addConnection(node2, node4, 3);
+		trafficMap.addConnection(node2, node5, 3);
 	}
 
 	private void renderTrafficMap() {

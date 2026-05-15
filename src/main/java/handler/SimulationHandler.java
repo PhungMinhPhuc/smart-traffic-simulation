@@ -45,7 +45,7 @@ public class SimulationHandler {
                 double deltaTime = (now - lastFrameTimeNano) / Constants.NANOS_PER_SECOND;
                 double deltaTimeSinceLastVehicleAdd = (now - lastVehicleAddTimeNano) / Constants.NANOS_PER_SECOND;
                 lastFrameTimeNano = now;
-
+                // Test
                 if (deltaTimeSinceLastVehicleAdd >= 3) {
                     if (!trafficMap.getRoadList().isEmpty()) {
                         trafficMap.addDefaultVehicleToRoad(trafficMap.getRoadList().get(0), true);

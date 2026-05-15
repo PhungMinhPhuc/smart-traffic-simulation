@@ -1,6 +1,7 @@
 package model.map;
 
 import config.Constants;
+import generator.*;
 import model.node.*;
 import model.road.*;
 import model.utility.*;
@@ -72,6 +73,7 @@ public class TrafficMap {
 		nodeList.remove(removeNode);
 	}
 
+	// Test
 	public void addDefaultVehicleToRoad(Road road, boolean isRightWay) {
 		Way way = isRightWay ? road.getRightWay() : road.getLeftWay();
 		if (way.getLaneList().isEmpty()) {
@@ -80,8 +82,8 @@ public class TrafficMap {
 		}
 		
 		Lane lane = way.getLaneList().get(0);
-		Vehicle vehicle = new Car(lane.getStartPoint().clone(),
-				new TrafficVector(lane.getStartPoint(), lane.getEndPoint()));
+		// Vehicle vehicle = new Car(lane.getStartPoint().clone(), new TrafficVector(lane.getStartPoint(), lane.getEndPoint()));
+		Vehicle vehicle = new VehicleGenerator().getRandomVehicle(lane.getStartPoint().clone(), new TrafficVector(lane.getStartPoint(), lane.getEndPoint()));
 		lane.addVehicle(vehicle);
 	}
 

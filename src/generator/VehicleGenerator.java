@@ -12,7 +12,7 @@ public class VehicleGenerator {
     //Phải tạo thêm hàm sinh tọa đỗ ngẫu nhiên cho xe nữa
 
     static final Random Rand = new Random();
-     public static Vehicle getVehicle(VehicleType type, TrafficPoint coordinate, TrafficVector direction,  DriverBehavior driverBehavior) {
+     public Vehicle getVehicle(VehicleType type, TrafficPoint coordinate, TrafficVector direction,  DriverBehavior driverBehavior) {
         switch (type) {
             case FIRETRUCK:
                 return new FireTruck(coordinate, direction, driverBehavior );
@@ -26,7 +26,8 @@ public class VehicleGenerator {
                 return new Car(coordinate, direction, driverBehavior);
         }
     }
-    public static Vehicle getRandomVehicle(TrafficPoint coordinate, TrafficVector direction) {
+
+    public Vehicle getRandomVehicle(TrafficPoint coordinate, TrafficVector direction) {
         VehicleType[] types = VehicleType.values();
         // Chọn ngẫu nhiên index từ 0 đến độ dài của mảng enum
         VehicleType randomType = types[Rand.nextInt(types.length)];

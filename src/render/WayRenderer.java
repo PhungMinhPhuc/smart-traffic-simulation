@@ -41,8 +41,7 @@ public class WayRenderer implements IRender<Way> {
 			wayGroup.getChildren().add(laneDividerLine);
 		}
 
-		// Render the traffic light as a perpendicular line centered at the lane end
-		// point.
+		// Render the traffic light as a perpendicular line centered at the lane end point.
 		TrafficPoint firstLaneEndPoint = way.getLaneList().getFirst().getEndPoint();
 		TrafficPoint lastLaneEndPoint = way.getLaneList().getLast().getEndPoint();
 

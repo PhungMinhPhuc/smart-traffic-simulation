@@ -7,7 +7,7 @@ import config.Constants;
 
 public class Ambulance extends Vehicle {
     public Ambulance(TrafficPoint position, TrafficVector direction, DriverBehavior behavior) {
-	   super("Ambulance", Constants.AMBULANCE_MAX_SPEED, Constants.AMBULANCE_LENGTH, Constants.AMBULANCE_WIDTH, Constants.AMBULANCE_SOUND,
+	   super("Ambulance", Constants.AMBULANCE_MAX_SPEED, Constants.AMBULANCE_LENGTH, Constants.AMBULANCE_WIDTH, Constants.AMBULANCE_SOUND, Constants.AMBULANCE_COLOR,
 			   position, direction, behavior);
    }
 

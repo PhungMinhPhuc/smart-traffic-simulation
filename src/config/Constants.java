@@ -46,13 +46,9 @@ public final class Constants {
     public static final double SPACING = 15;
 
     // TRAFFIC LIGHT TIMING
-    public static final int GREEN_TIME = 30;
-    public static final int YELLOW_TIME = 3;
-    public static final int RED_TIME = 30;
-
-    public static final double GREEN_DURATION = 30.0; // Seconds
+    public static final double GREEN_DURATION = 20.0; // Seconds
     public static final double YELLOW_DURATION = 3.0;
-    public static final double RED_DURATION = 30.0;
+    public static final double RED_DURATION = 20.0;
 
     // VEHICLE CONFIG
     public static final double SAFE_DISTANCE = 100.0;
@@ -77,47 +73,53 @@ public final class Constants {
     // VEHICLE SPECIFICS
     
     // Car
-    public static final double CAR_WIDTH = 30.0;
-    public static final double CAR_LENGTH = 15.0;
+    public static final double CAR_WIDTH = 20.0;
+    public static final double CAR_LENGTH = 12.0;
     public static final double CAR_MAX_SPEED = 100.0;
     public static final String CAR_SOUND = "CarSound.wav";
     public static final Color CAR_COLOR = Color.BLUE;
 
     // Ambulance
-    public static final double AMBULANCE_WIDTH = 22.0;
-    public static final double AMBULANCE_LENGTH = 45.0;
+    public static final double AMBULANCE_WIDTH = 25.0;
+    public static final double AMBULANCE_LENGTH = 12.0;
     public static final double AMBULANCE_MAX_SPEED = 120.0;
     public static final String AMBULANCE_SOUND = "AmbulanceSirens.wav";
-
+    public static final Color AMBULANCE_COLOR = Color.RED;
+    
     // Bicycle
     public static final double BICYCLE_WIDTH = 8.0;
-    public static final double BICYCLE_LENGTH = 15.0;
+    public static final double BICYCLE_LENGTH = 5.0;
     public static final double BICYCLE_MAX_SPEED = 20.0;
     public static final String BICYCLE_SOUND = "Bell.wav";
-
+    public static final Color BICYCLE_COLOR = Color.YELLOW;
+    
     // Bus
-    public static final double BUS_WIDTH = 28.0;
-    public static final double BUS_LENGTH = 70.0;
+    public static final double BUS_WIDTH = 40.0;
+    public static final double BUS_LENGTH = 12.0;
     public static final double BUS_MAX_SPEED = 70.0;
     public static final String BUS_SOUND = "BusSound.wav";
-
+    public static final Color BUS_COLOR = Color.GREEN;
+    
     // FireTruck
-    public static final double FIRE_TRUCK_WIDTH = 30.0;
-    public static final double FIRE_TRUCK_LENGTH = 85.0;
+    public static final double FIRE_TRUCK_WIDTH = 50.0;
+    public static final double FIRE_TRUCK_LENGTH = 12.0;
     public static final double FIRE_TRUCK_MAX_SPEED = 110.0;
     public static final String FIRE_TRUCK_SOUND = "FireTruckSiren.wav";
-
+    public static final Color FIRETRUCK_COLOR = Color.ORANGE;
+    
     // Motorbike
     public static final double MOTORBIKE_WIDTH = 10.0;
-    public static final double MOTORBIKE_LENGTH = 20.0;
+    public static final double MOTORBIKE_LENGTH = 8.0;
     public static final double MOTORBIKE_MAX_SPEED = 80.0;
     public static final String MOTORBIKE_SOUND = "MotorbikeSound.wav";
-
+    public static final Color MOTORBIKE_COLOR = Color.PURPLE;
+    
     // Truck
-    public static final double TRUCK_WIDTH = 30.0;
-    public static final double TRUCK_LENGTH = 80.0;
+    public static final double TRUCK_WIDTH = 40.0;
+    public static final double TRUCK_LENGTH = 12.0;
     public static final double TRUCK_MAX_SPEED = 60.0;
     public static final String TRUCK_SOUND = "TruckSound.wav";
+    public static final Color TRUCK_COLOR = Color.BLACK;
 
     // SIMULATION CONFIG
     public static final int TICK_RATE_MS = 1000;

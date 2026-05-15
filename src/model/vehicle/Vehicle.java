@@ -4,6 +4,7 @@ import generator.IdGenerator;
 import model.utility.TrafficPoint;
 import model.utility.TrafficVector;
 import model.vehicle.behavior.DriverBehavior;
+import javafx.scene.paint.Color;
 
 public abstract class Vehicle {
 	protected String id;
@@ -15,12 +16,13 @@ public abstract class Vehicle {
 	protected double length;
 	protected double width;
 	protected String sound;
+	protected Color color;
 	protected DriverBehavior behavior;
 	protected boolean isEmergency;
 	protected TrafficVector direction;
 	protected int laneChangeDirection = 0; // -1: move left, 0: stay, 1: move right
 
-	public Vehicle(String type, double maxSpeed, double length, double width, String sound,
+	public Vehicle(String type, double maxSpeed, double length, double width, String sound, Color color,
 			TrafficPoint position, TrafficVector direction, DriverBehavior behavior) {
 		this.id = IdGenerator.vehicleId(type);
 		this.type = type;
@@ -28,36 +30,37 @@ public abstract class Vehicle {
 		this.length = length;
 		this.width = width;
 		this.sound = sound;
+		this.color = color;
 		this.position = position;
 		this.direction = direction;
 		this.behavior = behavior;
 	}
 
-	// This method updates the vehicle by first asking the driver to 'decide' a plan 
-    // and then moving the vehicle physically using 'applyPhysics'
-	public void update(double distanceToVehicleAhead, 
-                       double speedOfVehicleAhead, 
-                       double distanceToLight,
-			           boolean isRed, 
-                       boolean canRight, 
-                       boolean canLeft, 
-                       double distLeft,
-                       double distRight,
-                       boolean onEmergency, 
-                       boolean isChangingLane,
-                       double deltaTime) {
-        
-		behavior.decide(this, 
-                        distanceToVehicleAhead, 
-                        speedOfVehicleAhead, 
-                        distanceToLight, 
-                        isRed, 
-                        canRight,
-				        canLeft, 
-                        distLeft,
-                        distRight,
-                        onEmergency,
-                        isChangingLane);
+	// This method updates the vehicle by first asking the driver to 'decide' a plan
+	// and then moving the vehicle physically using 'applyPhysics'
+	public void update(double distanceToVehicleAhead,
+			double speedOfVehicleAhead,
+			double distanceToLight,
+			boolean isRed,
+			boolean canRight,
+			boolean canLeft,
+			double distLeft,
+			double distRight,
+			boolean onEmergency,
+			boolean isChangingLane,
+			double deltaTime) {
+
+		behavior.decide(this,
+				distanceToVehicleAhead,
+				speedOfVehicleAhead,
+				distanceToLight,
+				isRed,
+				canRight,
+				canLeft,
+				distLeft,
+				distRight,
+				onEmergency,
+				isChangingLane);
 
 		applyPhysics(deltaTime);
 	}
@@ -72,14 +75,14 @@ public abstract class Vehicle {
 
 	private void applyPhysics(double deltaTime) {
 		speed += acceleration * deltaTime;
-        
+
 		double currentMaxSpeed = maxSpeed * behavior.getSpeedRatio();
 		if (speed > currentMaxSpeed) {
 			speed = currentMaxSpeed;
 		} else if (speed < 0) {
 			speed = 0;
 		}
-        
+
 		position = direction.translatePoint(position, deltaTime * speed);
 	}
 
@@ -161,5 +164,13 @@ public abstract class Vehicle {
 
 	public void setLaneChangeDirection(int laneChangeDirection) {
 		this.laneChangeDirection = laneChangeDirection;
+	}
+
+	public Color getColor() {
+		return color;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
 	}
 }
