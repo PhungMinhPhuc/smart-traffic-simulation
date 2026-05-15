@@ -61,7 +61,7 @@ public class TrafficLight {
     public String getDisplayText() {
         if (displayMode == 0)
             return "";
-        if (displayMode == 2 && internalTimer > 10)
+        if (displayMode == 2 && internalTimer > 8)
             return "";
         return String.valueOf((int) Math.ceil(internalTimer));
     }
@@ -81,5 +81,9 @@ public class TrafficLight {
 
     public void setState(LightState state) {
         this.currentState = state;
+    }
+
+    public void setDisplayMode(int displayMode) {
+        this.displayMode = displayMode;
     }
 }

@@ -8,6 +8,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.Pane;
 import main.java.handler.MapEditorHandler;
 import main.java.handler.SimulationHandler;
@@ -54,6 +56,9 @@ public class MainSceneController {
 	Pane mapLayer;
 
 	@FXML
+	Pane lightLayer;
+
+	@FXML
 	Pane vehicleLayer;
 
 	@FXML
@@ -62,9 +67,22 @@ public class MainSceneController {
 	@FXML
 	Spinner<Integer> laneCountSpinner;
 
+	@FXML
+	ToggleButton rectModeButton;
+
+	@FXML
+	ToggleButton imageModeButton;
+
+	@FXML
+	ToggleGroup renderModeGroup;
+
+	@FXML
+	ToggleGroup lightModeGroup;
+
 	// Map and map renderer
 	private final TrafficMapRenderer trafficMapRenderer = new TrafficMapRenderer();
-	private final VehicleRenderer vehicleRenderer = new VehicleRenderer();
+	private final VehicleRenderer rectRenderer = new VehicleRenderer();
+	private final ImageVehicleRenderer imageRenderer = new ImageVehicleRenderer();
 	private final render.TrafficLightRenderer trafficLightRenderer = new render.TrafficLightRenderer();
 	private final TrafficMap trafficMap = new TrafficMap();
 
@@ -86,7 +104,8 @@ public class MainSceneController {
 		mapEditorHandler.initialize(mapLayer, trafficMapWrapper, trafficMap, trafficMapRenderer,
 				laneCountSpinner, instructionsLabel, addTrafficNodeButton,
 				addRoadButton, removeTrafficNodeButton);
-		simulationHandler.initialize(trafficMap, vehicleRenderer, trafficLightRenderer, vehicleLayer, instructionsLabel);
+		simulationHandler.initialize(trafficMap, rectRenderer, trafficLightRenderer, vehicleLayer, lightLayer,
+				instructionsLabel);
 
 		// config scrollPane and Panes
 		trafficMapWrapper.setPannable(true);
@@ -118,20 +137,46 @@ public class MainSceneController {
 	}
 
 	private void createDefaultMap() {
-		TrafficNode node1 = new Junction(new TrafficPoint(25000, 24500));
-		TrafficNode node2 = new Junction(new TrafficPoint(25000, 25000));
-		TrafficNode node3 = new Junction(new TrafficPoint(25000, 25500));
-		TrafficNode node4 = new Junction(new TrafficPoint(25500, 25000));
-		TrafficNode node5 = new Junction(new TrafficPoint(24500, 25000));
-		trafficMap.addNode(node1);
-		trafficMap.addNode(node2);
-		trafficMap.addNode(node3);
-		trafficMap.addNode(node4);
-		trafficMap.addNode(node5);
-		trafficMap.addConnection(node2, node1, 3);
-		trafficMap.addConnection(node2, node3, 3);
-		trafficMap.addConnection(node2, node4, 3);
-		trafficMap.addConnection(node2, node5, 3);
+		// Define coordinates for a 3x3 grid
+		double c1 = 24600, c2 = 25000, c3 = 25400;
+		double r1 = 24600, r2 = 25000, r3 = 25400;
+
+		// Create nodes
+		TrafficNode n11 = new Junction(new TrafficPoint(c1, r1));
+		TrafficNode n12 = new Junction(new TrafficPoint(c2, r1));
+		TrafficNode n13 = new Junction(new TrafficPoint(c3, r1));
+		TrafficNode n21 = new Junction(new TrafficPoint(c1, r2));
+		TrafficNode n22 = new Junction(new TrafficPoint(c2, r2)); // Center
+		TrafficNode n23 = new Junction(new TrafficPoint(c3, r2));
+		TrafficNode n31 = new Junction(new TrafficPoint(c1, r3));
+		TrafficNode n32 = new Junction(new TrafficPoint(c2, r3));
+		TrafficNode n33 = new Junction(new TrafficPoint(c3, r3));
+
+		trafficMap.addNode(n11);
+		trafficMap.addNode(n12);
+		trafficMap.addNode(n13);
+		trafficMap.addNode(n21);
+		trafficMap.addNode(n22);
+		trafficMap.addNode(n23);
+		trafficMap.addNode(n31);
+		trafficMap.addNode(n32);
+		trafficMap.addNode(n33);
+
+		// Horizontal Connections
+		trafficMap.addConnection(n11, n12, 2);
+		trafficMap.addConnection(n12, n13, 2);
+		trafficMap.addConnection(n21, n22, 3); // Main road
+		trafficMap.addConnection(n22, n23, 3); // Main road
+		trafficMap.addConnection(n31, n32, 2);
+		trafficMap.addConnection(n32, n33, 2);
+
+		// Vertical Connections
+		trafficMap.addConnection(n11, n21, 2);
+		trafficMap.addConnection(n21, n31, 2);
+		trafficMap.addConnection(n12, n22, 4); // Main road
+		trafficMap.addConnection(n22, n32, 4); // Main road
+		trafficMap.addConnection(n13, n23, 1);
+		trafficMap.addConnection(n23, n33, 1);
 	}
 
 	private void renderTrafficMap() {
@@ -180,5 +225,35 @@ public class MainSceneController {
 	@FXML
 	public void resetZoom(ActionEvent event) {
 		zoomHandler.resetZoom(event);
+	}
+
+	@FXML
+	public void switchToRectangleMode(ActionEvent event) {
+		simulationHandler.setVehicleRenderer(rectRenderer);
+		instructionsLabel.setText("Switched to Rectangle Mode");
+	}
+
+	@FXML
+	public void switchToImageMode(ActionEvent event) {
+		simulationHandler.setVehicleRenderer(imageRenderer);
+		instructionsLabel.setText("Switched to Image Mode");
+	}
+
+	@FXML
+	public void switchLightOff(ActionEvent event) {
+		trafficMap.setTrafficLightDisplayMode(0);
+		instructionsLabel.setText("Traffic Light: No Countdown");
+	}
+
+	@FXML
+	public void switchLightFull(ActionEvent event) {
+		trafficMap.setTrafficLightDisplayMode(1);
+		instructionsLabel.setText("Traffic Light: Full Countdown");
+	}
+
+	@FXML
+	public void switchLightThreshold(ActionEvent event) {
+		trafficMap.setTrafficLightDisplayMode(2);
+		instructionsLabel.setText("Traffic Light: Countdown < 8s");
 	}
 }

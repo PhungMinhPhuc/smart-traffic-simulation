@@ -7,7 +7,7 @@ import model.vehicle.behavior.*;
 
 public class VehicleGenerator {
     public enum VehicleType {
-        CAR, FIRETRUCK, MOTORCYCLE, AMBULANCE, TRUCK
+        CAR, FIRETRUCK, MOTORCYCLE, AMBULANCE, TRUCK, BUS, BICYCLE
     }
     //Phải tạo thêm hàm sinh tọa đỗ ngẫu nhiên cho xe nữa
 
@@ -22,6 +22,10 @@ public class VehicleGenerator {
                 return new Ambulance(coordinate, direction, driverBehavior  );
             case TRUCK:
                 return new Truck(coordinate, direction, driverBehavior );
+            case BUS:
+                return new Bus(coordinate, direction, driverBehavior );
+            case BICYCLE:
+                return new Bicycle(coordinate, direction, driverBehavior );
             default:
                 return new Car(coordinate, direction, driverBehavior);
         }

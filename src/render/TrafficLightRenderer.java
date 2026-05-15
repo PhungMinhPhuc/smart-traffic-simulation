@@ -32,7 +32,7 @@ public class TrafficLightRenderer implements IRender<TrafficLight> {
 
         // Background housing: starts at x and extends backwards by w
         Rectangle housing = new Rectangle(x - w, y, w, h);
-        housing.setFill(Color.BLACK);
+        housing.setFill(Constants.HOUSING_COLOR);
 
         // Lights: centered horizontally in the housing
         double centerX = x - w / 2;

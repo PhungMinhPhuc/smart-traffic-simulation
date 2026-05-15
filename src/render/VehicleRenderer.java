@@ -6,7 +6,7 @@ import javafx.scene.shape.Rectangle;
 import model.vehicle.Vehicle;
 
 //VehicleRenderer class that renders a vehicle as a rectangle rotated in its direction
-public class VehicleRenderer implements IRender<Vehicle> {
+public class VehicleRenderer implements IVehicleRenderer {
 	public Group createNode(Vehicle vehicle) {
 		Rectangle rect = new Rectangle(vehicle.getLength(), vehicle.getWidth(), vehicle.getColor());
 		rect.setX(-vehicle.getLength() / 2);

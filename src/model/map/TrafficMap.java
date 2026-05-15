@@ -215,4 +215,10 @@ public class TrafficMap {
 		}
 		return trafficLightList;
 	}
+
+	public void setTrafficLightDisplayMode(int mode) {
+		for (TrafficLight light : getTrafficLightList()) {
+			light.setDisplayMode(mode);
+		}
+	}
 }

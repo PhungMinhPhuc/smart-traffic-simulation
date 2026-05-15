@@ -8,7 +8,7 @@ import javafx.scene.layout.Pane;
 import model.map.TrafficMap;
 import model.vehicle.Vehicle;
 import model.traffic.TrafficLight;
-import render.VehicleRenderer;
+import render.IVehicleRenderer;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,20 +21,22 @@ public class SimulationHandler {
     private boolean simulationPaused = false;
 
     private TrafficMap trafficMap;
-    private VehicleRenderer vehicleRenderer;
+    private IVehicleRenderer vehicleRenderer;
     private render.TrafficLightRenderer trafficLightRenderer;
     private Pane vehicleLayer;
+    private Pane lightLayer;
     private Label instructionsLabel;
     private final Map<Vehicle, Group> vehicleNodeMap = new HashMap<>();
     private final Map<TrafficLight, Group> trafficLightNodeMap = new HashMap<>();
 
-    public void initialize(TrafficMap trafficMap, VehicleRenderer vehicleRenderer,
-            render.TrafficLightRenderer trafficLightRenderer, Pane vehicleLayer,
+    public void initialize(TrafficMap trafficMap, IVehicleRenderer vehicleRenderer,
+            render.TrafficLightRenderer trafficLightRenderer, Pane vehicleLayer, Pane lightLayer,
             Label instructionsLabel) {
         this.trafficMap = trafficMap;
         this.vehicleRenderer = vehicleRenderer;
         this.trafficLightRenderer = trafficLightRenderer;
         this.vehicleLayer = vehicleLayer;
+        this.lightLayer = lightLayer;
         this.instructionsLabel = instructionsLabel;
 
         startVehicleAnimation();
@@ -100,7 +102,7 @@ public class SimulationHandler {
             if (node == null) {
                 node = trafficLightRenderer.createNode(light);
                 trafficLightNodeMap.put(light, node);
-                vehicleLayer.getChildren().add(node);
+                lightLayer.getChildren().add(node);
             } else {
                 trafficLightRenderer.updateNode(node, light);
             }
@@ -108,7 +110,7 @@ public class SimulationHandler {
 
         trafficLightNodeMap.entrySet().removeIf(entry -> {
             if (!activeLights.contains(entry.getKey())) {
-                vehicleLayer.getChildren().remove(entry.getValue());
+                lightLayer.getChildren().remove(entry.getValue());
                 return true;
             }
             return false;
@@ -134,5 +136,16 @@ public class SimulationHandler {
 
     public boolean isPaused() {
         return simulationPaused;
+    }
+
+    public void setVehicleRenderer(IVehicleRenderer renderer) {
+        this.vehicleRenderer = renderer;
+        // Clear existing nodes to force re-render with new renderer
+        if (vehicleLayer != null) {
+            for (Group node : vehicleNodeMap.values()) {
+                vehicleLayer.getChildren().remove(node);
+            }
+        }
+        vehicleNodeMap.clear();
     }
 }

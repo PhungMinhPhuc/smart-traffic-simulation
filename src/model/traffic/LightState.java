@@ -5,7 +5,7 @@ import javafx.scene.paint.Color;
 public enum LightState {
     RED(Color.RED),
     YELLOW(Color.YELLOW),
-    GREEN(Color.GREEN);
+    GREEN(Color.LIGHTGREEN);
 
     private final Color color;
 
