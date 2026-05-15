@@ -1,12 +1,11 @@
-#editingSideBar{
-	-fx-padding: 12;
-	-fx-spacing: 50;
+#editingSideBar {
+	-fx-padding: 10;
+	-fx-spacing: 30;
 	-fx-background-color: #ffffff;
 	-fx-border-color: #cccccc;
 }
 
-#trafficMapContainer{
-    -fx-min-width: 1000px;
-    -fx-min-height: 1000px;
+#trafficMapContainer {
+	-fx-min-width: 1000px;
+	-fx-min-height: 1000px;
 }
-

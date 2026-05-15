@@ -9,9 +9,9 @@ import model.vehicle.Vehicle;
 public class VehicleRenderer implements IRender<Vehicle> {
 	@Override
 	public Parent render(Vehicle vehicle) {
-		Rectangle rect = new Rectangle(vehicle.getWidth(), vehicle.getLength(), vehicle.getColor());
-		rect.setX(-vehicle.getWidth() / 2);
-		rect.setY(-vehicle.getLength() / 2);
+		Rectangle rect = new Rectangle(vehicle.getLength(), vehicle.getWidth(), vehicle.getColor());
+		rect.setX(-vehicle.getLength() / 2);
+		rect.setY(-vehicle.getWidth() / 2);
 
 		// Calculate angle from direction vector
 		double angle = Math.toDegrees(vehicle.getDirection().getAngle());

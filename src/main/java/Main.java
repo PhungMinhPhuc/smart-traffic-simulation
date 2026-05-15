@@ -7,10 +7,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 
 public class Main extends Application {
-	
+
 	@Override
 	public void start(Stage primaryStage) {
-		
+
 		try {
 			Parent root = FXMLLoader.load(getClass().getResource("/MainScene.fxml"));
 			Scene scene = new Scene(root);
@@ -18,15 +18,12 @@ public class Main extends Application {
 			primaryStage.setScene(scene);
 			primaryStage.setMaximized(true);
 			primaryStage.show();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void main(String[] args) {
 		launch(args);
 	}
 }
-
-
-
