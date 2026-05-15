@@ -1,13 +1,6 @@
-*.txt
 bin
 lib
 apache-maven-3.9.6
 maven.zip
-implementation_plan.md
-pom.xml
-src/event
-src/core
-src/controller
 target
 .vscode
-LANE_CHANGE_GUIDE.md
