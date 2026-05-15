@@ -86,8 +86,9 @@ public class Road implements IVehicleTransition {
         for (Lane lane : way.getLaneList()) {
             for (Iterator<Vehicle> vehicleIterator = lane.getVehicleList().iterator(); vehicleIterator.hasNext();) {
                 Vehicle vehicle = vehicleIterator.next();
-                
-                if (laneChangeHandler.isVehicleChangingLane(vehicle)) continue;
+
+                if (laneChangeHandler.isVehicleChangingLane(vehicle))
+                    continue;
 
                 TrafficPoint endPoint = lane.getEndPoint();
                 TrafficVector toEnd = new TrafficVector(vehicle.getPosition(), endPoint);
@@ -102,11 +103,11 @@ public class Road implements IVehicleTransition {
                         // If we haven't reached the end yet, signedDist is negative.
                         // If we passed it, signedDist is positive (overshoot).
                         double signedDist = (toEnd.dotProduct(vehicle.getDirection()) < 0) ? distToEnd : -distToEnd;
-                        
+
                         TrafficPoint nextStart = chosenPath.getStartPoint();
                         TrafficVector nextDir = new TrafficVector(nextStart, chosenPath.getEndPoint());
                         TrafficPoint nextPos = nextDir.translatePoint(nextStart, signedDist);
-                        
+
                         vehicle.setPosition(nextPos);
                         vehicle.setDirection(nextDir);
                         chosenPath.addVehicle(vehicle);

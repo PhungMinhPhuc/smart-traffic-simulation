@@ -15,6 +15,7 @@ import model.traffic.LightState;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Iterator;
 
 public abstract class TrafficNode implements IVehicleTransition {
     protected String id;
@@ -308,7 +309,7 @@ public abstract class TrafficNode implements IVehicleTransition {
     public void transitionVehicles() {
         // Transition all vehicles on all paths of this node
         for (Path path : pathList) {
-            java.util.Iterator<Vehicle> vehicleIterator = path.getVehicleList().iterator();
+            Iterator<Vehicle> vehicleIterator = path.getVehicleList().iterator();
             while (vehicleIterator.hasNext()) {
                 Vehicle vehicle = vehicleIterator.next();
                 TrafficPoint endPoint = path.getEndPoint();
@@ -320,7 +321,7 @@ public abstract class TrafficNode implements IVehicleTransition {
                     if (nextLane != null) {
                         // Perfect continuity transition
                         double signedDist = (toEnd.dotProduct(vehicle.getDirection()) < 0) ? distToEnd : -distToEnd;
-                        
+
                         TrafficPoint nextStart = nextLane.getStartPoint();
                         TrafficVector nextDir = new TrafficVector(nextStart, nextLane.getEndPoint());
                         TrafficPoint nextPos = nextDir.translatePoint(nextStart, signedDist);

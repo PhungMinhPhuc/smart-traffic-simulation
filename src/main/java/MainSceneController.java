@@ -35,6 +35,9 @@ public class MainSceneController {
 	Button pauseSimulationButton;
 
 	@FXML
+	ToggleButton stopSpawnButton;
+
+	@FXML
 	Button resumeSimulationButton;
 
 	@FXML
@@ -66,6 +69,9 @@ public class MainSceneController {
 
 	@FXML
 	Spinner<Integer> laneCountSpinner;
+
+	@FXML
+	Spinner<Double> vehicleSpawnSpinner;
 
 	@FXML
 	ToggleButton rectModeButton;
@@ -105,7 +111,7 @@ public class MainSceneController {
 				laneCountSpinner, instructionsLabel, addTrafficNodeButton,
 				addRoadButton, removeTrafficNodeButton);
 		simulationHandler.initialize(trafficMap, rectRenderer, trafficLightRenderer, vehicleLayer, lightLayer,
-				instructionsLabel);
+				instructionsLabel, vehicleSpawnSpinner, stopSpawnButton);
 
 		// config scrollPane and Panes
 		trafficMapWrapper.setPannable(true);
@@ -126,6 +132,9 @@ public class MainSceneController {
 		laneCountSpinner.setValueFactory(
 				new SpinnerValueFactory.IntegerSpinnerValueFactory(Constants.MIN_LANE_COUNT, Constants.MAX_LANE_COUNT,
 						Constants.DEFAULT_LANE_COUNT));
+
+		vehicleSpawnSpinner.setValueFactory(
+				new SpinnerValueFactory.DoubleSpinnerValueFactory(0.5, 30.0, 3.0, 0.5));
 
 		// Add mouse wheel zoom support
 		trafficMapWrapper.setOnScroll(event -> {
@@ -178,6 +187,25 @@ public class MainSceneController {
 		trafficMap.addConnection(n22, n32, 4); // Main road
 		trafficMap.addConnection(n13, n23, 1);
 		trafficMap.addConnection(n23, n33, 1);
+		
+		renderTrafficMap();
+	}
+
+	@FXML
+	public void clearMap(ActionEvent event) {
+		trafficMap.clear();
+		renderTrafficMap();
+		simulationHandler.clearNodes();
+		instructionsLabel.setText("Map cleared");
+	}
+
+	@FXML
+	public void resetToDefaultMap(ActionEvent event) {
+		trafficMap.clear();
+		simulationHandler.clearNodes();
+		createDefaultMap();
+		renderTrafficMap();
+		instructionsLabel.setText("Default map restored");
 	}
 
 	private void renderTrafficMap() {
@@ -226,6 +254,17 @@ public class MainSceneController {
 	@FXML
 	public void resetZoom(ActionEvent event) {
 		zoomHandler.resetZoom(event);
+	}
+
+	@FXML
+	public void toggleSpawn(ActionEvent event) {
+		if (stopSpawnButton.isSelected()) {
+			stopSpawnButton.setText("Start Spawn");
+			instructionsLabel.setText("Vehicle generation stopped");
+		} else {
+			stopSpawnButton.setText("Stop Spawn");
+			instructionsLabel.setText("Vehicle generation resumed");
+		}
 	}
 
 	@FXML

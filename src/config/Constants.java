@@ -34,7 +34,7 @@ public final class Constants {
 
     // PATH CONFIG
     public static final double PATH_WIDTH = 2.0;
-    public static final Color PATH_COLOR = Color.RED;
+    public static final Color PATH_COLOR = Color.TRANSPARENT;
 
     // GEOMETRY / MATH
     public static final double EPS = 1e-9;
@@ -47,12 +47,12 @@ public final class Constants {
     public static final double SPACING = 15;
 
     // TRAFFIC LIGHT TIMING
-    public static final double GREEN_DURATION = 20.0; // Seconds
+    public static final double GREEN_DURATION = 15.0; // Seconds
     public static final double YELLOW_DURATION = 3.0;
-    public static final double RED_DURATION = 20.0;
+    public static final double RED_DURATION = 15.0;
 
     // VEHICLE CONFIG
-    public static final double SAFE_DISTANCE = 40.0;
+    public static final double SAFE_DISTANCE = 100.0;
     public static final double MUST_STOP_DISTANCE = 40.0;
 
     public static final double NORMAL_SPEED_RATIO = 0.8;
@@ -94,25 +94,25 @@ public final class Constants {
 
     // Bicycle
     public static final double BICYCLE_WIDTH = 5.0;
-    public static final double BICYCLE_LENGTH = 8.0;
+    public static final double BICYCLE_LENGTH = 10.0;
     public static final double BICYCLE_MAX_SPEED = 40.0;
     public static final String BICYCLE_SOUND = "Bell.wav";
     public static final Color BICYCLE_COLOR = Color.YELLOW;
     public static final String BICYCLE_IMAGE = "/assets/images/bicycle.png";
-    public static final double BICYCLE_IMAGE_SCALE = 10.0;
+    public static final double BICYCLE_IMAGE_SCALE = 7.0;
 
     // Bus
     public static final double BUS_WIDTH = 12.0;
-    public static final double BUS_LENGTH = 40.0;
+    public static final double BUS_LENGTH = 35.0;
     public static final double BUS_MAX_SPEED = 120.0;
     public static final String BUS_SOUND = "BusSound.wav";
     public static final Color BUS_COLOR = Color.GREEN;
     public static final String BUS_IMAGE = "/assets/images/bus.png";
-    public static final double BUS_IMAGE_SCALE = 1.0;
+    public static final double BUS_IMAGE_SCALE = 1.2;
 
     // FireTruck
     public static final double FIRE_TRUCK_WIDTH = 12.0;
-    public static final double FIRE_TRUCK_LENGTH = 50.0;
+    public static final double FIRE_TRUCK_LENGTH = 43.0;
     public static final double FIRE_TRUCK_MAX_SPEED = 120.0;
     public static final String FIRE_TRUCK_SOUND = "FireTruckSiren.wav";
     public static final Color FIRETRUCK_COLOR = Color.ORANGE;
@@ -121,21 +121,21 @@ public final class Constants {
 
     // Motorbike
     public static final double MOTORBIKE_WIDTH = 8.0;
-    public static final double MOTORBIKE_LENGTH = 10.0;
+    public static final double MOTORBIKE_LENGTH = 15.0;
     public static final double MOTORBIKE_MAX_SPEED = 100.0;
     public static final String MOTORBIKE_SOUND = "MotorbikeSound.wav";
     public static final Color MOTORBIKE_COLOR = Color.PURPLE;
     public static final String MOTORBIKE_IMAGE = "/assets/images/motorbike.png";
-    public static final double MOTORBIKE_IMAGE_SCALE = 8.0;
+    public static final double MOTORBIKE_IMAGE_SCALE = 4.0;
 
     // Truck
     public static final double TRUCK_WIDTH = 12.0;
-    public static final double TRUCK_LENGTH = 40.0;
+    public static final double TRUCK_LENGTH = 30.0;
     public static final double TRUCK_MAX_SPEED = 100.0;
     public static final String TRUCK_SOUND = "TruckSound.wav";
     public static final Color TRUCK_COLOR = Color.BLACK;
     public static final String TRUCK_IMAGE = "/assets/images/truck.png";
-    public static final double TRUCK_IMAGE_SCALE = 1.0;
+    public static final double TRUCK_IMAGE_SCALE = 1.2;
 
     // SIMULATION CONFIG
     public static final int TICK_RATE_MS = 10000;
@@ -146,6 +146,6 @@ public final class Constants {
 
     // ZOOM CONFIG
     public static final double MIN_ZOOM = 0.1;
-    public static final double MAX_ZOOM = 10000.0;
+    public static final double MAX_ZOOM = 100000.0;
     public static final double ZOOM_STEP = 0.1;
 }

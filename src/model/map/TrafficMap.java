@@ -23,6 +23,11 @@ public class TrafficMap {
 		System.out.println("Map created");
 	}
 
+	public void clear() {
+		nodeList.clear();
+		roadList.clear();
+	}
+
 	public void addNode(TrafficNode newNode) {
 		if (!nodeList.contains(newNode)) {
 			for (TrafficNode node : nodeList) {

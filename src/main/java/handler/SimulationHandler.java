@@ -4,16 +4,16 @@ import config.Constants;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.Pane;
 import model.map.TrafficMap;
+import model.road.Road;
 import model.vehicle.Vehicle;
 import model.traffic.TrafficLight;
 import render.IVehicleRenderer;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class SimulationHandler {
     private AnimationTimer vehicleTimer;
@@ -26,18 +26,22 @@ public class SimulationHandler {
     private Pane vehicleLayer;
     private Pane lightLayer;
     private Label instructionsLabel;
+    private Spinner<Double> vehicleSpawnSpinner;
+    private ToggleButton stopSpawnButton;
     private final Map<Vehicle, Group> vehicleNodeMap = new HashMap<>();
     private final Map<TrafficLight, Group> trafficLightNodeMap = new HashMap<>();
 
     public void initialize(TrafficMap trafficMap, IVehicleRenderer vehicleRenderer,
             render.TrafficLightRenderer trafficLightRenderer, Pane vehicleLayer, Pane lightLayer,
-            Label instructionsLabel) {
+            Label instructionsLabel, Spinner<Double> vehicleSpawnSpinner, ToggleButton stopSpawnButton) {
         this.trafficMap = trafficMap;
         this.vehicleRenderer = vehicleRenderer;
         this.trafficLightRenderer = trafficLightRenderer;
         this.vehicleLayer = vehicleLayer;
         this.lightLayer = lightLayer;
         this.instructionsLabel = instructionsLabel;
+        this.vehicleSpawnSpinner = vehicleSpawnSpinner;
+        this.stopSpawnButton = stopSpawnButton;
 
         startVehicleAnimation();
     }
@@ -56,10 +60,16 @@ public class SimulationHandler {
                 double deltaTime = (now - lastFrameTimeNano) / Constants.NANOS_PER_SECOND;
                 double deltaTimeSinceLastVehicleAdd = (now - lastVehicleAddTimeNano) / Constants.NANOS_PER_SECOND;
                 lastFrameTimeNano = now;
-                // Test
-                if (deltaTimeSinceLastVehicleAdd >= 3) {
+
+                double spawnInterval = (vehicleSpawnSpinner != null) ? vehicleSpawnSpinner.getValue() : 3.0;
+                boolean isSpawnStopped = (stopSpawnButton != null && stopSpawnButton.isSelected());
+
+                if (deltaTimeSinceLastVehicleAdd >= spawnInterval && !isSpawnStopped) {
                     if (!trafficMap.getRoadList().isEmpty()) {
-                        trafficMap.addDefaultVehicleToRoad(trafficMap.getRoadList().get(0), true);
+                        // Spawn on a random road
+                        List<Road> roads = trafficMap.getRoadList();
+                        Road randomRoad = roads.get(new Random().nextInt(roads.size()));
+                        trafficMap.addDefaultVehicleToRoad(randomRoad, true);
                     }
                     lastVehicleAddTimeNano = now;
                 }
@@ -140,12 +150,17 @@ public class SimulationHandler {
 
     public void setVehicleRenderer(IVehicleRenderer renderer) {
         this.vehicleRenderer = renderer;
-        // Clear existing nodes to force re-render with new renderer
+        clearNodes();
+    }
+
+    public void clearNodes() {
         if (vehicleLayer != null) {
-            for (Group node : vehicleNodeMap.values()) {
-                vehicleLayer.getChildren().remove(node);
-            }
+            vehicleLayer.getChildren().clear();
+        }
+        if (lightLayer != null) {
+            lightLayer.getChildren().clear();
         }
         vehicleNodeMap.clear();
+        trafficLightNodeMap.clear();
     }
 }

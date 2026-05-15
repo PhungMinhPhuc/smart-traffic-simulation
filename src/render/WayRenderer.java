@@ -7,7 +7,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import model.road.Lane;
 import model.road.Way;
-import model.traffic.LightState;
 import model.utility.*;
 
 public class WayRenderer implements IRender<Way> {
@@ -51,16 +50,9 @@ public class WayRenderer implements IRender<Way> {
 
 		Line lightLine = new Line(firstLaneEndPoint.getX(), firstLaneEndPoint.getY(), lastLaneEndPoint.getX(),
 				lastLaneEndPoint.getY());
-		lightLine.setStrokeWidth(2.0);
+		lightLine.setStrokeWidth(Constants.ROAD_MARKING_WIDTH);
+		lightLine.setStroke(Constants.ROAD_MARKING_COLOR);
 		
-		LightState state = way.getTrafficLight().getCurrentState();
-		if (state == LightState.RED) {
-			lightLine.setStroke(Color.RED);
-		} else if (state == LightState.YELLOW) {
-			lightLine.setStroke(Color.YELLOW);
-		} else {
-			lightLine.setStroke(Color.LIMEGREEN);
-		}
 		wayGroup.getChildren().add(lightLine);
 
 		return wayGroup;

@@ -69,12 +69,34 @@ public class Junction extends TrafficNode {
                 double otherDistToConflict = otherVeh.getPosition().distanceTo(conflictPoint);
 
                 if (isConflictAhead(otherVeh, otherPath, conflictPoint)) {
-                    // Only yield if the other vehicle is closer and not about to exit
-                    if (otherDistToConflict < distToConflict &&
-                            otherVeh.getPosition()
-                                    .distanceTo(otherPath.getEndPoint()) > Constants.MIN_DISTANCE_TO_END_POINT) {
-                        if (distToConflict < minDistance) {
-                            minDistance = distToConflict;
+                    // Only yield if:
+                    // 1. The other vehicle is not about to exit
+                    // 2. The other vehicle has higher priority or is significantly closer
+                    if (otherVeh.getPosition().distanceTo(otherPath.getEndPoint()) > Constants.MIN_DISTANCE_TO_END_POINT) {
+                        
+                        boolean shouldYield = false;
+                        
+                        // Priority 1: Emergency vehicles
+                        if (!self.isEmergency() && otherVeh.isEmergency()) {
+                            shouldYield = true;
+                        } else if (self.isEmergency() && !otherVeh.isEmergency()) {
+                            shouldYield = false;
+                        } else {
+                            // Priority 2: Closer vehicle (with a small margin to avoid oscillation)
+                            if (otherDistToConflict < distToConflict - 5.0) {
+                                shouldYield = true;
+                            } else if (otherDistToConflict > distToConflict + 5.0) {
+                                shouldYield = false;
+                            } else {
+                                // Priority 3: Stable tie-breaker using ID to prevent deadlocks (circular waiting)
+                                shouldYield = self.getId().compareTo(otherVeh.getId()) > 0;
+                            }
+                        }
+
+                        if (shouldYield) {
+                            if (distToConflict < minDistance) {
+                                minDistance = distToConflict;
+                            }
                         }
                     }
                 }
