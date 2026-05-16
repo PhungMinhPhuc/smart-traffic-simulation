@@ -17,7 +17,7 @@ import render.TrafficMapRenderer;
 public class MapEditorHandler {
 
     private enum EditMode {
-        NONE, ADD_NODE, ADD_ROAD, REMOVE_NODE
+        NONE, ADD_NODE, ADD_ROAD, REMOVE_NODE, REMOVE_ROAD
     }
 
     private EditMode currentMode = EditMode.NONE;
@@ -34,6 +34,7 @@ public class MapEditorHandler {
     private Button addTrafficNodeButton;
     private Button addRoadButton;
     private Button removeTrafficNodeButton;
+    private Button removeRoadButton;
 
     // Internal state for road creation
     private Line previewLine = null;
@@ -42,7 +43,7 @@ public class MapEditorHandler {
 
     public void initialize(Pane mapLayer, ScrollPane trafficMapWrapper, TrafficMap trafficMap,
             TrafficMapRenderer trafficMapRenderer, Spinner<Integer> laneCountSpinner,
-            Label instructionsLabel, Button addNodeBtn, Button addRoadBtn, Button removeNodeBtn) {
+            Label instructionsLabel, Button addNodeBtn, Button addRoadBtn, Button removeNodeBtn, Button removeRoadBtn) {
         this.mapLayer = mapLayer;
         this.trafficMapWrapper = trafficMapWrapper;
         this.trafficMap = trafficMap;
@@ -52,6 +53,7 @@ public class MapEditorHandler {
         this.addTrafficNodeButton = addNodeBtn;
         this.addRoadButton = addRoadBtn;
         this.removeTrafficNodeButton = removeNodeBtn;
+        this.removeRoadButton = removeRoadBtn;
         
         // Ensure mapLayer is clickable everywhere
         this.mapLayer.setStyle("-fx-background-color: rgba(0,0,0,0);");
@@ -82,6 +84,8 @@ public class MapEditorHandler {
             addRoadButton.getStyleClass().remove("active-button");
         if (removeTrafficNodeButton != null)
             removeTrafficNodeButton.getStyleClass().remove("active-button");
+        if (removeRoadButton != null)
+            removeRoadButton.getStyleClass().remove("active-button");
 
         currentMode = EditMode.NONE;
     }
@@ -184,6 +188,24 @@ public class MapEditorHandler {
             TrafficNode clickedNode = trafficMap.getNodeByPoint(localPoint);
             if (clickedNode != null) {
                 trafficMap.removeNode(clickedNode);
+                renderTrafficMap();
+            }
+        });
+    }
+
+    public void removeRoad(ActionEvent event) {
+        setMode(EditMode.REMOVE_ROAD, removeRoadButton);
+        if (currentMode != EditMode.REMOVE_ROAD)
+            return;
+
+        displayInstruction("Click on roads to remove them. Click 'Remove Road' again to stop.");
+
+        mapLayer.setOnMouseClicked((e) -> {
+            Point2D clickedPoint = trafficMapWrapper.getContent().sceneToLocal(e.getSceneX(), e.getSceneY());
+            TrafficPoint localPoint = new TrafficPoint(clickedPoint.getX(), clickedPoint.getY());
+            model.road.Road clickedRoad = trafficMap.getRoadByPoint(localPoint);
+            if (clickedRoad != null) {
+                trafficMap.removeRoad(clickedRoad);
                 renderTrafficMap();
             }
         });

@@ -29,6 +29,7 @@
                 <Spinner fx:id="laneCountSpinner" prefWidth="80.0" />
              </HBox>
              <Button fx:id="addRoadButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#addNewRoad" text="Add Road" />
+             <Button fx:id="removeRoadButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#removeRoad" text="Remove Road" />
              <Button fx:id="resumeSimulationButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#resumeSimulation" text="Resume Simulation" />
              <Button fx:id="pauseSimulationButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#pauseSimulation" text="Pause Simulation" />
              <HBox alignment="CENTER_LEFT" spacing="8">

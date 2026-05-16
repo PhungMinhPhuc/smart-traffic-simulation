@@ -270,6 +270,24 @@ public class TrafficMap {
 		return null;
 	}
 
+	public Road getRoadByPoint(TrafficPoint point) {
+		for (Road road : roadList) {
+			if (TrafficGeometry.getDistanceToSegment(point, road.getStartPoint(), road.getEndPoint()) < 15.0) {
+				return road;
+			}
+		}
+		return null;
+	}
+
+	public void removeRoad(Road road) {
+		if (road == null || !roadList.contains(road)) {
+			return;
+		}
+		roadList.remove(road);
+		road.getStartNode().removeRoad(road);
+		road.getEndNode().removeRoad(road);
+	}
+
 	public ArrayList<TrafficLight> getTrafficLightList() {
 		ArrayList<TrafficLight> trafficLightList = new ArrayList<>();
 		for (Road road : roadList) {

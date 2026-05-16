@@ -32,6 +32,9 @@ public class MainSceneController {
 	Button addRoadButton;
 
 	@FXML
+	Button removeRoadButton;
+
+	@FXML
 	Button pauseSimulationButton;
 
 	@FXML
@@ -109,7 +112,7 @@ public class MainSceneController {
 		zoomHandler.initialize(trafficMapWrapper, trafficMapContainer);
 		mapEditorHandler.initialize(mapLayer, trafficMapWrapper, trafficMap, trafficMapRenderer,
 				laneCountSpinner, instructionsLabel, addTrafficNodeButton,
-				addRoadButton, removeTrafficNodeButton);
+				addRoadButton, removeTrafficNodeButton, removeRoadButton);
 		simulationHandler.initialize(trafficMap, rectRenderer, trafficLightRenderer, vehicleLayer, lightLayer,
 				instructionsLabel, vehicleSpawnSpinner, stopSpawnButton);
 
@@ -227,6 +230,11 @@ public class MainSceneController {
 	@FXML
 	public void removeNode(ActionEvent event) {
 		mapEditorHandler.removeNode(event);
+	}
+
+	@FXML
+	public void removeRoad(ActionEvent event) {
+		mapEditorHandler.removeRoad(event);
 	}
 
 	@FXML
