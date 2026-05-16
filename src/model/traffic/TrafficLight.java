@@ -66,6 +66,7 @@ public class TrafficLight {
         return String.valueOf((int) Math.ceil(internalTimer));
     }
 
+    // Getters and Setters
     public TrafficPoint getPosition() {
         return position;
     }
@@ -74,7 +75,14 @@ public class TrafficLight {
         return rotation;
     }
 
-    // Getters and Setters
+    public void setPosition(TrafficPoint position) {
+        this.position = position;
+    }
+
+    public void setRotation(double rotation) {
+        this.rotation = rotation;
+    }
+
     public LightState getCurrentState() {
         return currentState;
     }

@@ -66,6 +66,17 @@ public class Road implements IVehicleTransition {
         this.laneChangeHandler = new LaneChangeTransition();
     }
 
+    public void refresh() {
+        int lanes = rightWay.getLaneList().size();
+        double dStart = startNode.computeRoadStartDistance(lanes);
+        double dEnd = endNode.computeRoadStartDistance(lanes);
+        TrafficVector dir = new TrafficVector(startNode.getCenterPoint(), endNode.getCenterPoint());
+        this.startPoint = dir.translatePoint(startNode.getCenterPoint(), dStart);
+        this.endPoint = dir.translatePoint(endNode.getCenterPoint(), -dEnd);
+        rightWay.updateLanes(startPoint, endPoint);
+        leftWay.updateLanes(startPoint, endPoint);
+    }
+
     // Check if this road conflicts with another road (i.e., they intersect)
     public boolean checkConflict(Road otherRoad) {
         TrafficPoint p1 = this.startPoint;

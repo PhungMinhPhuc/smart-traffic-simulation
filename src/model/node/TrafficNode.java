@@ -40,17 +40,38 @@ public abstract class TrafficNode implements IVehicleTransition {
      * Radius = max(MIN_RADIUS, maxHalfWidth + ROAD_MARKING_OFFSET)
      */
     public void updateRadius() {
+        double oldR = this.radius;
         double maxHalfWidth = 0;
-        for (Road road : roadList) {
-            int laneCount = road.getRightWay().getLaneList().size();
-            double halfWidth = Constants.LANE_WIDTH * laneCount;
-            if (halfWidth > maxHalfWidth) {
-                maxHalfWidth = halfWidth;
+        if (roadList.isEmpty()) {
+            this.radius = Constants.JUNCTION_MIN_RADIUS;
+        } else {
+            for (Road road : roadList) {
+                int rL = road.getRightWay().getLaneList().size();
+                int lL = road.getLeftWay().getLaneList().size();
+                int laneCount = Math.max(rL, lL);
+                double halfWidth = Constants.LANE_WIDTH * laneCount;
+                if (halfWidth > maxHalfWidth) {
+                    maxHalfWidth = halfWidth;
+                }
             }
+            this.radius = Math.max(Constants.JUNCTION_MIN_RADIUS, maxHalfWidth + Constants.ROAD_MARKING_OFFSET);
         }
-        this.radius = Math.max(Constants.JUNCTION_MIN_RADIUS,
-                maxHalfWidth + Constants.ROAD_MARKING_OFFSET);
+
+        if (Math.abs(this.radius - oldR) > Constants.EPS) {
+            for (Road road : roadList) {
+                road.refresh();
+            }
+            // Update existing paths instead of clearing them to preserve vehicles
+            for (Path path : pathList) {
+                path.updatePoints();
+            }
+            buildAllConflictPoints();
+        }
     }
+
+    // This is now only called when absolutely necessary (major structural change)
+    // but we can try to avoid it.
+    // For now, addRoad/removeRoad already handle path management.
 
     /**
      * Computes the distance from center where a road with the given lane count
@@ -97,7 +118,9 @@ public abstract class TrafficNode implements IVehicleTransition {
                 Path path = new Path(
                         IdGenerator.pathId(id, pathList.size()),
                         entryLane.getEndPoint(),
-                        exitLane.getStartPoint());
+                        exitLane.getStartPoint(),
+                        entryLane,
+                        exitLane);
                 pathList.add(path);
             }
         }
@@ -123,10 +146,8 @@ public abstract class TrafficNode implements IVehicleTransition {
         }
 
         roadList.add(newRoad);
-        updateRadius(); // Recalculate radius based on widest road
-        buildAllConflictPoints();
-
-        // Reset traffic light cycle when a new road is added
+        updateRadius(); 
+        
         this.currentPhaseIndex = 0;
         this.phaseTimer = 0;
     }
@@ -138,25 +159,21 @@ public abstract class TrafficNode implements IVehicleTransition {
      */
     public void removeRoad(Road roadToRemove) {
         if (!roadList.contains(roadToRemove)) {
-            System.out.println("The road to be removed is not connected to this node");
             return;
         }
 
         Way entryWay = getEntryWay(roadToRemove);
         Way exitWay = getExitWay(roadToRemove);
 
-        // Remove any path whose start matches an entry lane end,
-        // or whose end matches an exit lane start
-        pathList.removeIf(path -> entryWay.getLaneList().stream()
-                .anyMatch(lane -> path.getStartPoint().equals(lane.getEndPoint()))
-                || exitWay.getLaneList().stream()
-                        .anyMatch(lane -> path.getEndPoint().equals(lane.getStartPoint())));
+        // Remove only paths associated with this road
+        if (entryWay != null && exitWay != null) {
+            pathList.removeIf(path -> entryWay.getLaneList().contains(path.getEntryLane()) 
+                                   || exitWay.getLaneList().contains(path.getExitLane()));
+        }
 
-        roadList.remove(roadToRemove);
-        buildAllConflictPoints();
-        updateRadius(); // Recalculate radius based on widest road
+        roadList.removeIf(r -> r.equals(roadToRemove));
+        updateRadius();
 
-        // Reset traffic light cycle when a road is removed
         this.currentPhaseIndex = 0;
         this.phaseTimer = 0;
     }

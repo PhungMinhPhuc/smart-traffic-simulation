@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
 import config.Constants;
+import model.road.Lane;
 
 public class Path {
     private String id;
@@ -13,13 +14,22 @@ public class Path {
     private TrafficPoint endPoint;
     private Map<Path, TrafficPoint> conflictPointList;
     private ArrayList<Vehicle> vehicleList = new ArrayList<Vehicle>();
+    private Lane entryLane;
+    private Lane exitLane;
 
-    public Path(String id, TrafficPoint start, TrafficPoint end) {
+    public Path(String id, TrafficPoint start, TrafficPoint end, Lane entryLane, Lane exitLane) {
         this.id = id;
         this.startPoint = start.clone();
         this.endPoint = end.clone();
+        this.entryLane = entryLane;
+        this.exitLane = exitLane;
         this.vehicleList = new ArrayList<>();
         this.conflictPointList = new HashMap<>();
+    }
+    
+    public void updatePoints() {
+        if (entryLane != null) this.startPoint = entryLane.getEndPoint().clone();
+        if (exitLane != null) this.endPoint = exitLane.getStartPoint().clone();
     }
 
     // Finds the intersection point between this path and another using Cramer's
@@ -127,6 +137,14 @@ public class Path {
 
     public Map<Path, TrafficPoint> getConflictPointList() {
         return conflictPointList;
+    }
+
+    public Lane getEntryLane() {
+        return entryLane;
+    }
+
+    public Lane getExitLane() {
+        return exitLane;
     }
 
     @Override

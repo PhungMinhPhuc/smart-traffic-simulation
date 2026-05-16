@@ -11,10 +11,14 @@ public class Way {
     private ArrayList<Lane> laneList = new ArrayList<Lane>();
     private TrafficLight trafficLight;
     private String roadId;
+    private int laneCount;
+    private boolean isRightWay;
 
     public Way(LightState lightState, int laneCount, boolean isRightWay, TrafficPoint roadStartPoint,
             TrafficPoint roadEndPoint, String roadId) {
         this.roadId = roadId;
+        this.laneCount = laneCount;
+        this.isRightWay = isRightWay;
         // Create lanes base on the lane count and the position of the road
         TrafficVector vectorRoad = new TrafficVector(roadStartPoint, roadEndPoint);
         if (isRightWay) {
@@ -52,6 +56,36 @@ public class Way {
             double angleDegrees = Math.toDegrees(direction.getAngle());
             this.trafficLight = new TrafficLight(firstLane.getEndPoint(), 1, angleDegrees);
             this.trafficLight.setState(lightState);
+        }
+    }
+
+    public void updateLanes(TrafficPoint roadStartPoint, TrafficPoint roadEndPoint) {
+        TrafficVector vectorRoad = new TrafficVector(roadStartPoint, roadEndPoint);
+        TrafficVector translateVector = vectorRoad.rotateVector(Math.toRadians(isRightWay ? -90 : 90));
+        translateVector = translateVector.scale(Constants.LANE_WIDTH / 2.0);
+
+        for (int i = 0; i < laneCount; i++) {
+            int j = 2 * i + 1;
+            TrafficPoint start, end;
+            if (isRightWay) {
+                start = new TrafficPoint(roadEndPoint.getX() + translateVector.getX() * j,
+                        roadEndPoint.getY() + translateVector.getY() * j);
+                end = new TrafficPoint(roadStartPoint.getX() + translateVector.getX() * j,
+                        roadStartPoint.getY() + translateVector.getY() * j);
+            } else {
+                start = new TrafficPoint(roadStartPoint.getX() + translateVector.getX() * j,
+                        roadStartPoint.getY() + translateVector.getY() * j);
+                end = new TrafficPoint(roadEndPoint.getX() + translateVector.getX() * j,
+                        roadEndPoint.getY() + translateVector.getY() * j);
+            }
+            laneList.get(i).setPoints(start, end);
+        }
+
+        if (trafficLight != null && !laneList.isEmpty()) {
+            Lane firstLane = laneList.get(0);
+            trafficLight.setPosition(firstLane.getEndPoint());
+            TrafficVector direction = new TrafficVector(firstLane.getStartPoint(), firstLane.getEndPoint());
+            trafficLight.setRotation(Math.toDegrees(direction.getAngle()));
         }
     }
 

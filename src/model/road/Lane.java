@@ -21,6 +21,11 @@ public class Lane {
         this.vehicleList = new ArrayList<>();
     }
 
+    public void setPoints(TrafficPoint start, TrafficPoint end) {
+        this.startPoint = start.clone();
+        this.endPoint = end.clone();
+    }
+
     // Adds a vehicle to this lane when it enters the road.
     public void addVehicle(Vehicle vehicle) {
         if (!vehicleList.contains(vehicle)) {
