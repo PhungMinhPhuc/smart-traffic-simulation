@@ -7,6 +7,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 import javafx.geometry.VPos;
 import java.io.InputStream;
@@ -54,8 +55,11 @@ public class TrafficLightRenderer implements IRender<TrafficLight> {
         } catch (Exception e) {
             timerText.setFont(new Font(13));
         }
+        // Center horizontally within the wrapping width
         timerText.setWrappingWidth(Constants.HOUSING_WIDTH);
-        timerText.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+        timerText.setTextAlignment(TextAlignment.CENTER);
+
+        // Set vertical origin to center for better positioning
         timerText.setTextOrigin(VPos.CENTER);
         timerText.setRotate(90);
     }
@@ -85,6 +89,7 @@ public class TrafficLightRenderer implements IRender<TrafficLight> {
         greenLight.setCenterX(centerX);
         greenLight.setCenterY(y + 3 * h / 4 - Constants.SPACING / 2);
 
+        // Update lights with active state and glow effect
         updateLight(redLight, Color.RED, light.getCurrentState() == LightState.RED);
         updateLight(yellowLight, Color.YELLOW, light.getCurrentState() == LightState.YELLOW);
         updateLight(greenLight, Color.GREEN, light.getCurrentState() == LightState.GREEN);
@@ -93,9 +98,12 @@ public class TrafficLightRenderer implements IRender<TrafficLight> {
         timerText.setText(timerTextValue);
         timerText.setVisible(!timerTextValue.isEmpty());
         timerText.setFill(light.getCurrentState().getColor());
+
+        // Update timer text position
         timerText.setX(x - w);
         timerText.setY(y + 4 * h / 4 - Constants.SPACING / 2);
 
+        // Update rotation transform
         if (!group.getTransforms().isEmpty() && group.getTransforms().get(0) instanceof Rotate) {
             Rotate rotate = (Rotate) group.getTransforms().get(0);
             rotate.setAngle(light.getRotation());

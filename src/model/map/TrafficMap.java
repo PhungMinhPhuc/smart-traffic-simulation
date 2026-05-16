@@ -114,20 +114,21 @@ public class TrafficMap {
 
 				for (int i = 0; i < pathVehicles.size(); i++) {
 					Vehicle currentVehicle = pathVehicles.get(i);
-					
+
 					double distanceToAhead = -1;
 					if (node instanceof Junction) {
 						distanceToAhead = ((Junction) node).getEffectiveDistanceAhead(currentVehicle, path);
 					}
-					
+
 					double speedOfAhead = 0;
-					
+
 					// If there's a vehicle ahead on the SAME path, use its speed
 					if (i > 0) {
 						speedOfAhead = pathVehicles.get(i - 1).getSpeed();
 					}
 
-					currentVehicle.update(distanceToAhead, speedOfAhead, 1000.0, false, false, false, -1, -1, false, false, timeInterval);
+					currentVehicle.update(distanceToAhead, speedOfAhead, 1000.0, false, false, false, -1, -1, false,
+							false, timeInterval);
 				}
 			}
 		}
@@ -163,12 +164,13 @@ public class TrafficMap {
 
 	private boolean isVehicleInvalid(Vehicle v, TrafficPoint start, TrafficPoint end) {
 		// 1. Check if vehicle has drifted too far from its assigned segment.
-		// We allow a buffer larger than MIN_DISTANCE_TO_END_POINT to accommodate 
-		// "pre-transitioned" vehicles positioned slightly before the start of the segment.
+		// We allow a buffer larger than MIN_DISTANCE_TO_END_POINT to accommodate
+		// "pre-transitioned" vehicles positioned slightly before the start of the
+		// segment.
 		double distToSegment = TrafficGeometry.getDistanceToSegment(v.getPosition(), start, end);
 		double buffer = Constants.MIN_DISTANCE_TO_END_POINT + 15.0; // Total buffer for adherence
-		
-		if (distToSegment > buffer) { 
+
+		if (distToSegment > buffer) {
 			return true;
 		}
 
@@ -272,7 +274,8 @@ public class TrafficMap {
 
 	public Road getRoadByPoint(TrafficPoint point) {
 		for (Road road : roadList) {
-			if (TrafficGeometry.getDistanceToSegment(point, road.getStartPoint(), road.getEndPoint()) < 15.0) {
+			if (TrafficGeometry.getDistanceToSegment(point, road.getStartPoint(),
+					road.getEndPoint()) < Constants.LANE_WIDTH * road.getRightWay().getLaneList().size()) {
 				return road;
 			}
 		}
