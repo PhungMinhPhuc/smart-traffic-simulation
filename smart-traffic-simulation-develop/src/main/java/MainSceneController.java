@@ -14,6 +14,7 @@ import javafx.scene.layout.Pane;
 import main.java.handler.MapEditorHandler;
 import main.java.handler.SimulationHandler;
 import main.java.handler.ZoomHandler;
+import main.java.handler.SoundManager;
 import model.map.*;
 import model.node.*;
 import model.utility.*;
@@ -84,6 +85,15 @@ public class MainSceneController {
 
 	@FXML
 	ToggleGroup lightModeGroup;
+	
+	@FXML
+	ToggleButton muteButton;
+
+	@FXML
+	ToggleButton unmuteButton;
+
+	@FXML
+	ToggleGroup soundModeGroup;
 
 	// Map and map renderer
 	private final TrafficMapRenderer trafficMapRenderer = new TrafficMapRenderer();
@@ -295,5 +305,16 @@ public class MainSceneController {
 	public void switchLightThreshold(ActionEvent event) {
 		trafficMap.setTrafficLightDisplayMode(2);
 		instructionsLabel.setText("Traffic Light: Countdown < 8s");
+	}
+	
+	public void muteSound(ActionEvent event) {
+    	SoundManager.mute();
+    	instructionsLabel.setText("Sound muted");
+	}
+
+	@FXML
+	public void unmuteSound(ActionEvent event) {
+   	 	SoundManager.unmute();
+    	instructionsLabel.setText("Sound unmuted");
 	}
 }
