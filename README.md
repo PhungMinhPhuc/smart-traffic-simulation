@@ -2,7 +2,7 @@
 
 A sophisticated, multi-agent urban traffic simulation engine built with JavaFX. This project provides a robust framework for modeling complex traffic interactions, driver behaviors, and urban infrastructure management.
 
-<img width="1280" height="800" alt="simulation" src="https://github.com/user-attachments/assets/ae64006f-7850-40c6-b339-e565e688552a" />
+<img width="1280" height="800" alt="fig_image_mode" src="https://github.com/user-attachments/assets/da689f15-4a80-43f6-af7d-5ee96514b65b" />
 
 > [!NOTE]
 > The current implementation features a "Dual-Switch" architecture for vehicle rendering. Users can toggle between **Rectangle Mode** (schematic view with ID labels) and **Image Mode** (sprite-based view) using separate dedicated ToggleButtons to ensure clear visual choice.
