@@ -1,0 +1,388 @@
+\documentclass[a4paper,13pt,3p,twoside]{report}
+\usepackage{scrextend}
+\changefontsizes{13pt}
+\usepackage[utf8]{vietnam}
+\usepackage[top=2cm, bottom=2cm, left=3.5cm, right=2.5cm]{geometry}
+\usepackage{xurl}
+\usepackage{appendix}
+\usepackage{babel}
+\usepackage{xcolor}
+\usepackage{outlines}
+\usepackage{graphicx} % Cho phép chèn hỉnh ảnh
+\usepackage{fancybox} % Tạo khung box
+\usepackage{indentfirst} % Thụt đầu dòng ở dòng đầu tiên trong đoạn
+\usepackage{amsthm} % Cho phép thêm các môi trường định nghĩa
+\usepackage{latexsym} % Các kí hiệu toán học
+\usepackage{amsmath} % Hỗ trợ một số biểu thức toán học
+\usepackage{amssymb} % Bổ sung thêm kí hiệu về toán học
+\usepackage{amsbsy} % Hỗ trợ các kí hiệu in đậm
+\usepackage{times} % Chọn font Time New Romans
+\usepackage{array} % Tạo bảng array
+\usepackage{enumitem} % Cho phép thay đổi kí hiệu của list
+\usepackage{subfiles} % Chèn các file nhỏ, giúp chia các chapter ra nhiều file hơn
+\usepackage{titlesec} % Giúp chỉnh sửa các tiêu đề, đề mục như chương, phần,..
+\usepackage{titletoc}
+\usepackage{chngcntr} % Dùng để thiết lập lại cách đánh số caption,..
+\usepackage{pdflscape} % Đưa các bảng có kích thước đặt theo chiều ngang giấy
+\usepackage{afterpage}
+\usepackage[ruled,vlined]{algorithm2e}  % Hỗ trợ viết các giải thuật
+\usepackage{capt-of} % Cho phép sử dụng caption lớn đối với landscape page
+\usepackage{multirow} % Merge cells
+\usepackage{fancyhdr} % Cho phép tùy biến header và footer
+% \usepackage[natbib,backend=biber,style=ieee]{biblatex} % Giúp chèn tài liệu tham khảo
+\usepackage{rotating}
+\usepackage[font=small,labelfont=bf]{caption}
+
+\usepackage{listings}
+\definecolor{vscBlue}{HTML}{0000FF}      % Xanh dương thuần khiết (Keywords)
+\definecolor{vscTeal}{HTML}{00709F}      % Xanh lơ đậm (Classes/Types) 
+\definecolor{vscRed}{HTML}{AF0000}       % Đỏ đậm (Strings) 
+\definecolor{vscGreen}{HTML}{008000}     % Xanh lá cây (Comments)
+\definecolor{vscAnnotation}{HTML}{797980} % Xám trầm (Annotation)
+\definecolor{vscNumbers}{HTML}{000000}   % Xám số dòng
+\definecolor{vscBg}{HTML}{FFFFFF}        % Nền trắng sạch
+
+\lstset{
+    language=Java,
+    backgroundcolor=\color{vscBg},
+    basicstyle=\bfseries\ttfamily\footnotesize\color{black}, 
+    columns=flexible,
+    keepspaces=true,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,    
+    showstringspaces=false,
+    frame=single,
+    classoffset=0,
+    numbers=left,
+    numbersep=8pt,
+    numberstyle=\tiny\color{vscNumbers},
+    commentstyle=\color{vscGreen},
+    stringstyle=\color{vscRed},
+    keywordstyle=\color{vscBlue}, 
+    emph={Application, Scene, Button, StackPane, Stage, JavaFXHello, String, ActionEvent, System, out, println, launch, setText, setOnAction, add, setScene, setTitle, show, getChildren, root, scene, primaryStage, btnHello, evt},
+    emphstyle=\color{vscTeal},
+    literate={->}{{{\color{vscBlue}->}}}2 
+             {@Override}{{{\color{vscAnnotation}@Override}}}9
+             {.}{{{\color{black}.}}}1, 
+    rulecolor=\color{black},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    xleftmargin=0pt,
+    xrightmargin=0pt,
+    linewidth=\linewidth
+}
+
+\usepackage{float}
+\usepackage{subcaption}
+
+
+\usepackage{tcolorbox}
+\usepackage{xparse}
+\RenewDocumentCommand{\texttt}{v}{%
+  \tcbox[
+    boxrule=0.4pt,
+    arc=1pt,
+    colback=gray!15,
+    colframe=gray!30,
+    coltext=black,
+    left=2pt, right=2pt,
+    top=1pt, bottom=1pt,
+    boxsep=0pt,
+    fontupper=\bfseries\ttfamily\footnotesize,
+    valign=center,
+    nobeforeafter,
+    box align=base
+  ]{#1}%
+}
+
+
+\usepackage[nonumberlist, nopostdot, nogroupskip, acronym]{glossaries}
+\usepackage{glossary-superragged}
+\setglossarystyle{superraggedheaderborder}
+\usepackage{setspace}
+\usepackage{parskip}
+
+% package content table
+\usepackage{tocbasic}
+
+\usepackage{blindtext}
+
+% ===================================================
+
+% \renewcommand{\bibname}{Danh_sach_tai_lieu_tham_khao} 
+\usepackage[backend=bibtex,style=ieee]{biblatex}  %backend=biber is 'better'
+
+\addbibresource{Chapter/reference.bib} % chèn file chứa danh mục tài liệu tham khảo vào 
+
+\include{lstlisting} % Phần này cho phép chèn code và formatting code như C, C++, Python
+
+\setglossarystyle{longheaderborder} % Style có khung và tiêu đề
+% Tùy chỉnh lại độ rộng cột để không bị tràn lề
+\renewenvironment{theglossary}%
+  {\begin{longtable}{|p{0.2\textwidth}|p{0.7\textwidth}|}}% p{0.7\textwidth} giúp tự xuống dòng
+  {\end{longtable}}
+\makenoidxglossaries
+\input{Chapter/glossary}
+
+% ===================================================
+%Thay đổi font của công thước toán học - dùng Xe hoặc Lua
+% \usepackage{unicode-math}
+% \setmathfont{CambriaMath} %[Extension={.ttf},Path=./CambriaFonts/,Scale=1]
+% \setmathrm{Cambria} %[Extension={.ttf},Path=./CambriaFonts/,Scale=1]
+% \usepackage{fontspec}
+% \setmainfont{Times New Roman}
+\sloppy
+
+
+
+\fancypagestyle{plain}{%
+\fancyhf{} % clear all header and footer fields
+\fancyfoot[RO,RE]{\thepage} %RO=right odd, RE=right even
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}}
+
+\setlength{\headheight}{10pt}
+
+\def \TITLE{GRADUATION THESIS}
+\def \AUTHOR{Phùng Minh Phúc}
+
+% ===================================================
+\titleformat{\chapter}[hang]{\centering\bfseries}{CHAPTER \thechapter.\ }{0pt}{}[]
+
+\titleformat 
+    {\chapter} % command
+    [hang] % shape
+    {\centering\bfseries} % format
+    {CHAPTER \thechapter.\ } % label
+    {0pt} %sep
+    {} % before
+    [] % after
+\titlespacing*{\chapter}{0pt}{-20pt}{20pt}
+
+\titleformat
+    {\section} % command
+    [hang] % shape
+    {\bfseries} % format
+    {\thechapter.\arabic{section}\ \ \ \ } % label
+    {0pt} %sep
+    {} % before
+    [] % after
+\titlespacing{\section}{0pt}{\parskip}{0.5\parskip}
+
+\titleformat
+    {\subsection} % command
+    [hang] % shape
+    {\bfseries} % format
+    {\thechapter.\arabic{section}.\arabic{subsection}\ \ \ \ } % label
+    {0pt} %sep
+    {} % before
+    [] % after
+\titlespacing{\subsection}{30pt}{\parskip}{0.5\parskip}
+
+\renewcommand\thesubsubsection{\alph{subsubsection}}
+\titleformat
+    {\subsubsection} % command
+    [hang] % shape
+    {\bfseries} % format
+    {\alph{subsubsection}, \ } % label
+    {0pt} %sep
+    {} % before
+    [] % after
+\titlespacing{\subsubsection}{50pt}{\parskip}{0.5\parskip}
+
+% \newcommand{\titlesize}{\fontsize{18pt}{23pt}\selectfont}
+% \newcommand{\subtitlesize}{\fontsize{16pt}{21pt}\selectfont}
+% \titleclass{\part}{top}
+% \titleformat{\part}[display]
+%   {\normalfont\huge\bfseries}{\centering}{20pt}{\Huge\centering}
+% \titlespacing{\part}{0pt}{em}{1em}
+% \titlespacing{\section}{0pt}{\parskip}{0.5\parskip}
+% \titlespacing{\subsection}{0pt}{\parskip}{0.5\parskip}
+% \titlespacing{\subsubsection}{0pt}{\parskip}{0.5\parskip}
+
+
+
+% ===================================================
+\usepackage{hyperref}
+\hypersetup{pdfborder = {0 0 0}}
+\hypersetup{pdftitle={\TITLE},
+	pdfauthor={\AUTHOR}}
+	
+\usepackage[all]{hypcap} % Cho phép tham chiếu chính xác đến hình ảnh và bảng biểu
+
+\graphicspath{{figures/}{../figures/}} % Thư mục chứa các hình ảnh
+
+\counterwithin{figure}{chapter} % Đánh số hình ảnh kèm theo chapter. Ví dụ: Hình 1.1, 1.2,..
+
+\title{\bf \TITLE}
+\author{\AUTHOR}
+
+\setcounter{secnumdepth}{3} % Cho phép subsubsection trong report
+% \setcounter{tocdepth}{3} % Chèn subsubsection vào bảng mục lục
+
+\theoremstyle{definition}
+\newtheorem{example}{Example}[chapter] % Định nghĩa môi trường ví dụ
+
+\onehalfspacing
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{15pt}
+
+
+
+% =========================== BODY ===============
+\begin{document}
+% \newgeometry{top=2cm, bottom=2cm, left=2cm, right=2cm}
+\subfile{Chapter/Cover} % Phần bìa
+% \subfile{Chapter/Cover2} % Phần bìa lót
+% \restoregeometry
+
+% ===================================================
+\pagestyle{empty} % Header và footer rỗng
+%\newpage
+%\pagenumbering{gobble} % Xóa page numbering ở cuối trang
+%\subfile{chapters/0_1_subject.tex}
+
+% \pagestyle{empty} % Header và footer rỗng
+\newpage
+\pagenumbering{gobble} % Xóa page numbering ở cuối trang
+\subfile{Chapter/0_2_Acknowledgment.tex}
+
+% \pagestyle{empty} % Header và footer rỗng
+\newpage
+\pagenumbering{gobble} % Xóa page numbering ở cuối trang
+\subfile{Chapter/0_3_Abstract.tex}
+
+
+% ===================================================
+% \pagestyle{empty} % Header và footer rỗng
+\newpage
+\pagenumbering{gobble} % Xóa page numbering ở cuối trang
+\renewcommand*\contentsname{TABLE OF CONTENTS}
+\titlecontents{chapter}
+    [0.0cm]             % left margin
+    {\bfseries\vspace{0.3cm}}                  % above code
+    {{\bfseries{\scshape} CHAPTER \thecontentslabel.\ }} % numbered format
+    {}         % unnumbered format
+    {\titlerule*[0.3pc]{.}\contentspage}         % filler-page-format, e.g dots
+    
+\titlecontents{section}
+    [0.0cm]             % left margin
+    {\vspace{0.3cm}}                  % above code
+    {\thecontentslabel \ } % numbered format
+    {}         % unnumbered format
+    {\titlerule*[0.3pc]{.}\contentspage}         % filler-page-format, e.g dots
+    
+\titlecontents{subsection}
+    [1.0cm]             % left margin
+    {\vspace{0.3cm}}                  % above code
+    {\thecontentslabel \ } % numbered format
+    {}         % unnumbered format
+    {\titlerule*[0.3pc]{.}\contentspage}         % filler-page-format, e.g dots
+
+ % Tạo mục lục tự động
+\addtocontents{toc}{\protect\thispagestyle{empty}}
+\tableofcontents 
+\thispagestyle{empty}
+\cleardoublepage
+
+\pagenumbering{roman}
+%Tạo danh mục hình vẽ.
+\renewcommand{\listfigurename}{LIST OF FIGURES}
+{\let\oldnumberline\numberline
+\renewcommand{\numberline}{Figure~\oldnumberline}
+\listoffigures} 
+% \phantomsection\addcontentsline{toc}{section}{\numberline {} DANH MỤC HÌNH VẼ}
+\newpage
+
+
+ %Tạo danh mục bảng biểu.
+\renewcommand{\listtablename}{LIST OF TABLES}
+{\let\oldnumberline\numberline
+\renewcommand{\numberline}{Table~\oldnumberline}
+\listoftables}
+% \phantomsection\addcontentsline{toc}{section}{\numberline {} DANH MỤC BẢNG BIỂU}
+
+\glsaddall 
+% \renewcommand*{\glossaryname}{Danh sách thuật ngữ}
+\renewcommand*{\acronymname}{LIST OF ABBREVIATIONS}
+\renewcommand*{\entryname}{Abbreviation}
+\renewcommand*{\descriptionname}{Definition}
+
+% In danh sách
+\printnoidxglossary[type=\acronymtype] % Chỉ định in loại từ viết tắt (acronym)
+% \phantomsection\addcontentsline{toc}{section}{\numberline {} DANH MỤC THUẬT NGỮ VÀ TỪ VIẾT TẮT}
+
+% \renewcommand\appendixname{APPENDIX}
+% \renewcommand\appendixpagename{APPENDIX}
+% \renewcommand\appendixtocname{APPENDIX}
+
+\renewcommand{\figurename}{Figure}
+\renewcommand{\tablename}{Table}
+\renewcommand{\chaptername}{CHAPTER}
+
+% ===================================================
+
+
+\newpage
+\pagenumbering{arabic}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[RE, LO]{\leftmark}
+%\fancyhead[LE]{\rightmark}
+\fancyfoot[RE, LO]{\thepage}
+
+\chapter{INTRODUCTION}
+\subfile{Chapter/1_Introduction} % Phần mở đầu
+
+\newpage
+%\pagestyle{fancy} % Áp dụng header và footer
+\chapter{METHODOLOGY}
+\subfile{Chapter/2_Methodology}
+
+\newpage
+% \pagestyle{fancy} % Áp dụng header và footer
+\chapter{RESULTS DISCUSSION}
+\subfile{Chapter/3_Numerical_results}
+
+\newpage
+\chapter{CONCLUSIONS}
+\subfile{Chapter/4_Conclusions}
+
+\newpage
+% \pagestyle{fancy} % Áp dụng header và footer
+% \chapter*{SHORT NOTICES ON REFERENCE} %Kết luận và hướng phát triển}
+% \label{chapter:reference}
+% \subfile{Chapter/5_Reference}
+
+% ===================================================
+\newpage
+\renewcommand\bibname{REFERENCE}
+\printbibliography
+\phantomsection\addcontentsline{toc}{chapter}{REFERENCE}
+
+% \appendixpage
+% \appendix
+% \addappheadtotoc
+
+\titleformat{\chapter}[hang]{\centering\bfseries}{ \thechapter.\ }{0pt}{}[]
+\titlespacing*{\chapter}{0pt}{-20pt}{20pt}
+
+\titlecontents{chapter}
+    [0.0cm]             % left margin
+    {\bfseries\vspace{0.3cm}}                  % above code
+    {{\bfseries{\scshape} \thecontentslabel.\ }} % numbered format
+    {}         % unnumbered format
+    {\titlerule*[0.3pc]{.}\contentspage} 
+    
+% \chapter{GRADUATION THESIS GUIDANCE}
+% \subfile{Chapter/Appendix_A}
+
+% \newpage
+% \chapter{USE CASE DESCRIPTIONS}
+% \subfile{Chapter/Appendix_B}
+
+\end{document}

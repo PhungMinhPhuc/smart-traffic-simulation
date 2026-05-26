@@ -1,0 +1,127 @@
+\documentclass[aspectratio=169, 10pt]{beamer}
+\usepackage[utf8]{vietnam}
+\usetheme{Boadilla}
+\usecolortheme{default}
+\usepackage[x11names]{xcolor}
+\usepackage{amsmath,amssymb,fancyhdr}
+\usepackage{newpxtext, newpxmath}
+% \usepackage{unicode-math}
+% \usepackage{fontspec}
+% \setsansfont{Palatino}
+\usepackage{tikz,tikz-3dplot,tkz-tab}
+\usetikzlibrary{arrows,calc,intersections,patterns,angles,shapes.geometric}
+\usetikzlibrary{calc,patterns}
+\usepackage{booktabs, array, xcolor}
+\usepackage{listings} % Cấu hình style cho code (Java/C++)
+\lstset{
+    language=Java,
+    basicstyle=\ttfamily\scriptsize,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{green!50!black}\itshape,
+    stringstyle=\color{orange},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=5pt,
+    backgroundcolor=\color{gray!5},
+    showspaces=false,
+    showstringspaces=false,
+    frame=single,
+    tabsize=2,
+    breaklines=true,
+    breakatwhitespace=false,
+    captionpos=b,
+    xleftmargin=15pt,
+}
+\everymath{\displaystyle}
+\graphicspath{{Figures/}}
+\sloppy
+\setbeamerfont{frametitle}{series=\bfseries}
+
+%------------------------------------------------------------
+%This block of code defines the information to appear in the
+%Title page
+\title[OOP – Project 2025.2]
+{\fontsize{18}{0}{\textcolor{Blue3}{\textbf{Smart City Traffic Simulation}}}}
+
+\author[Phung Minh Phuc]
+{\bf \textbf{Group 01}\\[0.3cm]
+\begin{tabular}{l l}
+Le Trong Nghia & 202416989 \\
+Duong Tuan Phi & 202417001 \\
+Phung Minh Phuc & 202417009 \\
+\end{tabular} 
+\hspace{1cm} 
+\begin{tabular}{l l}
+Tran Van Trung & 202417057 \\
+Tran Xuan Truong & 202417061 \\
+Nguyen Duc Van & 202417073 \\
+\end{tabular}}
+\institute[SoICT-HUST]
+{
+    \normalsize Hanoi University of Science and Technology
+}
+\date[\the\year]{\the\year}
+\logo { 
+\begin{tikzpicture}[overlay,remember picture]
+\node[left=0.2cm] at (current page.27){
+    \includegraphics[width=1.5cm]{Images/logo-soict-hust.png} %0.45 khi dùng hust.png
+};
+\end{tikzpicture}
+}
+\setbeamercolor{title}{parent=date in head/foot}
+\hypersetup{
+    pdfauthor={Phùng Minh Phúc},
+    pdfproducer={Microsoft Print to PDF},
+    hidelinks,
+}
+%End of title page configuration block
+%------------------------------------------------------------
+
+
+
+%------------------------------------------------------------
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{\textbf{Contents}}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+%------------------------------------------------------------
+
+
+\begin{document}
+\frame{\titlepage}
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{\textbf{Contents}}
+\tableofcontents
+\end{frame}
+%---------------------------------------------------------
+
+\renewcommand{\arraystretch}{1.6} 
+\setlength{\tabcolsep}{8pt}      
+
+% FRAME 1: 
+\begin{frame}{1. XXX}
+    \centering
+    \small
+    \begin{tabular}{|l|l|l|}
+        \hline
+        \textbf{Attribute} & \textbf{Datatype} & \textbf{Description} \\ \hline
+        \texttt{id} & UUID (PK) & XXX \\ \hline
+        \texttt{email} & Varchar(255) & XXX \\ \hline
+        \texttt{password} & Text & XXX \\ \hline
+ role& Varchar&XXX\\\hline
+    \end{tabular}
+    \vspace{0.3cm}
+    \begin{itemize}
+        \item XXX.
+    \end{itemize}
+\end{frame}
+
+
+
+\end{document}
