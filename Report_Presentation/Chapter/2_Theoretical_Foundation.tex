@@ -268,20 +268,20 @@ Let the primary road baseline vector from the start junction $W_{\text{start}}$ 
     \overrightarrow{V} = W_{\text{end}} - W_{\text{start}}
 \end{equation}
 The normalized direction vector of the road is $\overrightarrow{u} = \frac{\overrightarrow{V}}{\|\overrightarrow{V}\|}$.\\
-For the \textbf{Right-Hand Way} (which carries traffic from $W_{\text{end}}$ to $W_{\text{start}}$), the lanes are offset to the right by rotating the direction vector by $-90^\circ$:
+For the \textbf{Left-Hand Way} (which carries traffic from $W_{\text{end}}$ to $W_{\text{start}}$), the lanes are offset to the left by rotating the direction vector by $-90^\circ$:
 \begin{equation}
     \overrightarrow{u}_{\text{trans}} = R_{-90^\circ}(\overrightarrow{u}) = \begin{pmatrix} u_y \\ -u_x \end{pmatrix}
 \end{equation}
-For the $i$-th lane of the right-hand way ($i \in [0, N_r - 1]$), the lane start point $P_{\text{start}, i}$ and end point $P_{\text{end}, i}$ are generated using a scale factor $j = 2i + 1$:
+For the $i$-th lane of the left-hand way ($i \in [0, N_r - 1]$), the lane start point $P_{\text{start}, i}$ and end point $P_{\text{end}, i}$ are generated using a scale factor $j = 2i + 1$:
 \begin{align}
     P_{\text{start}, i} &= W_{\text{end}} + j \cdot \left( \frac{w_{\text{lane}}}{2} \right) \cdot \overrightarrow{u}_{\text{trans}} \\
     P_{\text{end}, i} &= W_{\text{start}} + j \cdot \left( \frac{w_{\text{lane}}}{2} \right) \cdot \overrightarrow{u}_{\text{trans}}
 \end{align}
-Conversely, for the \textbf{Left-Hand Way} (which carries traffic from $W_{\text{start}}$ to $W_{\text{end}}$), the lanes are offset to the left by rotating the direction vector by $90^\circ$:
+Conversely, for the \textbf{Right-Hand Way} (which carries traffic from $W_{\text{start}}$ to $W_{\text{end}}$), the lanes are offset to the right by rotating the direction vector by $90^\circ$:
 \begin{equation}
     \overrightarrow{u}_{\text{trans}} = R_{90^\circ}(\overrightarrow{u}) = \begin{pmatrix} -u_y \\ u_x \end{pmatrix}
 \end{equation}
-For the $i$-th lane of the left-hand way ($i \in [0, N_l - 1]$), the coordinates are generated as:
+For the $i$-th lane of the right-hand way ($i \in [0, N_l - 1]$), the coordinates are generated as:
 \begin{align}
     P_{\text{start}, i} &= W_{\text{start}} + j \cdot \left( \frac{w_{\text{lane}}}{2} \right) \cdot \overrightarrow{u}_{\text{trans}} \\
     P_{\text{end}, i} &= W_{\text{end}} + j \cdot \left( \frac{w_{\text{lane}}}{2} \right) \cdot \overrightarrow{u}_{\text{trans}}
