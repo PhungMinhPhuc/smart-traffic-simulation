@@ -109,7 +109,7 @@ To prevent rear-end collisions, the vehicle continuously scans for a leading veh
 where $s_{\text{must\_stop}}$ is the absolute minimum distance gap allowed before an emergency halt is triggered, and $s_{\text{safe}}$ is the safe braking distance.
 
 \subsection{Traffic Light Deceleration}
-When a vehicle approaches an upcoming traffic intersection with a red signal at a distance $d_{\text{light}}$, the light braking deceleration $a_{\text{light}}$ is computed using the classical kinematics formula derived from conservation of kinetic energy \cite{sgk2006vatly}:
+When a vehicle approaches an upcoming traffic intersection with a red signal at a distance $d_{\text{light}}$, the light braking deceleration $a_{\text{light}}$ is computed using the classical kinematics formula derived from conservation of kinetic energy \cite{luongduyenbinh2010vldc1}:
 \begin{equation}
     a_{\text{light}} = \begin{cases}
         \text{Emergency Stop } (v \leftarrow 0, a \leftarrow 0) & \text{if } d_{\text{light}} \leq s_{\text{must\_stop}} \\
