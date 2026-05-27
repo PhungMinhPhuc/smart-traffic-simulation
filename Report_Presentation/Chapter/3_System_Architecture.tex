@@ -1,0 +1,199 @@
+\documentclass[../report_main.tex]{subfiles}
+\begin{document}
+
+\section{Object-Oriented Design}
+The traffic simulation system is built using a rigorous \gls{OOP} approach in Java, deliberately separating the logical models from the rendering mechanisms to ensure scalability and maintainability. The core structural components include the map layout, which is composed of a network of traffic nodes, multi-lane roads, and complex intersections. The traffic entities traversing this network consist of various vehicle classes and traffic lights that dictate flow control. The rendering engine is powered by JavaFX, utilizing specific renderer classes to visually interpret the underlying mathematical state of the map and vehicles. A central simulation handler manages the continuous animation timer, synchronizing the logical updates of the traffic map with the graphical updates on the screen. The traffic lights operate under varying display modes to provide configurable user experiences: Mode 0 hides the timer, Mode 1 displays the full countdown timer continuously, and Mode 2 displays the countdown only when there are less than 8 seconds remaining.
+
+\begin{sidewaysfigure}
+  \centering
+  \includegraphics[width=\textwidth]{Figures/ClassDiagramFinal-Core Model.jpg}
+  \caption{Core Model Class Diagram}
+\end{sidewaysfigure}
+
+\begin{sidewaysfigure}
+  \centering
+  \includegraphics[width=0.75\textwidth]{Figures/ClassDiagramFinal-UI Rendering Handlers.jpg}
+  \caption{UI, Rendering, and Handler Class Diagram}
+\end{sidewaysfigure}
+
+\begin{sidewaysfigure}
+  \centering
+  \includegraphics[width=\textwidth]{Figures/ClassDiagramFinal-Vehicle Behavior.jpg}
+  \caption{Vehicle and Driver Behavior Class Diagram}
+\end{sidewaysfigure}
+
+\section{Simulation Workflow}
+The operational lifecycle of the simulation is driven by a high-frequency animation loop managed by the JavaFX framework. At each tick of this continuous loop, the simulation handler first calculates the elapsed time since the previous frame to ensure physics calculations remain frame-rate independent. The system then systematically updates the state of all traffic lights, decrementing their internal timers and transitioning their colors from green to yellow and subsequently to red based on predefined durations. Following the traffic light updates, the central traffic map iterates through every active vehicle, scanning the immediate environment to quantify distances to physical obstacles, leading vehicles on the same path, and upcoming intersections. The core driver behavior logic is then invoked for each vehicle, processing these environmental variables to determine the optimal target acceleration and any necessary lane-changing intent. With the acceleration vectors finalized, the kinematic equations are applied globally, updating the absolute physical position and velocity of every vehicle in the simulation. Finally, the synchronization phase executes, wherein the updated logical state of the map is translated into visual nodes by the rendering engine, displaying the current frame to the \gls{GUI}.
+
+\section{Map Editor Features}
+In addition to the continuous simulation loop, the application provides a robust, interactive \gls{GUI} module dedicated to map editing. Handled by the Map Editor Handler, users can dynamically modify the topological structure of the road network in real-time. The editor seamlessly switches between several functional modes:
+
+\textbf{Add Node Mode:} By clicking anywhere on the interactive map canvas, users can instantiate a new traffic junction at that specific physical coordinate. These junctions act as foundational anchors for the road network.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{Figures/map_add_node.png}
+  \caption{Adding a New Junction Node on the Map}
+\end{figure}
+
+\textbf{Add Road Mode:} Users can construct multi-lane roads by visually dragging a line from a starting junction node to an ending junction node. The handler calculates the geometric vectors between the two nodes and automatically generates the necessary internal lanes based on the user's configured lane count spinner.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{Figures/map_add_road.png}
+  \caption{Constructing a Road by Dragging Between Two Nodes}
+\end{figure}
+
+\textbf{Remove Elements:} To facilitate error correction and map optimization, dedicated removal modes exist for both nodes and roads. Clicking an existing road instantly severs the connection between its associated nodes, while clicking a node completely deletes it, alongside any roads that were previously connected to it, ensuring topological integrity is maintained.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{Figures/map_remove_elements.png}
+  \caption{Removing Roads and Nodes from the Map}
+\end{figure}
+
+\section{Entity Configuration and Specifications}
+The simulation initializes diverse vehicle types, each possessing unique kinematic properties and physical dimensions, which inherently affect traffic flow and collision probabilities. The following tables outline the default constants utilized by the simulation engine.
+
+\begin{table}[h]
+\centering
+\caption{Vehicle Physical and Kinematic Specifications}
+\label{tab:vehicle_specs}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Vehicle Type} & \textbf{Width (px)} & \textbf{Length (px)} & \textbf{Max Speed (px/s)} \\ \hline
+Car                   & 12.0                & 20.0                 & 150.0                     \\ \hline
+Ambulance             & 12.0                & 25.0                 & 200.0                     \\ \hline
+Bicycle               & 5.0                 & 10.0                 & 40.0                      \\ \hline
+Bus                   & 12.0                & 35.0                 & 120.0                     \\ \hline
+Fire Truck            & 12.0                & 43.0                 & 120.0                     \\ \hline
+Motorbike             & 8.0                 & 15.0                 & 100.0                     \\ \hline
+Truck                 & 12.0                & 30.0                 & 100.0                     \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Driver Behavior Profiles}
+\label{tab:driver_profiles}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Profile} & \textbf{Speed Ratio} & \textbf{Acceleration} & \textbf{Braking Deceleration} \\ \hline
+Normal           & 0.8                  & 80.0                  & -50.0                         \\ \hline
+Aggressive       & 1.2                  & 120.0                 & -70.0                         \\ \hline
+Cautious         & 0.8                  & 80.0                  & -50.0                         \\ \hline
+Emergency        & 1.0                  & 150.0                 & -70.0                         \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Traffic Light Timing Configuration}
+\label{tab:traffic_light_timing}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{State} & \textbf{Duration (Seconds)} \\ \hline
+Green Phase    & 15.0                        \\ \hline
+Yellow Phase   & 3.0                         \\ \hline
+Red Phase      & 15.0                        \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Interactive Controls and Audio Synthesizer}
+To deliver a highly immersive and responsive microscopic simulation, several interactive features and an advanced acoustic synthesizer were implemented:
+
+\subsection{Dynamic Viewport and Entity Sizing}
+To satisfy both macro-scale road network visualizations and microscopic junction interaction analyses, the rendering engine dynamically scales the visual assets depending on the spatial coordinates of each vehicle. When a vehicle navigates inside a junction's logical circular bounds (signifying an intersection transition), its sprite or rectangle scale is inflated to $1.4\times$ to draw visual emphasis to turn signals, flashing sirens, and spacing. When cruising along extensive road segments, its visual scale is compressed to $0.8\times$ to avoid overlaps and preserve structural perspective relative to road lanes.
+
+% \subsection{Programmatic Zero-Dependency Sound Synthesizer}
+% Instead of relying on heavy and missing sound file assets, the application incorporates a zero-dependency programmatic audio synthesis module. By directly controlling standard Java sound lines (\texttt{SourceDataLine}), it synthesizes high-fidelity waveforms at runtime in parallel threads:
+% \begin{itemize}
+%     \item \textbf{Turn Signal}: A sharp mechanical clicking sound synthesized via an exponential decay function on a high-pitch wave ($900\text{ Hz}$).
+%     \item \textbf{Overtaking Horn}: A dual-frequency wave mixing $400\text{ Hz}$ and $460\text{ Hz}$ sine waves to simulate a realistic automotive horn.
+%     \item \textbf{Emergency Siren}: A continuous frequency wailing sweep between $600\text{ Hz}$ and $1100\text{ Hz}$ wailing every $1.2\text{ seconds}$ to give a premium audio experience for ambulances and fire trucks.
+% \end{itemize}
+
+\subsection{Dual-Mode Vehicle Rendering Engine}
+To balance scientific performance with visual realism, the simulation implements a highly responsive dual-mode vehicle rendering pipeline. Users can dynamically toggle between these modes at runtime via the sidebar panel:
+\textbf{Rectangle Mode:} Managed by \texttt{VehicleRenderer}, this mode renders each vehicle as a solid colored rectangle drawn strictly according to its physical dimensions (width and length) and behavioral profile color. This mode minimizes graphics card rendering overhead and is optimized for debugging vector offsets, oriented bounding box (OBB) collision states, and segment-segment intersection formulas.
+
+\textbf{Image Mode:} Managed by \texttt{ImageVehicleRenderer}, this mode maps and renders realistic graphical sprite assets (PNG format) corresponding to the specific vehicle type (e.g., car, ambulance, bus, bicycle, fire truck, motorbike, truck, ...). The engine automatically applies affine rotations to align each sprite with the vehicle's directional vector ($\theta$). If the asset files are missing from the local disk, the renderer gracefully falls back to Rectangle Mode, preventing any software instability.
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{Figures/rectangle_mode.png}
+    \caption{Rectangle Mode}
+    \label{fig:rectangle_mode}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{Figures/image_mode.png}
+    \caption{Image Mode}
+    \label{fig:image_mode}
+  \end{subfigure}
+  \caption{Dual-Mode Vehicle Rendering Configurations}
+  \label{fig:vehicle_rendering_modes}
+\end{figure}
+
+\subsection{Configurable Traffic Light Countdown Modes}
+To simulate realistic driver reactions and support diverse urban aesthetics, the traffic signal system provides three distinct countdown display behaviors:
+
+\textbf{Mode 0 (No Countdown):} Completely hides numerical countdown values. Traffic lights are rendered solely as standard tri-color signal housings, which is optimal for a clean, distraction-free view of the macroscopic network.
+
+\textbf{Mode 1 (Full Countdown):} Renders a continuous, active numerical timer (in seconds) directly above each traffic light unit. This gives the user complete visual insight into timing sequences and automatic phase changes.
+
+\textbf{Mode 2 (Threshold Countdown):} Displays the countdown timer only when the remaining phase duration falls below a critical threshold of $8\text{ seconds}$. This mode emulates real-world smart signal designs, highlighting only the transition phases to alert approaching drivers.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{Figures/traffic_light_countdown_modes.png}
+  \caption{Three Configurable Traffic Light Countdown Behaviors (Modes 0, 1, and 2)}
+  \label{fig:traffic_light_countdown_modes}
+\end{figure}
+
+\subsection{Interactive Manual Flow Controls}
+Users can toggle between Automatic and Manual light control modes on the side panel. In Manual Mode, the automated timing cycles are paused. Users can interactively click directly on any traffic light visual group on the map canvas to cycle its state (Red $\rightarrow$ Green $\rightarrow$ Yellow $\rightarrow$ Red), offering direct manual flow override.
+
+\subsection{Dynamic Spawner Controls and Density Management}
+To facilitate stress testing and congestion analysis under varying load levels, the user interface incorporates a dynamic spawning control toggle (\texttt{stopSpawnButton}). At any point during the simulation, users can instantly freeze or resume the background vehicle generation engine. This toggle allows researchers to clear existing traffic bottlenecks, pause the induction of new vehicles to evaluate clearance times, or generate high-density traffic jams on the fly to observe emergent self-organized bottleneck routing behaviors.
+
+\subsection{Interactive Viewport and Scaling Controls}
+To support the visualization of extremely large traffic networks without losing the ability to inspect localized vehicle queues and microscopic collision boxes, the system incorporates comprehensive viewport navigation features:
+\textbf{Zoom In / Zoom Out:} Managed by the \texttt{ZoomHandler}, these controls dynamically adjust the affine scale factor ($S_{\text{new}}$) of the central \texttt{trafficMapContainer} by multiplying or dividing it by a zoom constant. This allows the user to magnify localized road crossings or zoom out to inspect the entire grid.
+
+\textbf{Reset Zoom:} Instantly restores the scale factor of the map container back to its default $1.0\times$ ratio, aligning it with the default viewport size.
+
+\textbf{Viewport Panning:} The map canvas is wrapped inside a JavaFX \texttt{ScrollPane} (\texttt{trafficMapWrapper}), allowing the user to seamlessly pan across the layout using the horizontal and vertical scrollbars, maintaining spatial consistency at all zoom levels.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{Figures/map_zoom_panning.png}
+  \caption{Interactive Map Viewport Scaling (Zoom) and Panning Interface}
+  \label{fig:map_zoom_panning}
+\end{figure}
+
+\subsection{Simulation Timeline and Map Management}
+To grant complete control over the simulation timeline and layout state, a suite of playback and initialization commands is accessible via the main panel:
+\textbf{Pause / Resume Simulation:} Handled by the \texttt{SimulationHandler}, this command pauses or resumes the central animation loop. Pausing freezes all logical position updates, driver decision trees, and kinematic timers, allowing users to inspect stable collision boundaries or edit the map in a static environment.
+
+\textbf{Clear Map:} Severely wipes the current traffic map, completely removing all junctions, multi-lane roads, and active vehicles from the logical model, preparing the canvas for custom creations.
+
+\textbf{Restore Default Map:} Instantly restores a pre-configured, highly realistic $3\times3$ grid consisting of 9 nodes, interconnected multi-lane main roads, and dynamic junctions, providing an immediate stress-testing environment.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth]{Figures/simulation_management_controls.png}
+  \caption{Simulation Timeline Controls (Play/Pause) and Map State Operations}
+  \label{fig:simulation_management_controls}
+\end{figure}
+
+\subsection{Dynamic Configuration Spinners}
+To allow real-time parameter tweaking and scenario building, the user interface features two dynamic configuration spinners:
+
+\textbf{Lane Count Spinner} (\texttt{laneCountSpinner}): Allows users to configure the exact number of lanes (ranging from 1 to 10, with the upper boundary easily scalable to higher limits within the system configurations) when constructing new road segments. Newly drawn road baselines are automatically offset using normal vector math to generate parallel lanes matching this exact lane count.
+
+\textbf{Vehicle Spawn Rate Spinner} (\texttt{vehicleSpawnSpinner}): Dynamically adjusts the vehicle spawning interval in seconds. Increasing this value speeds up the birth rate of standard and emergency vehicles, allowing researchers to transition seamlessly from low-density free-flowing traffic to high-density gridlocks.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth]{Figures/lane_and_spawn_spinners.png}
+  \caption{Dynamic UI Spinners for Configuring Lane Counts and Vehicle Spawn Intervals}
+  \label{fig:lane_and_spawn_spinners}
+\end{figure}
+
+\end{document}

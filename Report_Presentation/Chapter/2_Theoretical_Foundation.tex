@@ -1,0 +1,792 @@
+\documentclass[../report_main.tex]{subfiles}
+\begin{document}
+
+\section{Vehicle Kinematics}
+The continuous movement of vehicles within the simulation is governed by fundamental kinematics equations \cite{sgk2006vatly}, evaluated at discrete time intervals represented by a delta time variable. At each frame, every active vehicle computes its current speed and spatial position based on its localized acceleration profile. The velocity $v$ at any given moment is derived from the initial velocity $v_0$ augmented by the product of the applied acceleration $a$ and the time step $\Delta t$, mathematically expressed as:
+\begin{equation}
+    v = v_0 + a \cdot \Delta t
+\end{equation}
+To ensure the simulation remains visually and physically realistic, the calculated velocity is strictly bounded by a maximum speed limit uniquely defined for each specific vehicle type. Following the velocity calculation, the absolute position vector $\overrightarrow{p}$ of the vehicle is updated on the two-dimensional plane. This is achieved by taking the original position $\overrightarrow{p}_0$ and translating it along the normalized direction vector $\overrightarrow{d}$, scaled by the distance traveled over the time step, resulting in the equation:
+\begin{equation}
+    \overrightarrow{p} = \overrightarrow{p}_0 + \overrightarrow{d} \cdot (v \cdot \Delta t)
+\end{equation}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+      >=Stealth,
+      scale=1.75
+    ]
+    
+    % Colors
+    \definecolor{roadgray}{RGB}{245, 245, 245}
+    \definecolor{bluevector}{RGB}{28, 100, 242}
+    \definecolor{redvector}{RGB}{224, 86, 36}
+    \definecolor{greenlane}{RGB}{16, 124, 65}
+    \definecolor{orangevector}{RGB}{217, 119, 6}
+    
+    % Coordinates of centers
+    \coordinate (C0) at (2.0, 1.0);
+    \coordinate (C) at ($(C0) + (15:3.5)$);
+    
+    % Draw Grid
+    \draw[step=1.0, black!30, very thin] (-0.5, -0.5) grid (6.5, 3.5);
+    
+    % Draw Global World Axes
+    \draw[->, -{Stealth}, thick] (-0.5, 0) -- (6.5, 0) node[right] {$X_{\text{world}}$};
+    \draw[->, -{Stealth}, thick] (0, -0.5) -- (0, 3.5) node[above] {$Y_{\text{world}}$};
+    \node[below left] at (0,0) {$O_{\text{world}}$};
+    
+    % Draw Shaded Road Lane
+    \fill[roadgray] ($(C0) + (195:2.2) + (105:0.8)$) -- ($(C) + (15:1.6) + (105:0.8)$) -- ($(C) + (15:1.6) + (-75:0.8)$) -- ($(C0) + (195:2.2) + (-75:0.8)$) -- cycle;
+    \draw[gray, thick] ($(C0) + (195:2.2) + (105:0.8)$) -- ($(C) + (15:1.6) + (105:0.8)$);
+    \draw[gray, thick] ($(C0) + (195:2.2) + (-75:0.8)$) -- ($(C) + (15:1.6) + (-75:0.8)$);
+    \draw[gray!50, dashdotted, line width=1.0pt] ($(C0) + (195:2.2)$) -- ($(C) + (15:1.6)$) node[pos=0.0, below, black, font=\tiny, sloped] {Lane Centerline};
+    
+    % Position Vectors
+    \draw[->, bluevector, line width=1.5pt] (0,0) -- (C0) node[midway, above left, bluevector, font=\bfseries] {$\overrightarrow{p}_0$};
+    \draw[->, bluevector!70!black, line width=1.5pt] (0,0) -- (C) node[midway, below right, bluevector!70!black, font=\bfseries] {$\overrightarrow{p}$};
+    
+    % Displacement Vector s
+    \draw[->, greenlane, line width=2.2pt] (C0) -- (C) node[midway, above, greenlane, font=\bfseries\small, sloped] {$\Delta\overrightarrow{s} = \overrightarrow{d} \cdot (v \cdot \Delta t)$};
+    
+    % Vehicle 0 (at initial position, transparent dashed)
+    \begin{scope}[shift={(C0)}, rotate=15]
+      \draw[draw=orangevector!80!black, fill=orangevector!5, dashed, line width=0.8pt, rounded corners=2.5pt] (-0.6, -0.3) rectangle (0.6, 0.3);
+      \draw[draw=orangevector!80!black, fill=orangevector!20, dashed, line width=0.8pt] (0.18, -0.27) rectangle (0.48, 0.27);
+      % Velocity v0
+      \draw[->, -{Latex[scale=0.8]}, orangevector, line width=1.2pt] (0.6, 0.1) -- (1.5, 0.1) node[right, orangevector, font=\tiny\bfseries] {$v_0$};
+      % Acceleration a
+      \draw[->, -{Latex[scale=0.8]}, redvector, line width=1.2pt] (0.6, -0.1) -- (1.2, -0.1) node[right, redvector, font=\tiny\bfseries] {$a$};
+    \end{scope}
+    
+    % Vehicle 1 (at final position, solid)
+    \begin{scope}[shift={(C)}, rotate=15]
+      \draw[draw=orangevector!80!black, fill=orangevector!25, line width=1.2pt, rounded corners=2.5pt] (-0.6, -0.3) rectangle (0.6, 0.3);
+      \draw[draw=orangevector!80!black, fill=orangevector!50, line width=1.0pt] (0.18, -0.27) rectangle (0.48, 0.27);
+      % Velocity v (longer arrow, showing acceleration!)
+      \draw[->, -{Latex[scale=0.8]}, orangevector!80!black, line width=1.5pt] (0.6, 0) -- (1.9, 0) node[above, orangevector!80!black] {$v = v_0 + a\Delta t$};
+    \end{scope}
+    
+    % Centers
+    \fill[bluevector] (C0) circle (2.2pt) node[below=4pt, black, font=\tiny] {$C_0(\overrightarrow{p}_0)$ at $t_0$};
+    \fill[bluevector!70!black] (C) circle (2.2pt) node[below=4pt, black, font=\tiny] {$C(\overrightarrow{p})$ at $t_0 + \Delta t$};
+    
+    % Direction unit vector u (drawn starting from C0)
+    \draw[->, -{Stealth}, black, line width=1.0pt] (C0) -- ($(C0) + (15:0.8)$) node[pos=0.8, below, black, font=\tiny] {$\overrightarrow{d}$};
+
+  \end{tikzpicture}
+  \caption{Visualization of Vehicle Kinematics and Movement Update}
+  \label{fig:kinematics}
+\end{figure}
+
+\section{Driver Behavior Model}
+The simulation implements a microscopic decision-making framework to calculate the necessary acceleration or deceleration for each vehicle. The driver behavior module continuously scans the environment, evaluating the distance to the preceding vehicle, the state of upcoming traffic lights, and the availability of adjacent lanes. The final acceleration $a$ applied to the vehicle is the minimum of three distinct acceleration profiles, guaranteeing comfort, cruising efficiency, and absolute safety:
+\begin{equation}
+    a = \min(a_{\text{cruise}}, a_{\text{ahead}}, a_{\text{light}})
+\end{equation}
+
+\subsection{Free Cruiser Acceleration}
+When a vehicle cruises on an unobstructed lane segment, the driver accelerates or decelerates to reach their desired target speed $v_{\text{target}} = v_{\text{max}} \cdot \gamma$, where $\gamma \in \mathbb{R}^+$ represents the driver's custom speed ratio (e.g., $1.2$ for aggressive drivers, $0.8$ for cautious drivers). The cruising acceleration profile $a_{\text{cruise}}$ is defined as:
+\begin{equation}
+    a_{\text{cruise}} = \begin{cases}
+        a_{\text{acc}} & \text{if } v < v_{\text{target}} \\
+        a_{\text{brake}} & \text{if } v > v_{\text{target}} \\
+        0 & \text{otherwise}
+    \end{cases}
+\end{equation}
+where $a_{\text{acc}}$ is the maximum comfortable acceleration and $a_{\text{brake}}$ is the comfortable braking deceleration.
+
+\subsection{Following Car Acceleration}
+To prevent rear-end collisions, the vehicle continuously scans for a leading vehicle in the same lane. If a vehicle ahead is detected at a distance $s$ moving with speed $v_{\text{ahead}}$, the following acceleration profile $a_{\text{ahead}}$ is computed based on critical gap thresholds:
+\begin{equation}
+    a_{\text{ahead}} = \begin{cases}
+        \text{Emergency Stop } (v \leftarrow 0, a \leftarrow 0) & \text{if } s \leq s_{\text{must\_stop}} \\
+        a_{\text{brake}} & \text{if } s < s_{\text{safe}} \\
+        a_{\text{acc}} & \text{otherwise}
+    \end{cases}
+\end{equation}
+where $s_{\text{must\_stop}}$ is the absolute minimum distance gap allowed before an emergency halt is triggered, and $s_{\text{safe}}$ is the safe braking distance.
+
+\subsection{Traffic Light Deceleration}
+When a vehicle approaches an upcoming traffic intersection with a red signal at a distance $d_{\text{light}}$, the light braking deceleration $a_{\text{light}}$ is computed using the classical kinematics formula derived from conservation of kinetic energy \cite{sgk2006vatly}:
+\begin{equation}
+    a_{\text{light}} = \begin{cases}
+        \text{Emergency Stop } (v \leftarrow 0, a \leftarrow 0) & \text{if } d_{\text{light}} \leq s_{\text{must\_stop}} \\
+        \max\left(a_{\text{brake}}, -\frac{v^2}{2 \cdot d_{\text{light}}}\right) & \text{if } d_{\text{light}} \leq s_{\text{safe}} \\
+        \infty & \text{otherwise}
+    \end{cases}
+\end{equation}
+where $a_{\text{light}}$ ensures that the vehicle applies the exact kinetic braking deceleration required to come to a complete halt right before the intersection boundary.
+
+\section{Junction and Road Geometric Modeling}
+To establish a cohesive network topology, the simulation utilizes coordinate geometry to calculate circular junction boundaries, road segment coordinates, and multi-lane layouts dynamically. This mathematical modeling prevents overlapping boundaries and maintains perfect continuity between adjacent segments.
+
+\subsection{Junction Geometry and Dynamic Radius Scaling}
+To accommodate varying road structures, the circular boundary of each traffic junction is scaled dynamically based on the width of the connected roads. If a junction node is connected to roads with high lane counts, its radius $R$ must scale up to prevent lanes from visually protruding past the junction boundary.
+Let $w_{\text{lane}}$ be the constant lane width, and let $N_{r, k}$ and $N_{l, k}$ denote the number of lanes in the right-hand way and left-hand way of the $k$-th connected road, respectively. The maximum half-width $w_{\max}$ of any connected road is defined as:
+\begin{equation}
+    w_{\max} = \max_{k \in \mathcal{R}} \left( w_{\text{lane}} \cdot \max(N_{r, k}, N_{l, k}) \right)
+\end{equation}
+where $\mathcal{R}$ represents the set of all roads connected to the junction. The radius $R$ of the junction is then calculated dynamically as:
+\begin{equation}
+    R = \max \left( R_{\min}, w_{\max} + \delta_{\text{marking}} \right)
+\end{equation}
+where $R_{\min}$ is the predefined minimum junction radius, and $\delta_{\text{marking}}$ is the buffer offset for road markings.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+      >=Stealth,
+      scale=1.5
+    ]
+    
+    % Colors
+    \definecolor{roadgray}{RGB}{245, 245, 245}
+    \definecolor{bluevector}{RGB}{28, 100, 242}
+    \definecolor{redvector}{RGB}{224, 86, 36}
+    \definecolor{orangevector}{RGB}{217, 119, 6}
+    \definecolor{greenlane}{RGB}{16, 124, 65}
+    
+    % Draw Grid
+    \draw[step=1.0, black!30, very thin] (-3.0, -3.0) grid (4.5, 4.5);
+    
+    % Draw Shaded Road Areas (Background)
+    % Widest horizontal road (right)
+    \fill[roadgray] (1.73, 1.8) -- (4.0, 1.8) -- (4.0, -1.8) -- (1.73, -1.8) arc [start angle=-46.1, end angle=46.1, radius=2.5] -- cycle;
+    % Narrower vertical road (top)
+    \fill[roadgray] (-1.0, 2.29) -- (-1.0, 4.0) -- (1.0, 4.0) -- (1.0, 2.29) arc [start angle=66.42, end angle=113.58, radius=2.5] -- cycle;
+    
+    % Draw Road Borders
+    \draw[gray, line width=1.2pt] (1.73, 1.8) -- (4.0, 1.8) node[above left, black, font=\footnotesize] {Widest Road Boundary};
+    \draw[gray, line width=1.2pt] (1.73, -1.8) -- (4.0, -1.8);
+    \draw[gray, line width=1.2pt] (-1.0, 2.29) -- (-1.0, 4.0) node[above left, black, font=\footnotesize] {Narrower Road};
+    \draw[gray, line width=1.2pt] (1.0, 2.29) -- (1.0, 4.0);
+    
+    % Road Centerlines
+    \draw[gray, dashdotted, line width=0.8pt] (0, 0) -- (4.0, 0);
+    \draw[gray, dashdotted, line width=0.8pt] (0, 0) -- (0, 4.0);
+    
+    % Draw Junction Area
+    \draw[draw=black!70, fill=black!3, line width=1.5pt] (0,0) circle (2.5);
+    \node[below, black!70, font=\footnotesize\bfseries] at (0, -2.5) {Junction Area};
+    
+    % Draw Minimum Radius Circle
+    \draw[draw=gray, dashed, line width=0.8pt] (0,0) circle (1.8);
+    \node[black, font=\footnotesize] at (1.5, 0) {$R_{\min}$};
+    
+    % Reference dashed line from road boundary to y-axis
+    \draw[gray!60, thin, dashed] (0, 1.8) -- (1.73, 1.8);
+    
+    % Dimension Brackets on y-axis
+    \draw[|<->|, redvector, thin] (-0.3, 0) -- (-0.3, 1.8) node[midway, fill=black!3, inner sep=0.5pt, font=\footnotesize] {$w_{\max}$};
+    \draw[|<->|, orangevector, thin] (-0.3, 1.8) -- (-0.3, 2.5) node[midway, fill=black!3, inner sep=0.5pt, font=\footnotesize] {$\delta$};
+    
+    % Radius R Vector (drawn along positive y-axis and radial axis)
+    \draw[->, bluevector, line width=1.5pt] (0,0) -- (0, 2.5) node[pos=0.4, right, bluevector, font=\footnotesize] {$R = w_{\max} + \delta_{\text{marking}}$};
+    \draw[->, bluevector, line width=1.5pt] (0,0) -- (-135:2.5) node[midway, above left, bluevector, font=\footnotesize] {$R$};
+    
+    % Center node
+    \fill[black] (0,0) circle (2.2pt) node[below right] {$O$};
+
+  \end{tikzpicture}
+  \caption{Dynamic Scaling of Junction Radius Based on Road Width}
+  \label{fig:junction_radius}
+\end{figure}
+
+\subsection{Pythagorean Boundary Intersections for Roads}
+To ensure roads do not overlap within the junction interior, road segments are mathematically terminated at the junction boundary. The starting distance $d_{\text{start}}$ from the junction center to the point where a road with lane count $N_{\text{lane}}$ begins is computed using the Pythagorean theorem:
+\begin{equation}
+    d_{\text{start}} = \sqrt{R_{\text{needed}}^2 - w_{\text{half}}^2}
+\end{equation}
+where $w_{\text{half}} = w_{\text{lane}} \cdot N_{\text{lane}}$, and $R_{\text{needed}}$ is the minimum required boundary radius, computed as:
+\begin{equation}
+    R_{\text{needed}} = \max \left( R, w_{\text{half}} + \delta_{\text{marking}} \right)
+\end{equation}
+This formulation ensures that the outer edges of a multi-lane road intersect the circular boundary of the junction exactly, preserving visual and physical coherence.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+      >=Stealth,
+      scale=1.4
+    ]
+    \clip (-3.5, -1) rectangle (6, 3.6);
+    
+    % Colors
+    \definecolor{roadgray}{RGB}{245, 245, 245}
+    \definecolor{bluevector}{RGB}{28, 100, 242}
+    \definecolor{redvector}{RGB}{224, 86, 36}
+    \definecolor{orangevector}{RGB}{217, 119, 6}
+    
+    % Draw Grid
+    \draw[step=1.0, black!30, very thin] (-3.5, -3.5) grid (4.5, 3.5);
+    
+    % Draw Shaded Road Area (Background)
+    \fill[roadgray] (2.4, 1.8) -- (4.5, 1.8) -- (4.5, -1.8) -- (2.4, -1.8) arc [start angle=-36.87, end angle=36.87, radius=3.0] -- cycle;
+    
+    % Draw Road Borders and Centerline
+    \draw[gray!80, line width=1.2pt] (2.4, 1.8) -- (4.5, 1.8) node[below, black, font=\footnotesize] {Road Boundary};
+    \draw[gray!80, line width=1.2pt] (2.4, -1.8) -- (4.5, -1.8);
+    \draw[gray!50, dashdotted, line width=0.8pt] (2.4, 0) -- (4.5, 0);
+    
+    % Draw Cartesian Axes
+    \draw[->, -{Stealth}, thick] (-3.5, 0) -- (4.5, 0) node[right] {$x$};
+    \draw[->, -{Stealth}, thick] (0, -3.5) -- (0, 3.5) node[left] {$y$};
+    
+    % Draw Circular Junction Boundary
+    \draw[draw=black!70, fill=black!3, fill opacity=0.4, line width=1.5pt] (0,0) circle (3.0);
+    \node[above left, black!70, font=\footnotesize] at (0, 1.0) {Junction Area};
+    
+    % Pythagorean Right Triangle Delta OCB
+    % Hypotenuse (Junction Radius R_needed)
+    \draw[->, -{Latex}, bluevector, line width=2.0pt] (0,0) -- (2.4, 1.8) node[midway, above, bluevector, sloped] {$R_{\text{needed}}$};
+    
+    % Horizontal Leg (Road Start Distance d_start)
+    \draw[->, -{Latex}, redvector, line width=2.0pt] (0,0) -- (2.4, 0) node[midway, below, redvector] {$d_{\text{start}}$};
+    
+    % Vertical Leg (Road Half-Width w_half)
+    \draw[->, -{Latex}, orangevector, line width=2.0pt] (2.4, 0) -- (2.4, 1.8) node[midway, left, orangevector] {$w_{\text{half}}$};
+    
+    % Right Angle Marker
+    \draw[thin] (2.4, 0) -- (2.2, 0) -- (2.2, 0.2) -- (2.4, 0.2);
+    
+    % Coordinate nodes
+    \fill[black] (2.4, 1.8) circle (2.2pt) node[above right, black, font=\footnotesize] {$B(d_{\text{start}}, w_{\text{half}})$};
+    \fill[black] (2.4, 0) circle (2.2pt) node[below, black, font=\footnotesize] {$C(d_{\text{start}}, 0)$};
+    \fill[black] (0,0) circle (2.2pt) node[below left] {$O$};
+
+  \end{tikzpicture}
+  \caption{Pythagorean Intersection of a Wide Road with a Circular Junction}
+  \label{fig:pythagorean_boundary}
+\end{figure}
+
+\subsection{Multi-Lane Coordinate Offset Generation}
+Road segments are initially defined as simple baseline vectors between two junctions. To construct parallel, multi-lane roads, the system generates distinct lane coordinates by translating the baseline vector along its normal vector.
+Let the primary road baseline vector from the start junction $W_{\text{start}}$ to the end junction $W_{\text{end}}$ be defined as:
+\begin{equation}
+    \overrightarrow{V} = W_{\text{end}} - W_{\text{start}}
+\end{equation}
+The normalized direction vector of the road is $\overrightarrow{u} = \frac{\overrightarrow{V}}{\|\overrightarrow{V}\|}$.\\
+For the \textbf{Right-Hand Way} (which carries traffic from $W_{\text{end}}$ to $W_{\text{start}}$), the lanes are offset to the right by rotating the direction vector by $-90^\circ$:
+\begin{equation}
+    \overrightarrow{u}_{\text{trans}} = R_{-90^\circ}(\overrightarrow{u}) = \begin{pmatrix} u_y \\ -u_x \end{pmatrix}
+\end{equation}
+For the $i$-th lane of the right-hand way ($i \in [0, N_r - 1]$), the lane start point $P_{\text{start}, i}$ and end point $P_{\text{end}, i}$ are generated using a scale factor $j = 2i + 1$:
+\begin{align}
+    P_{\text{start}, i} &= W_{\text{end}} + j \cdot \left( \frac{w_{\text{lane}}}{2} \right) \cdot \overrightarrow{u}_{\text{trans}} \\
+    P_{\text{end}, i} &= W_{\text{start}} + j \cdot \left( \frac{w_{\text{lane}}}{2} \right) \cdot \overrightarrow{u}_{\text{trans}}
+\end{align}
+Conversely, for the \textbf{Left-Hand Way} (which carries traffic from $W_{\text{start}}$ to $W_{\text{end}}$), the lanes are offset to the left by rotating the direction vector by $90^\circ$:
+\begin{equation}
+    \overrightarrow{u}_{\text{trans}} = R_{90^\circ}(\overrightarrow{u}) = \begin{pmatrix} -u_y \\ u_x \end{pmatrix}
+\end{equation}
+For the $i$-th lane of the left-hand way ($i \in [0, N_l - 1]$), the coordinates are generated as:
+\begin{align}
+    P_{\text{start}, i} &= W_{\text{start}} + j \cdot \left( \frac{w_{\text{lane}}}{2} \right) \cdot \overrightarrow{u}_{\text{trans}} \\
+    P_{\text{end}, i} &= W_{\text{end}} + j \cdot \left( \frac{w_{\text{lane}}}{2} \right) \cdot \overrightarrow{u}_{\text{trans}}
+\end{align}
+This vector framework allows for the generation of parallel multi-lane systems for any arbitrary road angle.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+      >=Latex,
+      scale=1.5,
+      coordinate label/.style={draw, circle, fill=black, inner sep=1.5pt, label={#1}},
+      vector label/.style={midway, font=\small},
+      lane label/.style={font=\footnotesize\itshape}
+    ]
+    
+    % Colors
+    \definecolor{roadgray}{RGB}{245, 245, 245}
+    \definecolor{bluevector}{RGB}{28, 100, 242}
+    \definecolor{redvector}{RGB}{224, 86, 36}
+    \definecolor{orangevector}{RGB}{217, 119, 6}
+    \definecolor{greenlane}{RGB}{16, 124, 65}
+    \definecolor{purplelane}{RGB}{124, 58, 237}
+    
+    % Coordinates of baseline vertices
+    \coordinate (Wstart) at (0,0);
+    \coordinate (Wend) at (6,2);
+    
+    % Draw Road Background/Boundary
+    % Left lane boundary: shift Wstart and Wend by 1.6 in direction 108.43
+    \coordinate (LboundStart) at ($(Wstart) + (108.43:1.6)$);
+    \coordinate (LboundEnd) at ($(Wend) + (108.43:1.6)$);
+    % Right lane boundary: shift Wstart and Wend by 1.6 in direction -71.57
+    \coordinate (RboundStart) at ($(Wstart) + (-71.57:1.6)$);
+    \coordinate (RboundEnd) at ($(Wend) + (-71.57:1.6)$);
+    
+    % Fill road area
+    \fill[roadgray] (LboundStart) -- (LboundEnd) -- (RboundEnd) -- (RboundStart) -- cycle;
+    
+    % Draw road boundaries
+    \draw[gray, thick] (LboundStart) -- (LboundEnd);
+    \draw[gray, thick] (RboundStart) -- (RboundEnd);
+    
+    % Centerline (Reference Baseline)
+    \draw[black, dashdotted, line width=1.0pt] (Wstart) -- (Wend) node[midway, below, font=\footnotesize, sloped] {Reference Baseline};
+    
+    % Draw Baseline Vertices
+    \fill[black] (Wstart) circle (2.2pt) node[below left] {$W_{\text{start}}$};
+    \fill[black] (Wend) circle (2.2pt) node[above right] {$W_{\text{end}}$};
+    
+    % Road Direction Vector V (offset slightly for visibility)
+    \draw[->, bluevector, line width=1.5pt] ($(Wstart) + (108.43:0.15)$) -- ($(Wend) + (108.43:0.15)$) node[midway, above, bluevector, font=\bfseries\small, sloped] {$\overrightarrow{V}$};
+    
+    % Direction unit vector u (drawn starting from Wstart)
+    \draw[->, bluevector!70!black, line width=2.0pt] (Wstart) -- ($(Wstart) + (18.43:1.2)$) node[midway, below, bluevector!70!black, sloped] {$\overrightarrow{u}$};
+    
+    % Rotated normal unit vector for Left-Hand Way: R_{90}(u)
+    \draw[->, redvector, line width=1.5pt] (Wstart) -- ($(Wstart) + (108.43:1.0)$) node[above, redvector, font=\small] {$\overrightarrow{u}_{\text{trans}} = R_{90^\circ}(\overrightarrow{u})$};
+    
+    % Rotated normal unit vector for Right-Hand Way: R_{-90}(u)
+    \draw[->, orangevector, line width=1.5pt] (Wend) -- ($(Wend) + (-71.57:1.0)$) node[below, orangevector, font=\small] {$\overrightarrow{u}_{\text{trans}} = R_{-90^\circ}(\overrightarrow{u})$};
+    
+    % Left-Hand Way Lane (Lane 0)
+    \coordinate (PstartL) at ($(Wstart) + (108.43:0.8)$);
+    \coordinate (PendL) at ($(Wend) + (108.43:0.8)$);
+    \draw[greenlane, dashed, line width=1.0pt] (PstartL) -- (PendL);
+    \fill[greenlane] (PstartL) circle (1.8pt) node[left, font=\footnotesize] {$P_{\text{end},0}$};
+    \fill[greenlane] (PendL) circle (1.8pt) node[above right, font=\footnotesize] {$P_{\text{start},0}$};
+    \draw[<-, greenlane, line width=1.6pt] ($(PstartL)!0.45!(PendL)$) -- ($(PstartL)!0.55!(PendL)$)
+        node[midway, above, greenlane, lane label, sloped]
+        {Left Lane ($i=0$, Traffic $\gets$)};
+    
+    % Right-Hand Way Lane (Lane 0)
+    \coordinate (PstartR) at ($(Wend) + (-71.57:0.8)$);
+    \coordinate (PendR) at ($(Wstart) + (-71.57:0.8)$);
+    \draw[purplelane, dashed, line width=1.0pt] (PstartR) -- (PendR);
+    \fill[purplelane] (PstartR) circle (1.8pt) node[right, font=\footnotesize] {$P_{\text{end},0}$};
+    \fill[purplelane] (PendR) circle (1.8pt) node[below left, font=\footnotesize] {$P_{\text{start},0}$};
+    \draw[<-, purplelane, line width=1.6pt] ($(PstartR)!0.45!(PendR)$) -- ($(PstartR)!0.55!(PendR)$)
+        node[midway, below, purplelane, lane label, sloped]
+        {Right Lane ($i=0$, Traffic $\to$)};
+    
+    % Distance indicators
+    \draw[|<->|, gray!80!black, thin] ($(Wstart) + (18.43:0.05)$) -- ($(Wstart) + (18.43:0.05) + (108.43:0.8)$) node[midway, left, font=\tiny] {$\frac{w_{\text{lane}}}{2}$};
+    \draw[|<->|, gray!80!black, thin] ($(Wend) + (18.43:-0.05)$) -- ($(Wend) + (18.43:-0.05) + (-71.57:0.8)$) node[midway, right, font=\tiny] {$\frac{w_{\text{lane}}}{2}$};
+
+  \end{tikzpicture}
+  \caption{Vector Generation of Multi-Lane Coordinates with Parallel Offsets}
+  \label{fig:parallel_lanes}
+\end{figure}
+
+\section{Geometric Collision Detection}
+To accurately detect potential collisions and manage the complex paths vehicles take through intersections, the system relies extensively on vector mathematics and line intersection algorithms. 
+
+\subsection{Line Intersection Using Cramer's Rule}
+The simulation employs Cramer's rule \cite{daisoToan} to computationally determine the exact intersection point between any two arbitrary line segments on the map, defined by the coordinate pairs $(x_1, y_1), (x_2, y_2)$ and $(x_3, y_3), (x_4, y_4)$. The foundational equations are derived directly from the determinant of the linear equation system:
+\begin{equation}
+    D = (x_1 - x_2)(y_3 - y_4) - (y_1 - y_2)(x_3 - x_4)
+\end{equation}
+Due to the constraints of double-precision floating-point arithmetic (IEEE 754) in computational environments, exact zero checks ($D = 0$) are highly susceptible to rounding and truncation errors. To ensure numerical stability and prevent catastrophic division-by-zero failures, the simulation introduces a small positive precision threshold $\varepsilon = 10^{-9}$ (defined as \texttt{Constants.EPS}). The algorithm checks the absolute value of the determinant against this epsilon limit:
+\begin{equation}
+    |D| < \varepsilon
+\end{equation}
+If this condition is met, the system determines the lines to be parallel or collinear and safely returns a null intersection. In all other scenarios, the partial determinants $D_1$ and $D_2$ are computed, and the coordinates $(x,y)$ of the intersection are determined:
+\begin{align}
+    D_1 &= x_1 \cdot y_2 - y_1 \cdot x_2 \\
+    D_2 &= x_3 \cdot y_4 - y_3 \cdot x_4 \\
+    x &= \frac{D_1(x_3 - x_4) - (x_1 - x_2)D_2}{D} \\
+    y &= \frac{D_1(y_3 - y_4) - (y_1 - y_2)D_2}{D}
+\end{align}
+Furthermore, to verify whether the infinite line intersection point $(x,y)$ actually lies within both finite line segments, the system performs a localized bounding box containment check. To accommodate minor floating-point precision discrepancies at the boundary endpoints, the bounding bounds are cushioned with the same $\varepsilon$ buffer:
+\begin{align}
+    x &\in [x_{\min} - \varepsilon, x_{\max} + \varepsilon] \\
+    y &\in [y_{\min} - \varepsilon, y_{\max} + \varepsilon] \\
+    x &\in [x'_{\min} - \varepsilon, x'_{\max} + \varepsilon] \\
+    y &\in [y'_{\min} - \varepsilon, y'_{\max} + \varepsilon]
+\end{align}
+where $x_{\min} = \min(x_1, x_2)$, $x_{\max} = \max(x_1, x_2)$ (and similarly for segment $B$ denoted by primed limits). This precision padding guarantees stable collision detection near intersection junctions.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+      >=Latex,
+      scale=1.5,
+      coordinate label/.style={draw, circle, fill=black, inner sep=1.5pt, label={#1}}
+    ]
+    
+    % Colors
+    \definecolor{bluevector}{RGB}{28, 100, 242}
+    \definecolor{redvector}{RGB}{224, 86, 36}
+    
+    % Coordinates of segment endpoints
+    \coordinate (P1) at (0.75, 0.5);
+    \coordinate (P2) at (4.5, 3.5);
+    \coordinate (P3) at (1.0, 3.0);
+    \coordinate (P4) at (4.0, 0.0);
+    \coordinate (P) at (2.25, 1.75);
+    
+    % Draw Grid
+    \draw[step=1.0, black!30, very thin] (-1, -1) grid (5.0, 4.0);
+    
+    % Draw Axes
+    \draw[->, -{Stealth}, thick] (-0.5, 0) -- (5.0, 0) node[right] {$x$};
+    \draw[->, -{Stealth}, thick] (0, -0.5) -- (0, 4.0) node[above] {$y$};
+    \node[below left, thick,] at (0,0) {$O$};
+    
+    % Draw Bounding Box 1 (Segment 1)
+    \draw[draw=bluevector!35, fill=bluevector!4, dashed, line width=0.8pt] (0.75, 0.5) rectangle (4.5, 3.5);
+    \node[above left, bluevector!80!black] at (4.5, 3.5) {Bounding Box 1};
+    
+    % Draw Bounding Box 2 (Segment 2)
+    \draw[draw=redvector!35, fill=redvector!4, dashed, line width=0.8pt] (1.0, 0.0) rectangle (4.0, 3.0);
+    \node[below right, redvector!80!black] at (1.0, 0.0) {Bounding Box 2};
+    
+    % Draw Segment 1 & Segment 2
+    \draw[bluevector, very thick] (P1) -- (P2) node[pos=0.9, above left, sloped] {Segment 1};
+    \draw[redvector, very thick] (P3) -- (P4) node[pos=0.5, above right, sloped] {Segment 2};
+    
+    % Draw Endpoint Nodes
+    \fill[bluevector] (P1) circle (2.2pt) node[below, black] {$P_1(x_1, y_1)$};
+    \fill[bluevector] (P2) circle (2.2pt) node[above right, black] {$P_2(x_2, y_2)$};
+    \fill[redvector] (P3) circle (2.2pt) node[above, black] {$P_3(x_3, y_3)$};
+    \fill[redvector] (P4) circle (2.2pt) node[below right, black] {$P_4(x_4, y_4)$};
+    
+    % Draw Intersection Point P
+    \fill[black] (P) circle (2.5pt);
+    \draw[black, thin] (P) circle (4.5pt);
+    \node[above=5pt, draw=black!40, fill=white, rounded corners=2pt, inner sep=2pt] at (P) {$P(x, y)$};
+
+  \end{tikzpicture}
+  \caption{Geometric Representation of Cramer's Rule for Line Intersection}
+  \label{fig:cramer_intersection}
+\end{figure}
+
+\subsection{Point-in-Rectangle and Cross Product}
+To verify if a specific point (e.g., another vehicle's position) lies within the bounding rectangle of a vehicle, the system relies on the vector cross product method. For a rectangle defined by vertices $(A, B, C, D)$, the cross product of the edge vectors and the point vectors is used to determine the relative orientation. The cross product between three points $(A, B, P)$ is mathematically represented as:
+\begin{equation}
+    \text{cross}(A, B, P) = (B_x - A_x) \cdot (P_y - A_y) - (B_y - A_y) \cdot (P_x - A_x)
+\end{equation}
+By evaluating the sign of the cross product for all consecutive edges of the rectangle, the algorithm accurately determines spatial inclusion without relying on computationally expensive trigonometric functions.
+
+\subsection{Oriented Bounding Box (OBB) Collision Detection}
+To detect physical collisions between two arbitrary vehicles, the simulation applies a rigorous Oriented Bounding Box (OBB) intersection algorithm. For any vehicle, the OBB is defined by its center point $C$, direction vector $\overrightarrow{d}$, physical length $L$, and width $W$.
+First, the unit direction vector $\overrightarrow{u} = \frac{\overrightarrow{d}}{\|\overrightarrow{d}\|}$ and the lateral normal vector $\overrightarrow{n} = \begin{pmatrix} -u_y \\ u_x \end{pmatrix} \cdot \frac{W}{2}$ are computed. The four corners $P_0, P_1, P_2, P_3$ of the vehicle's bounding box are generated in clockwise order:
+\begin{align}
+    P_0 &= \left(C - \overrightarrow{u} \cdot \frac{L}{2}\right) + \overrightarrow{n} \\
+    P_1 &= \left(C + \overrightarrow{u} \cdot \frac{L}{2}\right) + \overrightarrow{n} \\
+    P_2 &= \left(C + \overrightarrow{u} \cdot \frac{L}{2}\right) - \overrightarrow{n} \\
+    P_3 &= \left(C - \overrightarrow{u} \cdot \frac{L}{2}\right) - \overrightarrow{n}
+\end{align}
+Two vehicles $A$ and $B$ are determined to be in collision if and only if either:
+\begin{enumerate}
+    \item Any edge segment of $A$'s bounding box intersects any edge segment of $B$'s bounding box. The edge segments are defined by consecutive pairs of corners, e.g., $(P_i, P_{i+1})$. Segment-segment intersections are resolved computationally via Cramer's rule.
+    \item One box is entirely contained inside the other without edge intersection. This containment is verified by checking if the corner $P_{A,0}$ lies within the bounding box of $B$, or if the corner $P_{B,0}$ lies within the bounding box of $A$, utilizing the Point-in-Rectangle cross product test.
+\end{enumerate}
+
+\subsection{Point-to-Segment Projection}
+Furthermore, the lateral distance from a vehicle's center point $P$ to the boundary of its current lane segment (defined by endpoints $A$ and $B$) is computed using orthogonal vector projection. The projection scalar $t$, which determines where the point projects onto the infinite line $AB$, is calculated as:
+\begin{equation}
+    t = \frac{(P_x - A_x)(B_x - A_x) + (P_y - A_y)(B_y - A_y)}{L^2}
+\end{equation}
+where $L$ is the length of the segment $AB$. The scalar $t$ is clamped to the range $[0, 1]$ to ensure the projected point strictly lies on the segment itself. This specific calculation guarantees that vehicles maintain strict adherence to their designated lanes and safely execute lane-changing maneuvers without intersecting parallel traffic flows.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+      >=Latex,
+      scale=1.5
+    ]
+    
+    % Colors
+    \definecolor{bluevector}{RGB}{28, 100, 242}
+    \definecolor{redvector}{RGB}{224, 86, 36}
+    
+    % Coordinates
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (6,0);
+    \coordinate (P) at (3.6, 2.2);
+    \coordinate (Pproj) at (3.6, 0);
+    
+    % Helper lines for dimensions
+    \draw[gray!40, thin, dashed] (A) -- (0, -1.3);
+    \draw[gray!40, thin, dashed] (Pproj) -- (3.6, -0.7);
+    \draw[gray!40, thin, dashed] (B) -- (6, -1.3);
+    
+    % Dimension Brackets
+    \draw[|<->|, black, thin] (0, -0.65) -- (3.6, -0.65) node[midway, fill=white] {$t \cdot L$};
+    \draw[|<->|, black, thin] (0, -1.3) -- (6, -1.3) node[midway, fill=white] {Segment Length $L$};
+    
+    % Segment AB
+    \draw[bluevector, line width=2.0pt, -{Latex[scale=1.1]}] (A) -- (B) node[pos=0.85, above, bluevector] {$\overrightarrow{AB}$};
+    
+    % Point P and projection
+    \draw[->, -{Latex}, black, dashed, thick] (A) -- (P) node[midway, above left, black] {$\overrightarrow{AP}$};
+    \draw[redvector, thick, dashed] (P) -- (Pproj) node[midway, right, redvector] {Lateral Distance $d$};
+    
+    % Right angle marker
+    \draw[thin] (3.6, 0) -- (3.6, 0.2) -- (3.4, 0.2) -- (3.4, 0);
+    
+    % Node points
+    \fill[bluevector] (A) circle (2.2pt) node[below left, black] {$A(A_x, A_y)$};
+    \fill[bluevector] (B) circle (2.2pt) node[below right, black] {$B(B_x, B_y)$};
+    \fill[redvector] (P) circle (2.2pt) node[above, black] {$P(P_x, P_y)$};
+    \fill[redvector] (Pproj) circle (2.0pt) node[below=4pt, redvector!80!black] {$P_{\text{proj}}$};
+
+  \end{tikzpicture}
+  \caption{Orthogonal Projection of a Point onto a Line Segment}
+  \label{fig:point_projection}
+\end{figure}
+
+\subsection{Lane-Changing Trajectory and Transition Math}
+During a lane change, a vehicle must not instantly teleport to the target lane; it must execute a smooth diagonal glide. Let $\overrightarrow{u}_{\text{lane}}$ be the normalized direction vector of the current lane. Let $o \in \{-1, 1\}$ represent the lane change direction, where $-1$ is left and $1$ is right.
+The perpendicular lateral vector $\overrightarrow{v}_{\text{lat}}$ is calculated as:
+\begin{equation}
+    \overrightarrow{v}_{\text{lat}} = R_{90^\circ}(\overrightarrow{u}_{\text{lane}}) \cdot w_{\text{lane}} \cdot o
+\end{equation}
+To simulate the forward glide during the lateral shift, the diagonal trajectory vector $\overrightarrow{V}_{\text{diagonal}}$ is calculated by combining a longitudinal displacement $d_{\text{lc}}$ with the lateral offset:
+\begin{equation}
+    \overrightarrow{V}_{\text{diagonal}} = d_{\text{lc}} \cdot \overrightarrow{u}_{\text{lane}} + \overrightarrow{v}_{\text{lat}}
+\end{equation}
+The vehicle's physical direction is then set to the normalized diagonal vector:
+\begin{equation}
+    \overrightarrow{u}_{\text{diagonal}} = \frac{\overrightarrow{V}_{\text{diagonal}}}{\|\overrightarrow{V}_{\text{diagonal}}\|}
+\end{equation}
+This mathematical vector defines both the visual rotation of the vehicle and its physical movement vector until the transition progress reaches $1.0$ (signifying completion).
+
+To guarantee collision-free lane changes, a safety check is evaluated on the target lane before a lane change begins. The target center position $\overrightarrow{P}_{\text{target}}$ is calculated as:
+\begin{equation}
+    \overrightarrow{P}_{\text{target}} = \overrightarrow{p} + \overrightarrow{u}_{\text{trans}} \cdot d_{\text{lateral}}
+\end{equation}
+A lane change transition is initiated only if both of the following safety bounds are met:
+\begin{enumerate}
+    \item No collision with any vehicle $V_j$ already on the target lane:
+    \begin{equation}
+        \|\overrightarrow{P}_{\text{target}} - \overrightarrow{P}_j\| \geq \frac{L_{\text{self}} + L_j}{2} + \delta_{\text{safe}} \cdot 0.2
+    \end{equation}
+    \item No collision with any other vehicle $V_k$ currently executing a lane change to the same target position:
+    \begin{equation}
+        \|\overrightarrow{P}_{\text{target}} - \overrightarrow{P}_{\text{target}, k}\| \geq \frac{L_{\text{self}} + L_k}{2} + 10.0
+    \end{equation}
+\end{enumerate}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+      >=Latex,
+      scale=1.4
+    ]
+    
+    % Colors
+    \definecolor{roadgray}{RGB}{245, 245, 245}
+    \definecolor{bluevector}{RGB}{28, 100, 242}
+    \definecolor{redvector}{RGB}{224, 86, 36}
+    \definecolor{greenlane}{RGB}{16, 124, 65}
+    \definecolor{purplelane}{RGB}{124, 58, 237}
+    
+    % Draw Road Background
+    \fill[roadgray] (-1.25, -1) rectangle (6.5, 3);
+    
+    % Draw Road Margins and Separators
+    \draw[gray, thick] (-1.25, -1) -- (6.5, -1);
+    \draw[gray, thick] (-1.25, 3) -- (6.5, 3);
+    \draw[dashed, black, line width=1.0pt] (-1, 1) -- (6.5, 1) node[pos=1, above, black!60, font=\footnotesize] {Lane Separator};
+    
+    % Lane Centerlines
+    \draw[dashdotted, bluevector, thin] (-1.25, 0) -- (6.5, 0) node[left, pos=0, bluevector, font=\tiny] {Current Lane Centerline};
+    \draw[dashdotted, purplelane, thin] (-1.25, 2) -- (6.5, 2) node[left, pos=0,  purplelane, font=\tiny] {Target Lane Centerline};
+    
+    % Dimension Brackets
+    \draw[|<->|, black, thin] (-0.5, 0) -- (-0.5, 2) node[midway, fill=white] {$w_{\text{lane}}$};
+    
+    % Vectors
+    % Longitudinal vector
+    \draw[->, bluevector, line width=1.5pt] (0,0) -- (5,0) node[midway, below, bluevector, font=\footnotesize, sloped] {$d_{\text{lc}} \cdot \overrightarrow{u}_{\text{lane}}$};
+    
+    % Lateral vector
+    \draw[->, redvector, line width=1.5pt] (5,0) -- (5,2) node[pos=0.4, right, redvector, font=\footnotesize] {$\overrightarrow{v}_{\text{lat}}$};
+    
+    % Diagonal trajectory vector
+    \draw[->, greenlane, line width=2.2pt] (0,0) -- (5,2) node[pos=0.7, above left] {$\overrightarrow{V}_{\text{diagonal}} = d_{\text{lc}} \cdot \overrightarrow{u}_{\text{lane}} + \overrightarrow{v}_{\text{lat}}$};
+    
+    % Unit vector u_lane
+    \draw[->, bluevector!70!black, line width=1.8pt] (0,0) -- (1.2,0) node[midway, below, bluevector!70!black, sloped] {$\overrightarrow{u}_{\text{lane}}$};
+    
+    % Unit vector u_diagonal (21.8 degrees angle)
+    \draw[->, greenlane!70!black, line width=1.8pt] (0,0) -- (21.8:1.3) node[midway, above right, greenlane!70!black, sloped] {$\overrightarrow{u}_{\text{diagonal}}$};
+    
+    % Right angle marker
+    \draw[thin] (5,0) -- (4.8,0) -- (4.8,0.2) -- (5,0.2);
+    
+    % Coordinate nodes
+    \fill[black] (0,0) circle (2.2pt) node[below left, font=\footnotesize] {Start Position};
+    \fill[black] (5,2) circle (2.2pt) node[above right, font=\footnotesize] {Target Position};
+
+  \end{tikzpicture}
+  \caption{Diagonal Trajectory and Direction Vectors During a Lane Change}
+  \label{fig:lane_change_vector}
+\end{figure}
+
+\subsection{Linear Projection for Boundary Continuity}
+When a vehicle exits an intersection path and enters a new road lane, visual jumps must be prevented. The vehicle may overshoot the exact end of the intersection path in a given frame. To ensure continuous movement, this overshoot $\delta_{\text{overshoot}}$ is computed and projected onto the new lane segment.
+Let $\overrightarrow{p}$ be the vehicle's uncorrected position at the end of the step, and let $\overrightarrow{p}_{\text{end}}$ be the end coordinate of the path. The overshoot scalar is:
+\begin{equation}
+    \delta_{\text{overshoot}} = (\overrightarrow{p} - \overrightarrow{p}_{\text{end}}) \cdot \overrightarrow{d}_{\text{path}}
+\end{equation}
+where $\overrightarrow{d}_{\text{path}}$ is the normalized direction of the intersection path. The corrected position $\overrightarrow{p}_{\text{new}}$ on the next lane segment is then set to:
+\begin{equation}
+    \overrightarrow{p}_{\text{new}} = P_{\text{start, new}} + \delta_{\text{overshoot}} \cdot \overrightarrow{u}_{\text{lane\_new}}
+\end{equation}
+where $P_{\text{start, new}}$ is the starting point of the new lane and $\overrightarrow{u}_{\text{lane\_new}}$ is its normalized direction. This mathematical correction prevents visual stuttering at the transition boundaries.
+
+\section{GUI and Rendering Transformations}
+
+\subsection{Interactive Zoom and Coordinate Scaling}
+To provide a comprehensive view of the macroscopic traffic network while preserving the ability to inspect microscopic vehicular interactions, the system implements an interactive zooming mechanism. The scaling factor $S_{\text{new}}$ is continuously bounded to prevent mathematical singularities or rendering artifacts \cite{giaitichToan}:
+\begin{equation}
+    S_{\text{new}} = \max\left(S_{\text{min}}, \min\left(S_{\text{max}}, S_{\text{old}} \cdot \text{factor}\right)\right)
+\end{equation}
+To ensure the zoom focuses precisely on the user's cursor position $(X_{\text{mouse}}, Y_{\text{mouse}})$, the system dynamically recalculates the horizontal and vertical scrollbar offsets. The new horizontal scroll value $H_{\text{new}}$ is derived from the targeted stack coordinate $X_{\text{target}}$ and the current viewport boundaries:
+\begin{equation}
+    H_{\text{new}} = \text{clamp} \left( \frac{X_{\text{target}} - X_{\text{viewport}}}{W_{\text{content}} - W_{\text{viewport}}} \right)
+\end{equation}
+This affine transformation ensures spatial consistency between the logical map and the JavaFX rendering canvas during scaling operations.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+      >=Stealth,
+      scale=1.3
+    ]
+    
+    % Colors
+    \definecolor{bluevector}{RGB}{28, 100, 242}
+    \definecolor{redvector}{RGB}{224, 86, 36}
+    \definecolor{greenlane}{RGB}{16, 124, 65}
+    
+    % Draw Grid
+    \draw[step=1.0, black!30, very thin] (-0.5, -2.0) grid (8.5, 5.5);
+    
+    % Draw Content Area (Logical Map)
+    \draw[draw=black!60, fill=black!2, line width=1.2pt] (0,0) rectangle (8,5);
+    \node[above right, black!75, font=\footnotesize\bfseries] at (0, 5.0) {Logical Map Content ($W_{\text{content}} \times H_{\text{content}}$)};
+    
+    % Draw Viewport Area (Visible Window)
+    \draw[draw=bluevector, fill=bluevector!8, line width=1.6pt, fill opacity=0.7, text opacity=1] (2, 1.5) rectangle (5.5, 3.8);
+    \node[bluevector, font=\footnotesize\bfseries] at (3.75, 3.5) {Visible Viewport};
+    
+    % Viewport Width Dimension (drawn inside viewport)
+    \draw[|<->|, bluevector!80!black, thin] (2, 1.8) -- (5.5, 1.8) node[midway, fill=bluevector!8, inner sep=1pt, font=\tiny] {$W_{\text{viewport}}$};
+    
+    % Cursor Position P
+    \coordinate (P) at (4.2, 2.5);
+    \draw[redvector, thick] (3.9, 2.5) -- (4.5, 2.5);
+    \draw[redvector, thick] (4.2, 2.2) -- (4.2, 2.8);
+    \draw[redvector, thin] (P) circle (4pt);
+    \fill[redvector] (P) circle (2.2pt) node[above left=2pt, redvector, font=\bfseries\tiny] {Cursor $(X_{\text{mouse}}, Y_{\text{mouse}})$};
+    
+    % Dimension Projection Helper Lines
+    \draw[gray, thin, dashed] (0, 0) -- (0, -1.7);
+    \draw[gray, thin, dashed] (2, 1.5) -- (2, -0.6);
+    \draw[gray, thin, dashed] (4.2, 2.5) -- (4.2, -1.1);
+    \draw[gray, thin, dashed] (5.5, 1.5) -- (5.5, -0.6);
+    \draw[gray, thin, dashed] (8, 0) -- (8, -1.7);
+    
+    % Dimension Brackets
+    % Level 1: Viewport Left Offset & Mouse Offset inside Viewport
+    \draw[|<->|, black, thin] (0, -0.4) -- (2, -0.4) node[midway, fill=white, font=\tiny] {$X_{\text{viewport}}$};
+    \draw[|<->|, bluevector, thin] (2, -0.4) -- (4.2, -0.4) node[midway, fill=white, font=\tiny] {$\frac{X_{\text{mouse}}}{S}$};
+    
+    % Level 2: Target coordinate in logical Content
+    \draw[|<->|, redvector, thin] (0, -1.0) -- (4.2, -1.0) node[midway, fill=white, font=\tiny] {$X_{\text{target}} = X_{\text{viewport}} + \frac{X_{\text{mouse}}}{S}$};
+    
+    % Level 3: Content Width
+    \draw[|<->|, black, thin] (0, -1.6) -- (8, -1.6) node[midway, fill=white, font=\tiny] {Total Content Width $W_{\text{content}}$};
+
+  \end{tikzpicture}
+  \caption{Viewport Coordinate Transformations during Zoom}
+  \label{fig:zoom_math}
+\end{figure}
+
+\subsection{Vehicle Rendering and Rotation}
+During the synchronization phase between the logical state and the \gls{GUI}, the system applies geometric transformations to each rendered vehicle to match its simulated physics state. A vehicle's directional vector $\overrightarrow{d} = (d_x, d_y)$ is converted into a rotational angle $\theta$ (in degrees) to accurately orient the rectangular shape on the canvas:
+\begin{equation}
+    \theta = \frac{180}{\pi} \cdot \operatorname{atan2}(d_y, d_x)
+\end{equation}
+The use of the two-argument arctangent function, $\operatorname{atan2}(y, x)$, is mathematically critical for microscopic traffic visualization compared to the standard single-argument arctangent function $\arctan(y/x)$ \cite{giaitichToan}. 
+
+Historically, the standard $\arctan(u)$ function only yields values within the restricted interval $(-\pi/2, \pi/2)$, which corresponds to the first and fourth quadrants of the Cartesian plane. Consequently, a single ratio $u = y/x$ is fundamentally ambiguous because it loses the individual signs of the coordinate components. For example:
+\begin{equation}
+    \frac{d_y}{d_x} = \frac{-d_y}{-d_x}
+\end{equation}
+A standard arctangent function yields the exact same angle for a vehicle moving forward-right (both $d_x, d_y > 0$) as it does for a vehicle moving backward-left (both $d_x, d_y < 0$), resulting in physical rendering errors where vehicles appear to slide backward or snap $180^\circ$ in the wrong direction. 
+
+To resolve this topological ambiguity, $\operatorname{atan2}(y, x)$ maps the vector to its unique position on the unit circle by checking the signs of both parameters independently, returning a continuous angular range in $(-\pi, \pi]$:
+\begin{equation}
+    \operatorname{atan2}(y, x) = \begin{cases}
+        \arctan\left(\frac{y}{x}\right) & \text{if } x > 0, \\
+        \arctan\left(\frac{y}{x}\right) + \pi & \text{if } x < 0 \text{ and } y \geq 0, \\
+        \arctan\left(\frac{y}{x}\right) - \pi & \text{if } x < 0 \text{ and } y < 0, \\
+        +\frac{\pi}{2} & \text{if } x = 0 \text{ and } y > 0, \\
+        -\frac{\pi}{2} & \text{if } x = 0 \text{ and } y < 0, \\
+        \text{undefined} & \text{if } x = 0 \text{ and } y = 0.
+    \end{cases}
+\end{equation}
+Furthermore, $\operatorname{atan2}$ robustly eliminates the mathematical singularity of division by zero that occurs when a vehicle moves purely along the vertical axis (where $d_x = 0$). By bypassing the explicit division $y/x$, the algorithm guarantees that vertical orientation transitions are perfectly stable. 
+
+Once the angle is computed in radians, it is scaled by $\frac{180}{\pi}$ to convert it to degrees, which is the native rotation format for the JavaFX canvas coordinate system. The rendering engine then applies an affine translation to the center point of the rectangle, mapping the logical position $(p_x, p_y)$ directly to the JavaFX window coordinates.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+      >=Stealth,
+      scale=1.4
+    ]
+    
+    % Colors
+    \definecolor{bluevector}{RGB}{28, 100, 242}
+    \definecolor{redvector}{RGB}{224, 86, 36}
+    \definecolor{greenlane}{RGB}{16, 124, 65}
+    
+    % Draw Grid
+    \draw[step=1.0, black!30, very thin] (-1.0, -1.0) grid (6.5, 4.0);
+    
+    % Draw Global World Axes
+    \draw[->, -{Stealth}, thick] (-1.0, 0) -- (6.5, 0) node[right] {$X_{\text{world}}$};
+    \draw[->, -{Stealth}, thick] (0, -1.0) -- (0, 4.0) node[above] {$Y_{\text{world}}$};
+    \node[below left, font=\footnotesize] at (0,0) {$O_{\text{world}}$};
+    
+    % 1. Untransformed State at Origin (Dashed Gray)
+    \begin{scope}[shift={(0,0)}, rotate=0]
+      \draw[draw=gray, fill=gray!25, dashed, line width=0.8pt, rounded corners=3pt] (-0.8, -0.4) rectangle (0.8, 0.4);
+      \draw[draw=gray, fill=gray!50, dashed, line width=0.8pt] (0.24, -0.36) rectangle (0.64, 0.36);
+      % Local axes (untransformed)
+      \draw[->, gray!70!black, dashed, line width=1.2pt] (0,0) -- (1.3, 0);
+      \draw[->, gray!70!black, dashed, line width=1.2pt] (0,0) -- (0, 0.8);
+    \end{scope}
+    \node[below right=2pt, gray!80!black, font=\small] at (0.2,-0.4) {Untransformed State};
+    
+    % 2. Translation Vector T (Blue Arrow)
+    \draw[->, bluevector, line width=1.8pt] (0,0) -- (4,2) node[midway, above left, bluevector] {$\overrightarrow{T} = \begin{pmatrix} p_x \\ p_y \end{pmatrix}$};
+    
+    % 3. Rotated & Translated State at Center C(px, py) (Green Solid)
+    \begin{scope}[shift={(4,2)}, rotate=30]
+      % Solid vehicle body
+      \draw[draw=greenlane!80!black, fill=greenlane!15, line width=1.2pt, rounded corners=3pt] (-0.8, -0.4) rectangle (0.8, 0.4);
+      % Windshield/Direction indicator
+      \draw[draw=greenlane!80!black, fill=greenlane!40, line width=1.0pt] (0.24, -0.36) rectangle (0.64, 0.36);
+      
+      % Rotated Local Axes
+      \draw[->, -{Stealth}, greenlane, line width=1.2pt] (0,0) -- (1.5, 0) node[right, greenlane, font=\small] {$X_{\text{local}}$};
+      \draw[->, -{Stealth}, greenlane, line width=1.2pt] (0,0) -- (0, 1.0) node[above, greenlane, font=\small] {$Y_{\text{local}}$};
+    \end{scope}
+    
+    % Vehicle Center node
+    \fill[bluevector] (4,2) circle (2.2pt) node[below right=6pt, black] {$C(p_x, p_y)$};
+    
+    % Horizontal reference line for rotation angle
+    \draw[dashed, black!50, thin] (4,2) -- (5.6,2);
+    
+    % Rotation Arc for Angle theta
+    \draw[->, redvector, line width=1.0pt] (4.8, 2) arc (0:30:0.8) node[midway, right=1pt, redvector, font=\small] {$\theta$};
+
+  \end{tikzpicture}
+  \caption{Affine Transformations for Vehicle Rendering}
+  \label{fig:rendering_transforms}
+\end{figure}
+
+\end{document}

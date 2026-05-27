@@ -1,7 +1,7 @@
 \documentclass[a4paper,13pt,3p,twoside]{report}
 \usepackage{scrextend}
 \changefontsizes{13pt}
-\usepackage[utf8]{vietnam}
+% \usepackage[utf8]{vietnam}
 \usepackage[top=2cm, bottom=2cm, left=3.5cm, right=2.5cm]{geometry}
 \usepackage{xurl}
 \usepackage{appendix}
@@ -77,6 +77,8 @@
 
 \usepackage{float}
 \usepackage{subcaption}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,calc}
 
 
 \usepackage{tcolorbox}
@@ -117,7 +119,27 @@
 
 \addbibresource{Chapter/reference.bib} % chèn file chứa danh mục tài liệu tham khảo vào 
 
-\include{lstlisting} % Phần này cho phép chèn code và formatting code như C, C++, Python
+% Redefine citation macro to include the brackets in the hyperlink, making '[1]' entirely blue
+\renewbibmacro*{cite}{%
+  \printtext[bibhyperref]{%
+    [\printfield{labelprefix}%
+     \printfield{labelnumber}%
+     \ifbool{bbx:subentry}
+       {\printfield{entrysetcount}}
+       {}%
+    ]%
+  }%
+} 
+
+% Redefine \cite command without the outer \mkbibbrackets wrapper to prevent double-bracket output
+\DeclareCiteCommand{\cite}
+  {\usebibmacro{prenote}}
+  {\usebibmacro{citeindex}%
+   \usebibmacro{cite}}
+  {\multicitedelim}
+  {\usebibmacro{postnote}}
+
+% \include{lstlisting} % Phần này cho phép chèn code và formatting code như C, C++, Python
 
 \setglossarystyle{longheaderborder} % Style có khung và tiêu đề
 % Tùy chỉnh lại độ rộng cột để không bị tràn lề
@@ -128,15 +150,33 @@
 \input{Chapter/glossary}
 
 % ===================================================
-%Thay đổi font của công thước toán học - dùng Xe hoặc Lua
-% \usepackage{unicode-math}
-% \setmathfont{CambriaMath} %[Extension={.ttf},Path=./CambriaFonts/,Scale=1]
-% \setmathrm{Cambria} %[Extension={.ttf},Path=./CambriaFonts/,Scale=1]
-% \usepackage{fontspec}
-% \setmainfont{Times New Roman}
+% Thay đổi font của công thức toán học - dùng Xe hoặc Lua
+\usepackage{unicode-math}
+\setmathfont{CambriaMath} %[Extension={.ttf},Path=./CambriaFonts/,Scale=1]
+\setmathrm{Cambria} %[Extension={.ttf},Path=./CambriaFonts/,Scale=1]
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\everymath{\displaystyle}
+\let\oldfrac\frac
+\renewcommand{\frac}[2]{%
+    \mathchoice
+        % 1. Khi ở dạng Display (dòng chính, to nhất) -> Thêm khoảng trống
+        {\oldfrac{#1}{#2}\rule[-2ex]{0pt}{0pt}\rule{0pt}{3.5ex}} 
+        % 2. Khi ở dạng Text (dòng chữ bình thường) -> Thêm ít hơn một chút
+        {\oldfrac{#1}{#2}\rule[-2ex]{0pt}{0pt}\rule{0pt}{3.5ex}}
+        % 3. Khi ở dạng Script (số mũ, chỉ số) -> KHÔNG thêm khoảng trống
+        {\oldfrac{#1}{#2}}
+        % 4. Khi ở dạng ScriptScript (số mũ của số mũ) -> KHÔNG thêm khoảng trống 
+        {\oldfrac{#1}{#2}}
+}
+
 \sloppy
 
+\usepackage{draftwatermark}
 
+\SetWatermarkText{SAMPLE\\Author: Phuc}
+\SetWatermarkScale{0.75}
+\SetWatermarkLightness{0.9}
 
 \fancypagestyle{plain}{%
 \fancyhf{} % clear all header and footer fields
@@ -146,7 +186,7 @@
 
 \setlength{\headheight}{10pt}
 
-\def \TITLE{GRADUATION THESIS}
+\def \TITLE{PROJECT REPORT}
 \def \AUTHOR{Phùng Minh Phúc}
 
 % ===================================================
@@ -207,9 +247,18 @@
 
 % ===================================================
 \usepackage{hyperref}
-\hypersetup{pdfborder = {0 0 0}}
-\hypersetup{pdftitle={\TITLE},
-	pdfauthor={\AUTHOR}}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=blue,
+    urlcolor=black,
+    pdfborder = {0 0 0}
+}
+\hypersetup{
+    pdftitle={\TITLE},
+	pdfauthor={\AUTHOR},
+    pdfproducer={Microsoft Print to PDF}
+}
 	
 \usepackage[all]{hypcap} % Cho phép tham chiếu chính xác đến hình ảnh và bảng biểu
 
@@ -340,13 +389,13 @@
 
 \newpage
 %\pagestyle{fancy} % Áp dụng header và footer
-\chapter{METHODOLOGY}
-\subfile{Chapter/2_Methodology}
+\chapter{THEORETICAL FOUNDATIONS}
+\subfile{Chapter/2_Theoretical_Foundation}
 
 \newpage
 % \pagestyle{fancy} % Áp dụng header và footer
-\chapter{RESULTS DISCUSSION}
-\subfile{Chapter/3_Numerical_results}
+\chapter{SYSTEM ARCHITECTURE AND DESIGN}
+\subfile{Chapter/3_System_Architecture}
 
 \newpage
 \chapter{CONCLUSIONS}
@@ -360,9 +409,9 @@
 
 % ===================================================
 \newpage
-\renewcommand\bibname{REFERENCE}
+\renewcommand\bibname{REFERENCES}
 \printbibliography
-\phantomsection\addcontentsline{toc}{chapter}{REFERENCE}
+\phantomsection\addcontentsline{toc}{chapter}{REFERENCES}
 
 % \appendixpage
 % \appendix

@@ -1,5 +1,5 @@
 \documentclass[aspectratio=169, 10pt]{beamer}
-\usepackage[utf8]{vietnam}
+% \usepackage[utf8]{vietnam}
 \usetheme{Boadilla}
 \usecolortheme{default}
 \usepackage[x11names]{xcolor}
@@ -9,7 +9,7 @@
 % \usepackage{fontspec}
 % \setsansfont{Palatino}
 \usepackage{tikz,tikz-3dplot,tkz-tab}
-\usetikzlibrary{arrows,calc,intersections,patterns,angles,shapes.geometric}
+\usetikzlibrary{arrows,arrows.meta,calc,intersections,patterns,angles,shapes.geometric}
 \usetikzlibrary{calc,patterns}
 \usepackage{booktabs, array, xcolor}
 \usepackage{listings} % Cấu hình style cho code (Java/C++)
@@ -104,24 +104,107 @@ Nguyen Duc Van & 202417073 \\
 \renewcommand{\arraystretch}{1.6} 
 \setlength{\tabcolsep}{8pt}      
 
-% FRAME 1: 
-\begin{frame}{1. XXX}
-    \centering
-    \small
-    \begin{tabular}{|l|l|l|}
-        \hline
-        \textbf{Attribute} & \textbf{Datatype} & \textbf{Description} \\ \hline
-        \texttt{id} & UUID (PK) & XXX \\ \hline
-        \texttt{email} & Varchar(255) & XXX \\ \hline
-        \texttt{password} & Text & XXX \\ \hline
- role& Varchar&XXX\\\hline
-    \end{tabular}
-    \vspace{0.3cm}
+\section{Introduction}
+\begin{frame}{Introduction}
     \begin{itemize}
-        \item XXX.
+        \item \textbf{Context:} Rapid urbanization leads to severe traffic congestion.
+        \item \textbf{Objective:} Develop a Java-based microscopic smart traffic simulation.
+        \item \textbf{Features:}
+        \begin{itemize}
+            \item Realistic vehicle kinematics and driver behaviors.
+            \item Dynamic traffic networks (lights, intersections, multi-lane roads).
+            \item OOP principles for modularity and scalability.
+        \end{itemize}
+    \end{itemize}
+    
+    % \begin{figure}
+    % \centering
+    % % \includegraphics[height=3cm]{Figures/sim_overview.png}
+    % \caption{Simulation Overview}
+    % \end{figure}
+\end{frame}
+
+\section{System Architecture}
+\begin{frame}{System Architecture}
+    \begin{itemize}
+        \item Separated core logic models from JavaFX rendering.
+        \item Key components:
+        \begin{itemize}
+            \item \texttt{TrafficMap}, \texttt{Road}, \texttt{Lane}, \texttt{Intersection}.
+            \item \texttt{Vehicle}, \texttt{DriverBehavior}.
+            \item Handlers for Simulation, Map Editing, and Zooming.
+        \end{itemize}
     \end{itemize}
 \end{frame}
 
+\section{Mathematical Models}
+\begin{frame}{Mathematical Models: Physics}
+    \textbf{Vehicle Kinematics:}
+    \begin{itemize}
+        \item Velocity Update: $v = v_0 + a \cdot \Delta t$
+        \item Position Update: $\overrightarrow{p} = \overrightarrow{p}_0 + \overrightarrow{d} \cdot (v \cdot \Delta t)$
+    \end{itemize}
+    \vspace{0.3cm}
+    \textbf{Braking Model (IDM Variant):}
+    \begin{itemize}
+        \item Required deceleration to stop at distance $d$:
+        \item $a_{brake} = -\frac{v^2}{2 \cdot d}$
+    \end{itemize}
+\end{frame}
 
+\begin{frame}{Mathematical Models: Collision Detection}
+    \textbf{Line Intersection using Cramer's Rule:}
+    \begin{itemize}
+        \item Determinant: $D = (x_1 - x_2)(y_3 - y_4) - (y_1 - y_2)(x_3 - x_4)$
+        \item Coordinates: 
+        \begin{align*}
+            x &= \frac{D_1(x_3 - x_4) - (x_1 - x_2)D_2}{D} \\
+            y &= \frac{D_1(y_3 - y_4) - (y_1 - y_2)D_2}{D}
+        \end{align*}
+    \end{itemize}
+    
+    % \begin{figure}
+    % \centering
+    % % \includegraphics[height=2.5cm]{Figures/intersection_math.png}
+    % \caption{Intersection Geometry}
+    % \end{figure}
+\end{frame}
+
+\section{Results and Conclusion}
+\begin{frame}{Simulation Results}
+    \begin{itemize}
+        \item Stable performance with high FPS handling numerous vehicles.
+        \item Accurate modeling of distinct driver behaviors (Aggressive, Normal, Cautious).
+        \item Effective emergency vehicle yielding mechanisms.
+    \end{itemize}
+    
+    % \begin{figure}
+    % \centering
+    % % \includegraphics[height=3cm]{Figures/results.png}
+    % \caption{Simulation Snapshot}
+    % \end{figure}
+\end{frame}
+
+\begin{frame}{Conclusions and Future Work}
+    \textbf{Conclusions:}
+    \begin{itemize}
+        \item Successfully implemented a comprehensive traffic simulation.
+        \item Validated the application of physics and geometric algorithms in software engineering.
+    \end{itemize}
+    \vspace{0.3cm}
+    \textbf{Future Work:}
+    \begin{itemize}
+        \item Machine Learning for autonomous vehicle routing.
+        \item Dynamic traffic light synchronization.
+        \item Data analytics for traffic density evaluation.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \centering
+    \Huge \textbf{Thank You!}\\
+    \vspace{0.5cm}
+    \Large \textbf{Q\&A}
+\end{frame}
 
 \end{document}
