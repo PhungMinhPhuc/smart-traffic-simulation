@@ -155,6 +155,12 @@ Users can toggle between Automatic and Manual light control modes on the side pa
 
 \subsection{Dynamic Spawner Controls and Density Management}
 To facilitate stress testing and congestion analysis under varying load levels, the user interface incorporates a dynamic spawning control toggle (\texttt{stopSpawnButton}). At any point during the simulation, users can instantly freeze or resume the background vehicle generation engine. This toggle allows researchers to clear existing traffic bottlenecks, pause the induction of new vehicles to evaluate clearance times, or generate high-density traffic jams on the fly to observe emergent self-organized bottleneck routing behaviors.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth]{Figures/stop_spawn.png}
+  \caption{Spawner Controls to Toggle Vehicle Generation On/Off During Simulation}
+  \label{fig:stop_spawn}
+\end{figure}
 
 \subsection{Interactive Viewport and Scaling Controls}
 To support the visualization of extremely large traffic networks without losing the ability to inspect localized vehicle queues and microscopic collision boxes, the system incorporates comprehensive viewport navigation features:
@@ -182,7 +188,7 @@ To grant complete control over the simulation timeline and layout state, a suite
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.6\textwidth]{Figures/simulation_management_controls.png}
-  \caption{Simulation Timeline Controls (Play/Pause) and Map State Operations}
+  \caption{Simulation Timeline Controls (Resume/Pause) and Map State Operations}
   \label{fig:simulation_management_controls}
 \end{figure}
 
