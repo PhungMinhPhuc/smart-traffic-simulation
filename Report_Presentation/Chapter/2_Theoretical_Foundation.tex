@@ -377,20 +377,55 @@ This vector framework allows for the generation of parallel multi-lane systems f
 To accurately detect potential collisions and manage the complex paths vehicles take through intersections, the system relies extensively on vector mathematics and line intersection algorithms. 
 
 \subsection{Line Intersection Using Cramer's Rule}
-The simulation employs Cramer's rule \cite{daisoToan} to computationally determine the exact intersection point between any two arbitrary line segments on the map, defined by the coordinate pairs $(x_1, y_1), (x_2, y_2)$ and $(x_3, y_3), (x_4, y_4)$. The foundational equations are derived directly from the determinant of the linear equation system:
-\begin{equation}
-    D = (x_1 - x_2)(y_3 - y_4) - (y_1 - y_2)(x_3 - x_4)
-\end{equation}
-Due to the constraints of double-precision floating-point arithmetic (IEEE 754) in computational environments, exact zero checks ($D = 0$) are highly susceptible to rounding and truncation errors. To ensure numerical stability and prevent catastrophic division-by-zero failures, the simulation introduces a small positive precision threshold $\varepsilon = 10^{-9}$ (defined as \texttt{Constants.EPS}). The algorithm checks the absolute value of the determinant against this epsilon limit:
-\begin{equation}
-    |D| < \varepsilon
-\end{equation}
-If this condition is met, the system determines the lines to be parallel or collinear and safely returns a null intersection. In all other scenarios, the partial determinants $D_1$ and $D_2$ are computed, and the coordinates $(x,y)$ of the intersection are determined:
+The simulation employs Cramer's rule \cite{daisoToan} to computationally determine the exact intersection point between any two arbitrary line segments on the map, defined by the coordinate pairs $(x_1, y_1), (x_2, y_2)$ and $(x_3, y_3), (x_4, y_4)$. Any line passing through two distinct coordinate points $P_a(x_a, y_a)$ and $P_b(x_b, y_b)$ can be represented in standard linear form as $A x + B y = C$, where: $A = y_a - y_b$; $B = x_b - x_a$; $C = x_b y_a - x_a y_b = - (x_a y_b - y_a x_b)$ To simplify this representation, the simulation introduces cross-product determinants $D_1$ and $D_2$ for the two respective line segments:
 \begin{align}
-    D_1 &= x_1 \cdot y_2 - y_1 \cdot x_2 \\
-    D_2 &= x_3 \cdot y_4 - y_3 \cdot x_4 \\
-    x &= \frac{D_1(x_3 - x_4) - (x_1 - x_2)D_2}{D} \\
-    y &= \frac{D_1(y_3 - y_4) - (y_1 - y_2)D_2}{D}
+    D_1 &= \begin{vmatrix} x_1 & y_1 \\ x_2 & y_2 \end{vmatrix} = x_1 \cdot y_2 - y_1 \cdot x_2 \\
+    D_2 &= \begin{vmatrix} x_3 & y_3 \\ x_4 & y_4 \end{vmatrix} = x_3 \cdot y_4 - y_3 \cdot x_4
+\end{align}
+This allows the system of equations for the intersection point $(x,y)$ to be formulated as a system of linear equations in matrix form:
+\begin{equation}
+    \begin{bmatrix}
+        y_1 - y_2 & x_2 - x_1 \\
+        y_3 - y_4 & x_4 - x_3
+    \end{bmatrix}
+    \begin{bmatrix}
+        x \\
+        y
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        -D_1 \\
+        -D_2
+    \end{bmatrix}
+\end{equation}
+The determinant $D$ of the coefficient matrix is defined as:
+\begin{equation}
+    D =
+    \begin{vmatrix}
+        y_1 - y_2 & x_2 - x_1 \\
+        y_3 - y_4 & x_4 - x_3
+    \end{vmatrix}
+    =
+    (x_1 - x_2)(y_3 - y_4) - (y_1 - y_2)(x_3 - x_4)
+\end{equation}
+Due to the constraints of double-precision floating-point arithmetic (IEEE 754) in computational environments, exact zero checks ($D = 0$) are highly susceptible to rounding and truncation errors. To ensure numerical stability and prevent catastrophic division-by-zero failures, the simulation introduces a small positive precision threshold $\varepsilon = 10^{-9}$ (defined as \texttt{Constants.EPS}). The algorithm checks the absolute value of the determinant against this epsilon limit: $|D| < \varepsilon$. If this condition is met, the system determines the lines to be parallel or collinear and safely returns a null intersection. In all other scenarios where $|D| \ge \varepsilon$, Cramer's rule is applied to compute the exact coordinates $(x,y)$ of the unique intersection:
+\begin{align}
+    x &= \frac{
+    \begin{vmatrix}
+        -D_1 & x_2 - x_1 \\
+        -D_2 & x_4 - x_3
+    \end{vmatrix}
+    }{D}
+    =
+    \frac{D_1(x_3 - x_4) - (x_1 - x_2)D_2}{D} \\
+    y &= \frac{
+    \begin{vmatrix}
+        y_1 - y_2 & -D_1 \\
+        y_3 - y_4 & -D_2
+    \end{vmatrix}
+    }{D}
+    =
+    \frac{D_1(y_3 - y_4) - (y_1 - y_2)D_2}{D}
 \end{align}
 Furthermore, to verify whether the infinite line intersection point $(x,y)$ actually lies within both finite line segments, the system performs a localized bounding box containment check. To accommodate minor floating-point precision discrepancies at the boundary endpoints, the bounding bounds are cushioned with the same $\varepsilon$ buffer:
 \begin{align}
