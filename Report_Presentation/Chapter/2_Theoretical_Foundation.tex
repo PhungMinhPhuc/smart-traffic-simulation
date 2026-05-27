@@ -10,12 +10,13 @@ To ensure the simulation remains visually and physically realistic, the calculat
 \begin{equation}
     \overrightarrow{p} = \overrightarrow{p}_0 + \overrightarrow{d} \cdot (v \cdot \Delta t)
 \end{equation}
+The visual and geometric representation of these vehicle kinematics and movement updates is illustrated in Figure~\ref{fig:kinematics}.
 
 \begin{figure}[H]
   \centering
   \begin{tikzpicture}[
       >=Stealth,
-      scale=1.75
+      scale=1.85
     ]
     
     % Colors
@@ -41,23 +42,23 @@ To ensure the simulation remains visually and physically realistic, the calculat
     \fill[roadgray] ($(C0) + (195:2.2) + (105:0.8)$) -- ($(C) + (15:1.6) + (105:0.8)$) -- ($(C) + (15:1.6) + (-75:0.8)$) -- ($(C0) + (195:2.2) + (-75:0.8)$) -- cycle;
     \draw[gray, thick] ($(C0) + (195:2.2) + (105:0.8)$) -- ($(C) + (15:1.6) + (105:0.8)$);
     \draw[gray, thick] ($(C0) + (195:2.2) + (-75:0.8)$) -- ($(C) + (15:1.6) + (-75:0.8)$);
-    \draw[gray!50, dashdotted, line width=1.0pt] ($(C0) + (195:2.2)$) -- ($(C) + (15:1.6)$) node[pos=0.0, below, black, font=\tiny, sloped] {Lane Centerline};
+    \draw[gray, dashdotted, line width=1.0pt] ($(C0) + (195:2.2)$) -- ($(C) + (15:1.6)$) node[pos=0.0, above, black, font=\tiny, sloped] {Lane Centerline};
     
     % Position Vectors
-    \draw[->, bluevector, line width=1.5pt] (0,0) -- (C0) node[midway, above left, bluevector, font=\bfseries] {$\overrightarrow{p}_0$};
-    \draw[->, bluevector!70!black, line width=1.5pt] (0,0) -- (C) node[midway, below right, bluevector!70!black, font=\bfseries] {$\overrightarrow{p}$};
+    \draw[->, bluevector, line width=1.5pt] (0,0) -- (C0) node[midway, above left, bluevector, font=\small] {$\overrightarrow{p}_0$};
+    \draw[->, bluevector!70!black, line width=1.5pt] (0,0) -- (C) node[midway, below right, bluevector!70!black, font=\small] {$\overrightarrow{p}$};
     
     % Displacement Vector s
-    \draw[->, greenlane, line width=2.2pt] (C0) -- (C) node[midway, above, greenlane, font=\bfseries\small, sloped] {$\Delta\overrightarrow{s} = \overrightarrow{d} \cdot (v \cdot \Delta t)$};
+    \draw[->, greenlane, line width=2.2pt] (C0) -- (C) node[midway, above, greenlane, font=\small, sloped] {$\Delta\overrightarrow{s} = \overrightarrow{d} \cdot (v \cdot \Delta t)$};
     
     % Vehicle 0 (at initial position, transparent dashed)
     \begin{scope}[shift={(C0)}, rotate=15]
       \draw[draw=orangevector!80!black, fill=orangevector!5, dashed, line width=0.8pt, rounded corners=2.5pt] (-0.6, -0.3) rectangle (0.6, 0.3);
       \draw[draw=orangevector!80!black, fill=orangevector!20, dashed, line width=0.8pt] (0.18, -0.27) rectangle (0.48, 0.27);
       % Velocity v0
-      \draw[->, -{Latex[scale=0.8]}, orangevector, line width=1.2pt] (0.6, 0.1) -- (1.5, 0.1) node[right, orangevector, font=\tiny\bfseries] {$v_0$};
+      \draw[->, -{Latex[scale=0.8]}, orangevector, line width=1.2pt] (0.6, 0.1) -- (1.5, 0.1) node[right, orangevector, font=\small] {$v_0$};
       % Acceleration a
-      \draw[->, -{Latex[scale=0.8]}, redvector, line width=1.2pt] (0.6, -0.1) -- (1.2, -0.1) node[right, redvector, font=\tiny\bfseries] {$a$};
+      \draw[->, -{Latex[scale=0.8]}, redvector, line width=1.2pt] (0.6, -0.1) -- (1.2, -0.1) node[below, redvector, font=\small] {$\overrightarrow{a}$};
     \end{scope}
     
     % Vehicle 1 (at final position, solid)
@@ -65,15 +66,15 @@ To ensure the simulation remains visually and physically realistic, the calculat
       \draw[draw=orangevector!80!black, fill=orangevector!25, line width=1.2pt, rounded corners=2.5pt] (-0.6, -0.3) rectangle (0.6, 0.3);
       \draw[draw=orangevector!80!black, fill=orangevector!50, line width=1.0pt] (0.18, -0.27) rectangle (0.48, 0.27);
       % Velocity v (longer arrow, showing acceleration!)
-      \draw[->, -{Latex[scale=0.8]}, orangevector!80!black, line width=1.5pt] (0.6, 0) -- (1.9, 0) node[above, orangevector!80!black] {$v = v_0 + a\Delta t$};
+      \draw[->, -{Latex[scale=0.8]}, orangevector!80!black, line width=1.5pt] (0.6, 0) -- (1.9, 0) node[above, orangevector!80!black, font=\small] {$v = v_0 + a\Delta t$};
     \end{scope}
     
     % Centers
-    \fill[bluevector] (C0) circle (2.2pt) node[below=4pt, black, font=\tiny] {$C_0(\overrightarrow{p}_0)$ at $t_0$};
-    \fill[bluevector!70!black] (C) circle (2.2pt) node[below=4pt, black, font=\tiny] {$C(\overrightarrow{p})$ at $t_0 + \Delta t$};
+    \fill[bluevector] (C0) circle (2.2pt) node[below=20pt, black, font=\small] {$C_0(\overrightarrow{p}_0)$ at $t_0$};
+    \fill[bluevector!70!black] (C) circle (2.2pt) node[below=20pt, black, font=\small] {$C(\overrightarrow{p})$ at $t_0 + \Delta t$};
     
     % Direction unit vector u (drawn starting from C0)
-    \draw[->, -{Stealth}, black, line width=1.0pt] (C0) -- ($(C0) + (15:0.8)$) node[pos=0.8, below, black, font=\tiny] {$\overrightarrow{d}$};
+    \draw[->, -{Stealth}, black, line width=1.0pt] (C0) -- ($(C0) + (15:0.8)$) node[pos=0.35, above, black, font=\small] {$\overrightarrow{d}$};
 
   \end{tikzpicture}
   \caption{Visualization of Vehicle Kinematics and Movement Update}
@@ -82,6 +83,7 @@ To ensure the simulation remains visually and physically realistic, the calculat
 
 \section{Driver Behavior Model}
 The simulation implements a microscopic decision-making framework to calculate the necessary acceleration or deceleration for each vehicle. The driver behavior module continuously scans the environment, evaluating the distance to the preceding vehicle, the state of upcoming traffic lights, and the availability of adjacent lanes. The final acceleration $a$ applied to the vehicle is the minimum of three distinct acceleration profiles, guaranteeing comfort, cruising efficiency, and absolute safety:
+
 \begin{equation}
     a = \min(a_{\text{cruise}}, a_{\text{ahead}}, a_{\text{light}})
 \end{equation}
@@ -132,7 +134,7 @@ where $\mathcal{R}$ represents the set of all roads connected to the junction. T
 \begin{equation}
     R = \max \left( R_{\min}, w_{\max} + \delta_{\text{marking}} \right)
 \end{equation}
-where $R_{\min}$ is the predefined minimum junction radius, and $\delta_{\text{marking}}$ is the buffer offset for road markings.
+where $R_{\min}$ is the predefined minimum junction radius, and $\delta_{\text{marking}}$ is the buffer offset for road markings. The dynamic scaling behavior and its relationship with the maximum road half-width are geometrically illustrated in Figure~\ref{fig:junction_radius}.
 
 \begin{figure}[H]
   \centering
@@ -203,7 +205,7 @@ where $w_{\text{half}} = w_{\text{lane}} \cdot N_{\text{lane}}$, and $R_{\text{n
 \begin{equation}
     R_{\text{needed}} = \max \left( R, w_{\text{half}} + \delta_{\text{marking}} \right)
 \end{equation}
-This formulation ensures that the outer edges of a multi-lane road intersect the circular boundary of the junction exactly, preserving visual and physical coherence.
+This formulation ensures that the outer edges of a multi-lane road intersect the circular boundary of the junction exactly, preserving visual and physical coherence, as diagrammed in Figure~\ref{fig:pythagorean_boundary}.
 
 \begin{figure}[H]
   \centering
@@ -211,7 +213,7 @@ This formulation ensures that the outer edges of a multi-lane road intersect the
       >=Stealth,
       scale=1.4
     ]
-    \clip (-3.5, -1) rectangle (6, 3.6);
+    \clip (-3.5, -0.65) rectangle (6, 3.6);
     
     % Colors
     \definecolor{roadgray}{RGB}{245, 245, 245}
@@ -272,7 +274,7 @@ For the \textbf{Left-Hand Way} (which carries traffic from $W_{\text{end}}$ to $
 \begin{equation}
     \overrightarrow{u}_{\text{trans}} = R_{-90^\circ}(\overrightarrow{u}) = \begin{pmatrix} u_y \\ -u_x \end{pmatrix}
 \end{equation}
-For the $i$-th lane of the left-hand way ($i \in [0, N_r - 1]$), the lane start point $P_{\text{start}, i}$ and end point $P_{\text{end}, i}$ are generated using a scale factor $j = 2i + 1$:
+For the $i$-th lane of the left-hand way ($i \in [0, N_l - 1]$), the lane start point $P_{\text{start}, i}$ and end point $P_{\text{end}, i}$ are generated using a scale factor $j = 2i + 1$:
 \begin{align}
     P_{\text{start}, i} &= W_{\text{end}} + j \cdot \left( \frac{w_{\text{lane}}}{2} \right) \cdot \overrightarrow{u}_{\text{trans}} \\
     P_{\text{end}, i} &= W_{\text{start}} + j \cdot \left( \frac{w_{\text{lane}}}{2} \right) \cdot \overrightarrow{u}_{\text{trans}}
@@ -281,18 +283,18 @@ Conversely, for the \textbf{Right-Hand Way} (which carries traffic from $W_{\tex
 \begin{equation}
     \overrightarrow{u}_{\text{trans}} = R_{90^\circ}(\overrightarrow{u}) = \begin{pmatrix} -u_y \\ u_x \end{pmatrix}
 \end{equation}
-For the $i$-th lane of the right-hand way ($i \in [0, N_l - 1]$), the coordinates are generated as:
+For the $i$-th lane of the right-hand way ($i \in [0, N_r - 1]$), the coordinates are generated as:
 \begin{align}
     P_{\text{start}, i} &= W_{\text{start}} + j \cdot \left( \frac{w_{\text{lane}}}{2} \right) \cdot \overrightarrow{u}_{\text{trans}} \\
     P_{\text{end}, i} &= W_{\text{end}} + j \cdot \left( \frac{w_{\text{lane}}}{2} \right) \cdot \overrightarrow{u}_{\text{trans}}
 \end{align}
-This vector framework allows for the generation of parallel multi-lane systems for any arbitrary road angle.
+This vector framework allows for the generation of parallel multi-lane systems for any arbitrary road angle, with the coordinate offsets and transformation vectors illustrated in Figure~\ref{fig:parallel_lanes}.
 
 \begin{figure}[H]
   \centering
   \begin{tikzpicture}[
       >=Latex,
-      scale=1.5,
+      scale=1.75,
       coordinate label/.style={draw, circle, fill=black, inner sep=1.5pt, label={#1}},
       vector label/.style={midway, font=\small},
       lane label/.style={font=\footnotesize\itshape}
@@ -377,7 +379,8 @@ This vector framework allows for the generation of parallel multi-lane systems f
 To accurately detect potential collisions and manage the complex paths vehicles take through intersections, the system relies extensively on vector mathematics and line intersection algorithms. 
 
 \subsection{Line Intersection Using Cramer's Rule}
-The simulation employs Cramer's rule \cite{daisoToan} to computationally determine the exact intersection point between any two arbitrary line segments on the map, defined by the coordinate pairs $(x_1, y_1), (x_2, y_2)$ and $(x_3, y_3), (x_4, y_4)$. Any line passing through two distinct coordinate points $P_a(x_a, y_a)$ and $P_b(x_b, y_b)$ can be represented in standard linear form as $A x + B y = C$, where: ${A = y_a - y_b}$; ${B = x_b - x_a}$; ${C = x_b y_a - x_a y_b = - (x_a y_b - y_a x_b)}$ To simplify this representation, the simulation introduces cross-product determinants $D_1$ and $D_2$ for the two respective line segments:
+
+The simulation employs Cramer's rule \cite{daisoToan} to computationally determine the exact intersection point between any two arbitrary line segments on the map, defined by the coordinate pairs $(x_1, y_1), (x_2, y_2)$ and $(x_3, y_3), (x_4, y_4)$. Any line passing through two distinct coordinate points ${P_a(x_a, y_a)}$ and $P_b(x_b, y_b)$ can be represented in standard linear form as ${A x + B y = C}$, where: ${A = y_a - y_b}$; ${B = x_b - x_a}$; ${C = x_b y_a - x_a y_b = - (x_a y_b - y_a x_b)}$ To simplify this representation, the simulation introduces cross-product determinants $D_1$ and $D_2$ for the two respective line segments:
 \begin{align}
     D_1 &= \begin{vmatrix} x_1 & y_1 \\ x_2 & y_2 \end{vmatrix} = x_1 \cdot y_2 - y_1 \cdot x_2 \\
     D_2 &= \begin{vmatrix} x_3 & y_3 \\ x_4 & y_4 \end{vmatrix} = x_3 \cdot y_4 - y_3 \cdot x_4
@@ -408,7 +411,7 @@ The determinant $D$ of the coefficient matrix is defined as:
     =
     (x_1 - x_2)(y_3 - y_4) - (y_1 - y_2)(x_3 - x_4)
 \end{equation}
-Due to the constraints of double-precision floating-point arithmetic (IEEE 754) in computational environments, exact zero checks ($D = 0$) are highly susceptible to rounding and truncation errors. To ensure numerical stability and prevent catastrophic division-by-zero failures, the simulation introduces a small positive precision threshold $\varepsilon = 10^{-9}$ (defined as \texttt{Constants.EPS}). The algorithm checks the absolute value of the determinant against this epsilon limit: $|D| < \varepsilon$. If this condition is met, the system determines the lines to be parallel or collinear and safely returns a null intersection. In all other scenarios where $|D| \ge \varepsilon$, Cramer's rule is applied to compute the exact coordinates $(x,y)$ of the unique intersection:
+Due to the constraints of double-precision floating-point arithmetic (IEEE 754) in computational environments, exact zero checks (${D = 0}$) are highly susceptible to rounding and truncation errors. To ensure numerical stability and prevent catastrophic division-by-zero failures, the simulation introduces a small positive precision threshold ${\varepsilon = 10^{-9}}$ (defined as \texttt{Constants.EPS}). The algorithm checks the absolute value of the determinant against this epsilon limit: ${|D| < \varepsilon}$. If this condition is met, the system determines the lines to be parallel or collinear and safely returns a null intersection. In all other scenarios where ${|D| \ge \varepsilon}$, Cramer's rule is applied to compute the exact coordinates $(x,y)$ of the unique intersection:
 \begin{align}
     x &= \frac{
     \begin{vmatrix}
@@ -434,8 +437,7 @@ Furthermore, to verify whether the infinite line intersection point $(x,y)$ actu
     x &\in [x'_{\min} - \varepsilon, x'_{\max} + \varepsilon] \\
     y &\in [y'_{\min} - \varepsilon, y'_{\max} + \varepsilon]
 \end{align}
-where $x_{\min} = \min(x_1, x_2)$, $x_{\max} = \max(x_1, x_2)$ (and similarly for segment $B$ denoted by primed limits). This precision padding guarantees stable collision detection near intersection junctions.
-
+where ${x_{\min} = \min(x_1, x_2)}$, ${x_{\max} = \max(x_1, x_2)}$ (and similarly for segment $B$ denoted by primed limits). This precision padding guarantees stable collision detection near intersection junctions. Figure~\ref{fig:cramer_intersection} displays the geometric representation of these intersecting line segments and their respective bounding boxes.
 \begin{figure}[H]
   \centering
   \begin{tikzpicture}[
@@ -518,8 +520,7 @@ Furthermore, the lateral distance from a vehicle's center point $P$ to the bound
 \begin{equation}
     t = \frac{(P_x - A_x)(B_x - A_x) + (P_y - A_y)(B_y - A_y)}{L^2}
 \end{equation}
-where $L$ is the length of the segment $AB$. The scalar $t$ is clamped to the range $[0, 1]$ to ensure the projected point strictly lies on the segment itself. This specific calculation guarantees that vehicles maintain strict adherence to their designated lanes and safely execute lane-changing maneuvers without intersecting parallel traffic flows.
-
+where $L$ is the length of the segment $AB$. The scalar $t$ is clamped to the range $[0, 1]$ to ensure the projected point strictly lies on the segment itself. This specific calculation guarantees that vehicles maintain strict adherence to their designated lanes and safely execute lane-changing maneuvers without intersecting parallel traffic flows, as depicted in Figure~\ref{fig:point_projection}.
 \begin{figure}[H]
   \centering
   \begin{tikzpicture}[
@@ -598,12 +599,12 @@ A lane change transition is initiated only if both of the following safety bound
         \|\overrightarrow{P}_{\text{target}} - \overrightarrow{P}_{\text{target}, k}\| \geq \frac{L_{\text{self}} + L_k}{2} + 10.0
     \end{equation}
 \end{enumerate}
-
+% The combined vector trajectory, containing both the longitudinal and lateral displacement vectors during a typical lane change maneuver, is shown in Figure~\ref{fig:lane_change_vector}.
 \begin{figure}[H]
   \centering
   \begin{tikzpicture}[
       >=Latex,
-      scale=1.4
+      scale=1.55
     ]
     
     % Colors
@@ -655,7 +656,6 @@ A lane change transition is initiated only if both of the following safety bound
   \caption{Diagonal Trajectory and Direction Vectors During a Lane Change}
   \label{fig:lane_change_vector}
 \end{figure}
-
 \subsection{Linear Projection for Boundary Continuity}
 When a vehicle exits an intersection path and enters a new road lane, visual jumps must be prevented. The vehicle may overshoot the exact end of the intersection path in a given frame. To ensure continuous movement, this overshoot $\delta_{\text{overshoot}}$ is computed and projected onto the new lane segment.
 Let $\overrightarrow{p}$ be the vehicle's uncorrected position at the end of the step, and let $\overrightarrow{p}_{\text{end}}$ be the end coordinate of the path. The overshoot scalar is:
@@ -679,13 +679,13 @@ To ensure the zoom focuses precisely on the user's cursor position $(X_{\text{mo
 \begin{equation}
     H_{\text{new}} = \text{clamp} \left( \frac{X_{\text{target}} - X_{\text{viewport}}}{W_{\text{content}} - W_{\text{viewport}}} \right)
 \end{equation}
-This affine transformation ensures spatial consistency between the logical map and the JavaFX rendering canvas during scaling operations.
+This affine transformation ensures spatial consistency between the logical map and the JavaFX rendering canvas during scaling operations, as shown in Figure~\ref{fig:zoom_math}.
 
 \begin{figure}[H]
   \centering
   \begin{tikzpicture}[
-      >=Stealth,
-      scale=1.3
+      >={Stealth},
+      scale=1.6
     ]
     
     % Colors
@@ -694,25 +694,25 @@ This affine transformation ensures spatial consistency between the logical map a
     \definecolor{greenlane}{RGB}{16, 124, 65}
     
     % Draw Grid
-    \draw[step=1.0, black!30, very thin] (-0.5, -2.0) grid (8.5, 5.5);
+    \draw[step=1.0, black!30, very thin] (-0.5, -1.5) grid (8.5, 5);
     
     % Draw Content Area (Logical Map)
-    \draw[draw=black!60, fill=black!2, line width=1.2pt] (0,0) rectangle (8,5);
-    \node[above right, black!75, font=\footnotesize\bfseries] at (0, 5.0) {Logical Map Content ($W_{\text{content}} \times H_{\text{content}}$)};
+    \draw[draw=black!60, fill=black!2, line width=1.2pt] (0,0) rectangle (8,4.5);
+    \node[above right, black!75, font=\bfseries] at (0, 4.5) {Logical Map Content ($W_{\text{content}} \times H_{\text{content}}$)};
     
     % Draw Viewport Area (Visible Window)
     \draw[draw=bluevector, fill=bluevector!8, line width=1.6pt, fill opacity=0.7, text opacity=1] (2, 1.5) rectangle (5.5, 3.8);
-    \node[bluevector, font=\footnotesize\bfseries] at (3.75, 3.5) {Visible Viewport};
+    \node[bluevector, font=\bfseries] at (3.75, 3.5) {Visible Viewport};
     
     % Viewport Width Dimension (drawn inside viewport)
-    \draw[|<->|, bluevector!80!black, thin] (2, 1.8) -- (5.5, 1.8) node[midway, fill=bluevector!8, inner sep=1pt, font=\tiny] {$W_{\text{viewport}}$};
+    \draw[|<->|, bluevector!80!black, thin] (2, 1.8) -- (5.5, 1.8) node[midway, fill=bluevector!8, inner sep=1pt, font=\small] {$W_{\text{viewport}}$};
     
     % Cursor Position P
     \coordinate (P) at (4.2, 2.5);
     \draw[redvector, thick] (3.9, 2.5) -- (4.5, 2.5);
     \draw[redvector, thick] (4.2, 2.2) -- (4.2, 2.8);
     \draw[redvector, thin] (P) circle (4pt);
-    \fill[redvector] (P) circle (2.2pt) node[above left=2pt, redvector, font=\bfseries\tiny] {Cursor $(X_{\text{mouse}}, Y_{\text{mouse}})$};
+    \fill[redvector] (P) circle (2.2pt) node[above left=2pt, redvector, font=\bfseries\small, align=center] {Cursor \\ $(X_{\mathrm{mouse}}, Y_{\mathrm{mouse}})$};
     
     % Dimension Projection Helper Lines
     \draw[gray, thin, dashed] (0, 0) -- (0, -1.7);
@@ -723,14 +723,14 @@ This affine transformation ensures spatial consistency between the logical map a
     
     % Dimension Brackets
     % Level 1: Viewport Left Offset & Mouse Offset inside Viewport
-    \draw[|<->|, black, thin] (0, -0.4) -- (2, -0.4) node[midway, fill=white, font=\tiny] {$X_{\text{viewport}}$};
-    \draw[|<->|, bluevector, thin] (2, -0.4) -- (4.2, -0.4) node[midway, fill=white, font=\tiny] {$\frac{X_{\text{mouse}}}{S}$};
+    \draw[|<->|, black, thin] (0, -0.4) -- (2, -0.4) node[midway, fill=white, font=\small] {$X_{\text{viewport}}$};
+    \draw[|<->|, bluevector, thin] (2, -0.4) -- (4.2, -0.4) node[midway, fill=white, inner sep=0pt, font=\small] {$\dfrac{X_{\text{mouse}}}{S}$};
     
     % Level 2: Target coordinate in logical Content
-    \draw[|<->|, redvector, thin] (0, -1.0) -- (4.2, -1.0) node[midway, fill=white, font=\tiny] {$X_{\text{target}} = X_{\text{viewport}} + \frac{X_{\text{mouse}}}{S}$};
+    \draw[|<->|, redvector, thin] (0, -1.0) -- (4.2, -1.0) node[midway, fill=white, inner sep=0pt, font=\small] {$X_{\text{target}} = X_{\text{viewport}} + \dfrac{X_{\text{mouse}}}{S}$};
     
     % Level 3: Content Width
-    \draw[|<->|, black, thin] (0, -1.6) -- (8, -1.6) node[midway, fill=white, font=\tiny] {Total Content Width $W_{\text{content}}$};
+    \draw[|<->|, black, thin] (0, -1.6) -- (8, -1.6) node[midway, fill=white, font=\small] {Total Content Width $W_{\text{content}}$};
 
   \end{tikzpicture}
   \caption{Viewport Coordinate Transformations during Zoom}
@@ -742,9 +742,9 @@ During the synchronization phase between the logical state and the \gls{GUI}, th
 \begin{equation}
     \theta = \frac{180}{\pi} \cdot \operatorname{atan2}(d_y, d_x)
 \end{equation}
-The use of the two-argument arctangent function, $\operatorname{atan2}(y, x)$, is mathematically critical for microscopic traffic visualization compared to the standard single-argument arctangent function $\arctan(y/x)$ \cite{giaitichToan}. 
+The use of the two-argument arctangent function, $\operatorname{atan2}(y, x)$, is mathematically critical for microscopic traffic visualization compared to the standard single-argument arctangent function $\arctan\left(\frac{y}{x}\right)$ \cite{giaitichToan}. 
 
-Historically, the standard $\arctan(u)$ function only yields values within the restricted interval $(-\pi/2, \pi/2)$, which corresponds to the first and fourth quadrants of the Cartesian plane. Consequently, a single ratio $u = y/x$ is fundamentally ambiguous because it loses the individual signs of the coordinate components. For example:
+Historically, the standard $\arctan(u)$ function only yields values within the restricted interval $\left(-\frac{\pi}{2}, \frac{\pi}{2}\right)$, which corresponds to the first and fourth quadrants of the Cartesian plane. Consequently, a single ratio $u = \frac{y}{x}$ is fundamentally ambiguous because it loses the individual signs of the coordinate components. For example:
 \begin{equation}
     \frac{d_y}{d_x} = \frac{-d_y}{-d_x}
 \end{equation}
@@ -761,9 +761,9 @@ To resolve this topological ambiguity, $\operatorname{atan2}(y, x)$ maps the vec
         \text{undefined} & \text{if } x = 0 \text{ and } y = 0.
     \end{cases}
 \end{equation}
-Furthermore, $\operatorname{atan2}$ robustly eliminates the mathematical singularity of division by zero that occurs when a vehicle moves purely along the vertical axis (where $d_x = 0$). By bypassing the explicit division $y/x$, the algorithm guarantees that vertical orientation transitions are perfectly stable. 
+Furthermore, $\operatorname{atan2}$ robustly eliminates the mathematical singularity of division by zero that occurs when a vehicle moves purely along the vertical axis (where $d_x = 0$). By bypassing the explicit division $\frac{y}{x}$, the algorithm guarantees that vertical orientation transitions are perfectly stable. 
 
-Once the angle is computed in radians, it is scaled by $\frac{180}{\pi}$ to convert it to degrees, which is the native rotation format for the JavaFX canvas coordinate system. The rendering engine then applies an affine translation to the center point of the rectangle, mapping the logical position $(p_x, p_y)$ directly to the JavaFX window coordinates.
+Once the angle is computed in radians, it is scaled by $\frac{180}{\pi}$ to convert it to degrees, which is the native rotation format for the JavaFX canvas coordinate system. The rendering engine then applies an affine translation to the center point of the rectangle, mapping the logical position $(p_x, p_y)$ directly to the JavaFX window coordinates. The step-by-step translation and rotation affine transformations applied during the vehicle rendering process are visualized in Figure~\ref{fig:rendering_transforms}.
 
 \begin{figure}[H]
   \centering

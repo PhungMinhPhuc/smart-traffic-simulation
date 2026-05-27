@@ -2,24 +2,27 @@
 \begin{document}
 
 \section{Object-Oriented Design}
-The traffic simulation system is built using a rigorous \gls{OOP} approach in Java, deliberately separating the logical models from the rendering mechanisms to ensure scalability and maintainability. The core structural components include the map layout, which is composed of a network of traffic nodes, multi-lane roads, and complex intersections. The traffic entities traversing this network consist of various vehicle classes and traffic lights that dictate flow control. The rendering engine is powered by JavaFX, utilizing specific renderer classes to visually interpret the underlying mathematical state of the map and vehicles. A central simulation handler manages the continuous animation timer, synchronizing the logical updates of the traffic map with the graphical updates on the screen. The traffic lights operate under varying display modes to provide configurable user experiences: Mode 0 hides the timer, Mode 1 displays the full countdown timer continuously, and Mode 2 displays the countdown only when there are less than 8 seconds remaining.
+The traffic simulation system is built using a rigorous \gls{OOP} approach in Java, deliberately separating the logical models from the rendering mechanisms to ensure scalability and maintainability. The core structural components include the map layout, which is composed of a network of traffic nodes, multi-lane roads, and complex intersections. The traffic entities traversing this network consist of various vehicle classes and traffic lights that dictate flow control; their structural relationships are detailed in the Core Model Class Diagram in Figure~\ref{fig:class_diagram_core_model}. The rendering engine is powered by JavaFX, utilizing specific renderer classes to visually interpret the underlying mathematical state of the map and vehicles, as shown in the UI and Rendering Class Diagram in Figure~\ref{fig:class_diagram_ui_rendering}. A central simulation handler manages the continuous animation timer, synchronizing the logical updates of the traffic map with the graphical updates on the screen. The traffic lights operate under varying display modes to provide configurable user experiences: Mode 0 hides the timer, Mode 1 displays the full countdown timer continuously, and Mode 2 displays the countdown only when there are less than 8 seconds remaining. The design details and hierarchies governing vehicle kinetics and driver decision profiles are illustrated in the Vehicle and Driver Behavior Class Diagram in Figure~\ref{fig:class_diagram_vehicle_behavior}.
 
 \begin{sidewaysfigure}
   \centering
   \includegraphics[width=\textwidth]{Figures/ClassDiagramFinal-Core Model.jpg}
   \caption{Core Model Class Diagram}
+  \label{fig:class_diagram_core_model}
 \end{sidewaysfigure}
 
 \begin{sidewaysfigure}
   \centering
   \includegraphics[width=0.75\textwidth]{Figures/ClassDiagramFinal-UI Rendering Handlers.jpg}
   \caption{UI, Rendering, and Handler Class Diagram}
+  \label{fig:class_diagram_ui_rendering}
 \end{sidewaysfigure}
 
 \begin{sidewaysfigure}
   \centering
   \includegraphics[width=\textwidth]{Figures/ClassDiagramFinal-Vehicle Behavior.jpg}
   \caption{Vehicle and Driver Behavior Class Diagram}
+  \label{fig:class_diagram_vehicle_behavior}
 \end{sidewaysfigure}
 
 \section{Simulation Workflow}
@@ -28,25 +31,28 @@ The operational lifecycle of the simulation is driven by a high-frequency animat
 \section{Map Editor Features}
 In addition to the continuous simulation loop, the application provides a robust, interactive \gls{GUI} module dedicated to map editing. Handled by the Map Editor Handler, users can dynamically modify the topological structure of the road network in real-time. The editor seamlessly switches between several functional modes:
 
-\textbf{Add Node Mode:} By clicking anywhere on the interactive map canvas, users can instantiate a new traffic junction at that specific physical coordinate. These junctions act as foundational anchors for the road network.
+\textbf{Add Node Mode:} By clicking anywhere on the interactive map canvas, users can instantiate a new traffic junction at that specific physical coordinate. These junctions act as foundational anchors for the road network, as shown in Figure~\ref{fig:map_add_node}.
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth]{Figures/map_add_node.png}
+  \includegraphics[width=0.65\textwidth]{Figures/map_add_node.png}
   \caption{Adding a New Junction Node on the Map}
+  \label{fig:map_add_node}
 \end{figure}
 
-\textbf{Add Road Mode:} Users can construct multi-lane roads by visually dragging a line from a starting junction node to an ending junction node. The handler calculates the geometric vectors between the two nodes and automatically generates the necessary internal lanes based on the user's configured lane count spinner.
+\textbf{Add Road Mode:} Users can construct multi-lane roads by visually dragging a line from a starting junction node to an ending junction node. The handler calculates the geometric vectors between the two nodes and automatically generates the necessary internal lanes based on the user's configured lane count spinner, illustrated in Figure~\ref{fig:map_add_road}.
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth]{Figures/map_add_road.png}
+  \includegraphics[width=0.65\textwidth]{Figures/map_add_road.png}
   \caption{Constructing a Road by Dragging Between Two Nodes}
+  \label{fig:map_add_road}
 \end{figure}
 
-\textbf{Remove Elements:} To facilitate error correction and map optimization, dedicated removal modes exist for both nodes and roads. Clicking an existing road instantly severs the connection between its associated nodes, while clicking a node completely deletes it, alongside any roads that were previously connected to it, ensuring topological integrity is maintained.
+\textbf{Remove Elements:} To facilitate error correction and map optimization, dedicated removal modes exist for both nodes and roads. Clicking an existing road instantly severs the connection between its associated nodes, while clicking a node completely deletes it, alongside any roads that were previously connected to it, ensuring topological integrity is maintained (see Figure~\ref{fig:map_remove_elements}).
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth]{Figures/map_remove_elements.png}
+  \includegraphics[width=0.65\textwidth]{Figures/map_remove_elements.png}
   \caption{Removing Roads and Nodes from the Map}
+  \label{fig:map_remove_elements}
 \end{figure}
 
 \section{Entity Configuration and Specifications}
@@ -113,9 +119,9 @@ To satisfy both macro-scale road network visualizations and microscopic junction
 \subsection{Dual-Mode Vehicle Rendering Engine}
 To balance scientific performance with visual realism, the simulation implements a highly responsive dual-mode vehicle rendering pipeline. Users can dynamically toggle between these modes at runtime via the sidebar panel:
 
-\textbf{Rectangle Mode:} Managed by \texttt{VehicleRenderer}, this mode renders each vehicle as a solid colored rectangle drawn strictly according to its physical dimensions (width and length) and behavioral profile color. This mode minimizes graphics card rendering overhead and is optimized for debugging vector offsets, oriented bounding box (OBB) collision states, and segment-segment intersection formulas.
+\textbf{Rectangle Mode:} Managed by \texttt{VehicleRenderer}, this mode renders each vehicle as a solid colored rectangle drawn strictly according to its physical dimensions (width and length) and behavioral profile color, as shown in Figure~\ref{fig:rectangle_mode}. This mode minimizes graphics card rendering overhead and is optimized for debugging vector offsets, oriented bounding box (OBB) collision states, and segment-segment intersection formulas.
 
-\textbf{Image Mode:} Managed by \texttt{ImageVehicleRenderer}, this mode maps and renders realistic graphical sprite assets (PNG format) corresponding to the specific vehicle type (e.g., car, ambulance, bus, bicycle, fire truck, motorbike, truck, ...). The engine automatically applies affine rotations to align each sprite with the vehicle's directional vector ($\theta$). If the asset files are missing from the local disk, the renderer gracefully falls back to Rectangle Mode, preventing any software instability.
+\textbf{Image Mode:} Managed by \texttt{ImageVehicleRenderer}, this mode maps and renders realistic graphical sprite assets (PNG format) corresponding to the specific vehicle type (e.g., car, ambulance, bus, bicycle, fire truck, motorbike, truck, ...), as illustrated in Figure~\ref{fig:image_mode}. The engine automatically applies affine rotations to align each sprite with the vehicle's directional vector ($\theta$). If the asset files are missing from the local disk, the renderer gracefully falls back to Rectangle Mode, preventing any software instability. The side-by-side comparison of these two vehicle rendering modes is shown in Figure~\ref{fig:vehicle_rendering_modes}.
 \begin{figure}[H]
   \centering
   \begin{subfigure}[b]{\textwidth}
@@ -136,7 +142,7 @@ To balance scientific performance with visual realism, the simulation implements
 \end{figure}
 
 \subsection{Configurable Traffic Light Countdown Modes}
-To simulate realistic driver reactions and support diverse urban aesthetics, the traffic signal system provides three distinct countdown display behaviors:
+To simulate realistic driver reactions and support diverse urban aesthetics, the traffic signal system provides three distinct countdown display behaviors, depicted in Figure~\ref{fig:traffic_light_countdown_modes}:
 
 \textbf{Mode 0 (No Countdown):} Completely hides numerical countdown values. Traffic lights are rendered solely as standard tri-color signal housings, which is optimal for a clean, distraction-free view of the macroscopic network.
 
@@ -154,7 +160,7 @@ To simulate realistic driver reactions and support diverse urban aesthetics, the
 Users can toggle between Automatic and Manual light control modes on the side panel. In Manual Mode, the automated timing cycles are paused. Users can interactively click directly on any traffic light visual group on the map canvas to cycle its state (Red $\rightarrow$ Green $\rightarrow$ Yellow $\rightarrow$ Red), offering direct manual flow override.
 
 \subsection{Dynamic Spawner Controls and Density Management}
-To facilitate stress testing and congestion analysis under varying load levels, the user interface incorporates a dynamic spawning control toggle (\texttt{stopSpawnButton}). At any point during the simulation, users can instantly freeze or resume the background vehicle generation engine. This toggle allows researchers to clear existing traffic bottlenecks, pause the induction of new vehicles to evaluate clearance times, or generate high-density traffic jams on the fly to observe emergent self-organized bottleneck routing behaviors.
+To facilitate stress testing and congestion analysis under varying load levels, the user interface incorporates a dynamic spawning control toggle (\texttt{stopSpawnButton}). At any point during the simulation, users can instantly freeze or resume the background vehicle generation engine. This toggle, depicted in Figure~\ref{fig:stop_spawn}, allows researchers to clear existing traffic bottlenecks, pause the induction of new vehicles to evaluate clearance times, or generate high-density traffic jams on the fly to observe emergent self-organized bottleneck routing behaviors.
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.6\textwidth]{Figures/stop_spawn.png}
@@ -163,7 +169,7 @@ To facilitate stress testing and congestion analysis under varying load levels, 
 \end{figure}
 
 \subsection{Interactive Viewport and Scaling Controls}
-To support the visualization of extremely large traffic networks without losing the ability to inspect localized vehicle queues and microscopic collision boxes, the system incorporates comprehensive viewport navigation features:
+To support the visualization of extremely large traffic networks without losing the ability to inspect localized vehicle queues and microscopic collision boxes, the system incorporates comprehensive viewport navigation features, shown in Figure~\ref{fig:map_zoom_panning}:
 
 \textbf{Zoom In / Zoom Out:} Managed by the \texttt{ZoomHandler}, these controls dynamically adjust the affine scale factor ($S_{\text{new}}$) of the central \texttt{trafficMapContainer} by multiplying or dividing it by a zoom constant. This allows the user to magnify localized road crossings or zoom out to inspect the entire grid.
 
@@ -178,7 +184,7 @@ To support the visualization of extremely large traffic networks without losing 
 \end{figure}
 
 \subsection{Simulation Timeline and Map Management}
-To grant complete control over the simulation timeline and layout state, a suite of playback and initialization commands is accessible via the main panel:
+To grant complete control over the simulation timeline and layout state, a suite of playback and initialization commands is accessible via the main panel, shown in Figure~\ref{fig:simulation_management_controls}:
 
 \textbf{Pause / Resume Simulation:} Handled by the \texttt{SimulationHandler}, this command pauses or resumes the central animation loop. Pausing freezes all logical position updates, driver decision trees, and kinematic timers, allowing users to inspect stable collision boundaries or edit the map in a static environment.
 
@@ -193,7 +199,7 @@ To grant complete control over the simulation timeline and layout state, a suite
 \end{figure}
 
 \subsection{Dynamic Configuration Spinners}
-To allow real-time parameter tweaking and scenario building, the user interface features two dynamic configuration spinners:
+To allow real-time parameter tweaking and scenario building, the user interface features two dynamic configuration spinners, illustrated in Figure~\ref{fig:lane_and_spawn_spinners}:
 
 \textbf{Lane Count Spinner} (\texttt{laneCountSpinner}): Allows users to configure the exact number of lanes (ranging from 1 to 10, with the upper boundary easily scalable to higher limits within the system configurations) when constructing new road segments. Newly drawn road baselines are automatically offset using normal vector math to generate parallel lanes matching this exact lane count.
 
