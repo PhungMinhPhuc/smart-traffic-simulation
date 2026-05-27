@@ -112,6 +112,7 @@ To satisfy both macro-scale road network visualizations and microscopic junction
 
 \subsection{Dual-Mode Vehicle Rendering Engine}
 To balance scientific performance with visual realism, the simulation implements a highly responsive dual-mode vehicle rendering pipeline. Users can dynamically toggle between these modes at runtime via the sidebar panel:
+
 \textbf{Rectangle Mode:} Managed by \texttt{VehicleRenderer}, this mode renders each vehicle as a solid colored rectangle drawn strictly according to its physical dimensions (width and length) and behavioral profile color. This mode minimizes graphics card rendering overhead and is optimized for debugging vector offsets, oriented bounding box (OBB) collision states, and segment-segment intersection formulas.
 
 \textbf{Image Mode:} Managed by \texttt{ImageVehicleRenderer}, this mode maps and renders realistic graphical sprite assets (PNG format) corresponding to the specific vehicle type (e.g., car, ambulance, bus, bicycle, fire truck, motorbike, truck, ...). The engine automatically applies affine rotations to align each sprite with the vehicle's directional vector ($\theta$). If the asset files are missing from the local disk, the renderer gracefully falls back to Rectangle Mode, preventing any software instability.
@@ -157,6 +158,7 @@ To facilitate stress testing and congestion analysis under varying load levels, 
 
 \subsection{Interactive Viewport and Scaling Controls}
 To support the visualization of extremely large traffic networks without losing the ability to inspect localized vehicle queues and microscopic collision boxes, the system incorporates comprehensive viewport navigation features:
+
 \textbf{Zoom In / Zoom Out:} Managed by the \texttt{ZoomHandler}, these controls dynamically adjust the affine scale factor ($S_{\text{new}}$) of the central \texttt{trafficMapContainer} by multiplying or dividing it by a zoom constant. This allows the user to magnify localized road crossings or zoom out to inspect the entire grid.
 
 \textbf{Reset Zoom:} Instantly restores the scale factor of the map container back to its default $1.0\times$ ratio, aligning it with the default viewport size.
@@ -171,6 +173,7 @@ To support the visualization of extremely large traffic networks without losing 
 
 \subsection{Simulation Timeline and Map Management}
 To grant complete control over the simulation timeline and layout state, a suite of playback and initialization commands is accessible via the main panel:
+
 \textbf{Pause / Resume Simulation:} Handled by the \texttt{SimulationHandler}, this command pauses or resumes the central animation loop. Pausing freezes all logical position updates, driver decision trees, and kinematic timers, allowing users to inspect stable collision boundaries or edit the map in a static environment.
 
 \textbf{Clear Map:} Severely wipes the current traffic map, completely removing all junctions, multi-lane roads, and active vehicles from the logical model, preparing the canvas for custom creations.
