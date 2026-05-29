@@ -2,6 +2,7 @@ package model.transition;
 
 import java.util.*;
 import config.Constants;
+import main.java.handler.SoundManager;
 import model.road.Lane;
 import model.road.Way;
 import model.utility.TrafficVector;
@@ -136,6 +137,9 @@ public class LaneChangeTransition {
         
         currentLane.removeVehicle(vehicle);
         targetLane.addVehicle(vehicle);
+
+        // Add sound
+        SoundManager.play(vehicle.getSound());
 
         double lateralDistance = Constants.LANE_WIDTH * laneIndexOffset;
         TrafficPoint targetPosition = lateralDir.translatePoint(vehicle.getPosition(), lateralDistance);

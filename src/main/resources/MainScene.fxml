@@ -5,83 +5,113 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.control.ToggleGroup?>
 
-<BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.java.MainSceneController">
-   <fx:define>
-      <ToggleGroup fx:id="renderModeGroup" />
-      <ToggleGroup fx:id="lightModeGroup" />
-   </fx:define>
-   <left>
-      <VBox id="editingSideBar" maxHeight="Infinity" prefHeight="400.0" prefWidth="200.0" BorderPane.alignment="TOP_LEFT">
-         <children>
-             <Button fx:id="addTrafficNodeButton" alignment="CENTER" maxWidth="Infinity" mnemonicParsing="false" onAction="#addNewNode" text="Add Traffic Node" />
-             <Button fx:id="removeTrafficNodeButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#removeNode" text="Remove Traffic Node" />
-             <HBox alignment="CENTER_LEFT" spacing="8">
-                <Label text="Lanes:" />
-                <Spinner fx:id="laneCountSpinner" prefWidth="80.0" />
-             </HBox>
-             <Button fx:id="addRoadButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#addNewRoad" text="Add Road" />
-             <Button fx:id="removeRoadButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#removeRoad" text="Remove Road" />
-             <Button fx:id="resumeSimulationButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#resumeSimulation" text="Resume Simulation" />
-             <Button fx:id="pauseSimulationButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#pauseSimulation" text="Pause Simulation" />
-             <HBox alignment="CENTER_LEFT" spacing="8">
-                <Label text="Spawn Rate (s):" />
-                <Spinner fx:id="vehicleSpawnSpinner" prefWidth="80.0" />
-             </HBox>
-             <ToggleButton fx:id="stopSpawnButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#toggleSpawn" text="Stop Spawn" />
-             <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#resetToDefaultMap" text="Default Map" />
-             <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#clearMap" text="Clear Map" />
-             <HBox alignment="CENTER" spacing="5">
-               <children>
-                  <Button maxWidth="100" prefWidth="100" mnemonicParsing="false" onAction="#zoomIn" text="Zoom In" />
-                  <Button maxWidth="100" prefWidth="100" mnemonicParsing="false" onAction="#zoomOut" text="Zoom Out" />
-               </children>
-            </HBox>
-            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#resetZoom" text="Reset Zoom" />
-            <Label text="Vehicle Mode:" />
-            <VBox spacing="5">
-               <children>
-                  <ToggleButton fx:id="rectModeButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#switchToRectangleMode" text="Rectangle Mode" toggleGroup="$renderModeGroup" selected="true" />
-                  <ToggleButton fx:id="imageModeButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#switchToImageMode" text="Image Mode" toggleGroup="$renderModeGroup" />
-               </children>
-            </VBox>
-            <Label text="Traffic Light Mode:" />
-            <VBox spacing="5">
-               <children>
-                  <ToggleButton maxWidth="Infinity" mnemonicParsing="false" onAction="#switchLightOff" text="No Countdown" toggleGroup="$lightModeGroup" />
-                  <ToggleButton maxWidth="Infinity" mnemonicParsing="false" onAction="#switchLightFull" text="Full Countdown" toggleGroup="$lightModeGroup" selected="true" />
-                  <ToggleButton maxWidth="Infinity" mnemonicParsing="false" onAction="#switchLightThreshold" text="Countdown &lt; 8s" toggleGroup="$lightModeGroup" />
-               </children>
-            </VBox>
-            <Label fx:id="instructionsLabel" text="">
-               <font>
-                  <Font name="System Bold" size="15.0" />
-               </font></Label>
-         </children>
-      </VBox>
-   </left>
-   <center>
-      <ScrollPane fx:id="trafficMapWrapper" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <content>
-            <StackPane prefHeight="50000.0" prefWidth="50000.0">
-               <children>
-                  <Group fx:id="trafficMapContainer">
-                     <children>
-                        <Pane fx:id="mapLayer" prefHeight="50000.0" prefWidth="50000.0" />
-                        <Pane fx:id="vehicleLayer" prefHeight="50000.0" prefWidth="50000.0" />
-                        <Pane fx:id="lightLayer" prefHeight="50000.0" prefWidth="50000.0" />
-                     </children>
-                  </Group>
-               </children>
-            </StackPane>
-         </content></ScrollPane>
-   </center>
+<BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
+    xmlns="http://javafx.com/javafx/26"
+    xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="main.java.MainSceneController">
+
+    <fx:define>
+        <ToggleGroup fx:id="renderModeGroup" />
+        <ToggleGroup fx:id="lightModeGroup" />
+        <ToggleGroup fx:id="soundModeGroup" />
+    </fx:define>
+
+    <left>
+        <ScrollPane prefWidth="200.0" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" pannable="true">
+            <content>
+                <VBox id="editingSideBar" maxHeight="Infinity" prefWidth="200.0" spacing="10">
+                    <children>
+                        <Button fx:id="addTrafficNodeButton" alignment="CENTER" maxWidth="Infinity" mnemonicParsing="false" onAction="#addNewNode" text="Add Traffic Node" />
+                        <Button fx:id="removeTrafficNodeButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#removeNode" text="Remove Traffic Node" />
+
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <children>
+                                <Label text="Lanes:" />
+                                <Spinner fx:id="laneCountSpinner" prefWidth="80.0" />
+                            </children>
+                        </HBox>
+
+                        <Button fx:id="addRoadButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#addNewRoad" text="Add Road" />
+                        <Button fx:id="resumeSimulationButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#resumeSimulation" text="Resume Simulation" />
+                        <Button fx:id="pauseSimulationButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#pauseSimulation" text="Pause Simulation" />
+
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <children>
+                                <Label text="Spawn Rate (s):" />
+                                <Spinner fx:id="vehicleSpawnSpinner" prefWidth="80.0" />
+                            </children>
+                        </HBox>
+
+                        <ToggleButton fx:id="stopSpawnButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#toggleSpawn" text="Stop Spawn" />
+
+                        <ToggleButton fx:id="muteButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#muteSound" text="Mute" toggleGroup="$soundModeGroup" />
+                        <ToggleButton fx:id="unmuteButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#unmuteSound" text="Unmute" toggleGroup="$soundModeGroup" selected="true" />
+
+                        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#resetToDefaultMap" text="Default Map" />
+                        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#clearMap" text="Clear Map" />
+
+                        <HBox alignment="CENTER" spacing="5">
+                            <children>
+                                <Button maxWidth="100" prefWidth="100" mnemonicParsing="false" onAction="#zoomIn" text="Zoom In" />
+                                <Button maxWidth="100" prefWidth="100" mnemonicParsing="false" onAction="#zoomOut" text="Zoom Out" />
+                            </children>
+                        </HBox>
+
+                        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#resetZoom" text="Reset Zoom" />
+
+                        <Label text="Vehicle Mode:" />
+                        <VBox spacing="5">
+                            <children>
+                                <ToggleButton fx:id="rectModeButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#switchToRectangleMode" text="Rectangle Mode" toggleGroup="$renderModeGroup" selected="true" />
+                                <ToggleButton fx:id="imageModeButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#switchToImageMode" text="Image Mode" toggleGroup="$renderModeGroup" />
+                            </children>
+                        </VBox>
+
+                        <Label text="Traffic Light Mode:" />
+                        <VBox spacing="5">
+                            <children>
+                                <ToggleButton maxWidth="Infinity" mnemonicParsing="false" onAction="#switchLightOff" text="No Countdown" toggleGroup="$lightModeGroup" />
+                                <ToggleButton maxWidth="Infinity" mnemonicParsing="false" onAction="#switchLightFull" text="Full Countdown" toggleGroup="$lightModeGroup" selected="true" />
+                                <ToggleButton maxWidth="Infinity" mnemonicParsing="false" onAction="#switchLightThreshold" text="Countdown &lt; 8s" toggleGroup="$lightModeGroup" />
+                            </children>
+                        </VBox>
+
+                        <Label fx:id="instructionsLabel" text="">
+                            <font>
+                                <Font name="System Bold" size="15.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </left>
+
+    <center>
+        <ScrollPane fx:id="trafficMapWrapper" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <content>
+                <StackPane prefHeight="50000.0" prefWidth="50000.0">
+                    <children>
+                        <Group fx:id="trafficMapContainer">
+                            <children>
+                                <Pane fx:id="mapLayer" prefHeight="50000.0" prefWidth="50000.0" />
+                                <Pane fx:id="vehicleLayer" prefHeight="50000.0" prefWidth="50000.0" />
+                                <Pane fx:id="lightLayer" prefHeight="50000.0" prefWidth="50000.0" />
+                            </children>
+                        </Group>
+                    </children>
+                </StackPane>
+            </content>
+        </ScrollPane>
+    </center>
+
 </BorderPane>
