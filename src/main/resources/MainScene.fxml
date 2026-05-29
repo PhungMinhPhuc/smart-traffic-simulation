@@ -53,9 +53,6 @@
 
                         <ToggleButton fx:id="stopSpawnButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#toggleSpawn" text="Stop Spawn" />
 
-                        <ToggleButton fx:id="muteButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#muteSound" text="Mute" toggleGroup="$soundModeGroup" />
-                        <ToggleButton fx:id="unmuteButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#unmuteSound" text="Unmute" toggleGroup="$soundModeGroup" selected="true" />
-
                         <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#resetToDefaultMap" text="Default Map" />
                         <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#clearMap" text="Clear Map" />
 
@@ -82,6 +79,14 @@
                                 <ToggleButton maxWidth="Infinity" mnemonicParsing="false" onAction="#switchLightOff" text="No Countdown" toggleGroup="$lightModeGroup" />
                                 <ToggleButton maxWidth="Infinity" mnemonicParsing="false" onAction="#switchLightFull" text="Full Countdown" toggleGroup="$lightModeGroup" selected="true" />
                                 <ToggleButton maxWidth="Infinity" mnemonicParsing="false" onAction="#switchLightThreshold" text="Countdown &lt; 8s" toggleGroup="$lightModeGroup" />
+                            </children>
+                        </VBox>
+
+                        <Label text="Sound Mode:" />
+                        <VBox spacing="5">
+                            <children>
+                                <ToggleButton fx:id="muteButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#muteSound" text="Mute" toggleGroup="$soundModeGroup" />
+                                <ToggleButton fx:id="unmuteButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#unmuteSound" text="Unmute" toggleGroup="$soundModeGroup" selected="true" />
                             </children>
                         </VBox>
 
