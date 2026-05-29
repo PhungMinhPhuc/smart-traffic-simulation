@@ -2,7 +2,7 @@
 \begin{document}
 
 \section{Object-Oriented Design}
-The traffic simulation system is built using a rigorous \gls{OOP} approach in Java, deliberately separating the logical models from the rendering mechanisms to ensure scalability and maintainability. The core structural components include the map layout, which is composed of a network of traffic nodes, multi-lane roads, and complex intersections. The traffic entities traversing this network consist of various vehicle classes and traffic lights that dictate flow control; their structural relationships are detailed in the Core Model Class Diagram in Figure~\ref{fig:class_diagram_core_model}. The rendering engine is powered by JavaFX, utilizing specific renderer classes to visually interpret the underlying mathematical state of the map and vehicles, as shown in the UI and Rendering Class Diagram in Figure~\ref{fig:class_diagram_ui_rendering}. A central simulation handler manages the continuous animation timer, synchronizing the logical updates of the traffic map with the graphical updates on the screen. The traffic lights operate under varying display modes to provide configurable user experiences: Mode 0 hides the timer, Mode 1 displays the full countdown timer continuously, and Mode 2 displays the countdown only when there are less than 8 seconds remaining. The design details and hierarchies governing vehicle kinetics and driver decision profiles are illustrated in the Vehicle and Driver Behavior Class Diagram in Figure~\ref{fig:class_diagram_vehicle_behavior}.
+The traffic simulation system is built using a rigorous \gls{OOP} approach in Java, deliberately separating the logical models from the rendering mechanisms to ensure scalability and maintainability. The core structural components include the map layout, which is composed of a network of traffic nodes, multi-lane roads, and complex intersections. The traffic entities traversing this network consist of various vehicle classes and traffic lights that dictate flow control; their structural relationships are detailed in the Core Model Class Diagram in Figure~\ref{fig:class_diagram_core_model}. The rendering engine is powered by JavaFX, utilizing specific renderer classes to visually interpret the underlying mathematical state of the map and vehicles, as shown in the UI and Rendering Class Diagram in Figure~\ref{fig:class_diagram_ui_rendering}. A central simulation handler manages the continuous animation timer, synchronizing the logical updates of the traffic map with the graphical updates on the screen. The traffic lights operate under varying display modes to provide configurable user experiences: Mode 0 hides the timer, Mode 1 displays the full countdown timer continuously, and Mode 2 displays the countdown only when there are less than 8 seconds remaining. The design details and hierarchies governing vehicle kinetics and driver decision profiles are illustrated in the Vehicle and Driver Behavior Class Diagram in Figure~\ref{fig:class_diagram_vehicle_behavior}, and the interactive map editing features are outlined in the Use Case Diagram for the Map Editor in Figure~\ref{fig:use_case_diagram_map_editor}. 
 
 \begin{sidewaysfigure}
   \centering
@@ -23,6 +23,13 @@ The traffic simulation system is built using a rigorous \gls{OOP} approach in Ja
   \includegraphics[width=\textwidth]{Figures/ClassDiagramFinal-Vehicle Behavior.jpg}
   \caption{Vehicle and Driver Behavior Class Diagram}
   \label{fig:class_diagram_vehicle_behavior}
+\end{sidewaysfigure}
+
+\begin{sidewaysfigure} 
+  \centering
+  \includegraphics[width=0.65\textwidth]{Figures/UseCaseDiagram.jpg}
+  \caption{Use Case Diagram for Map Editor}
+  \label{fig:use_case_diagram_map_editor}
 \end{sidewaysfigure}
 
 \section{Simulation Workflow}
@@ -211,4 +218,49 @@ To allow real-time parameter tweaking and scenario building, the user interface 
   \label{fig:lane_and_spawn_spinners}
 \end{figure}
 
+\subsection{Vehicle Audio System and Sound Controls}
+
+To further enhance realism and immersion within the microscopic traffic simulation, the system integrates a lightweight vehicle audio subsystem capable of reproducing distinct sound effects for different vehicle categories. Each vehicle type is associated with a unique acoustic asset, allowing the simulation to emulate realistic urban traffic environments through auditory feedback.
+
+The sound engine is implemented through a dedicated SoundManager utility class located within the handler package. Internally, the system utilizes the JavaFX AudioClip API to provide low-latency playback suitable for short traffic sound effects such as horns, bicycle bells, emergency sirens, and engine noises. Compared to heavier multimedia pipelines, AudioClip provides faster triggering performance and reduced synchronization overhead, making it ideal for highly dynamic simulations involving many simultaneously spawned entities.
+
+Each vehicle type references a predefined sound constant stored in the global configuration system (\texttt{Constants.java}). For example:
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|c|c|}
+    \hline
+    \textbf{Vehicle Type} & \textbf{Acoustic Trigger File} \\
+    \hline
+    Car & CarSound.wav\\
+    \hline
+    Ambulance & AmbulanceSirens.wav \\
+    \hline
+    Bus & BusHorn.wav \\
+    \hline
+    Fire Truck & FireTruckSirens.wav \\
+    \hline
+    Motorbike & MotorbikeHorn.wav \\
+    \hline
+    Truck & TruckHorn.wav \\
+    \hline
+    Bicycle & BicycleBell.wav \\
+    \hline
+  \end{tabular}
+  \caption{Sound Effects for Different Vehicle Types}
+  \label{tab:vehicle_sounds}
+\end{table}
+
+To optimize runtime efficiency, the sound manager maintains an internal cache structure mapping sound filenames to reusable AudioClip instances. When a sound is requested for the first time, the corresponding audio resource is loaded from the /assets/sounds/ directory and stored in memory. Subsequent playback operations reuse the cached clip instead of repeatedly loading files from disk, significantly reducing I/O overhead and improving responsiveness during dense traffic scenarios.
+
+The system additionally implements a global mute controller to allow users to instantly disable all active sound effects. When the user presses the Mute button on the graphical interface, the simulation immediately stops every currently playing audio clip and suppresses future playback requests. Pressing Unmute restores normal sound behavior. The sidebar interface uses JavaFX ToggleButton controls grouped through a ToggleGroup, ensuring that the currently active audio state remains visually highlighted at all times.
+
+This audio subsystem contributes substantially to the perceptual realism of the simulation, especially during high-density traffic conditions and emergency vehicle interactions. Sirens from ambulances and fire trucks provide immediate auditory awareness of priority vehicles, while ordinary traffic sounds help reinforce the continuous dynamic nature of the simulated urban environment.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth]{Figures/sound_controls.png}
+  \caption{Vehicle Audio System with Mute / Unmute Controls}
+  \label{fig:sound_controls}
+\end{figure}
 \end{document}
